@@ -1,0 +1,43 @@
+{
+  "id": "demo-field",
+  "name": "Demo field (placeholder)",
+  "credit": "Generated placeholder. Replace with NASA/JPL-Caltech SPHEREx images.",
+  "layers": [
+    {
+      "png": "layer-0.85um.svg",
+      "wavelength_um": 0.85,
+      "feature": null,
+      "tint": "#4f8dff"
+    },
+    {
+      "png": "layer-1.00um.svg",
+      "wavelength_um": 1.0,
+      "feature": "Paδ",
+      "tint": "#4fe0ff"
+    },
+    {
+      "png": "layer-1.10um.svg",
+      "wavelength_um": 1.1,
+      "feature": null,
+      "tint": "#5cf06a"
+    },
+    {
+      "png": "layer-1.30um.svg",
+      "wavelength_um": 1.3,
+      "feature": "Paβ",
+      "tint": "#ffe45c"
+    },
+    {
+      "png": "layer-3.30um.svg",
+      "wavelength_um": 3.3,
+      "feature": "PAH",
+      "tint": "#ffb04a"
+    },
+    {
+      "png": "layer-5.00um.svg",
+      "wavelength_um": 5.0,
+      "feature": null,
+      "tint": "#ff5c5c"
+    }
+  ]
+}

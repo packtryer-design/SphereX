@@ -1,0 +1,25 @@
+{
+  "_note": "PLACEHOLDER. Person C replaces this with the paper-checked version. Nothing here is verified yet.",
+  "bands": [
+    { "name": "Paδ", "center_um": 1.005, "width_um": 0.03, "kind": "emission", "verified": false },
+    { "name": "Paβ", "center_um": 1.282, "width_um": 0.03, "kind": "emission", "verified": false },
+    { "name": "H₂O", "center_um": 1.4, "width_um": 0.1, "kind": "absorption", "verified": false },
+    { "name": "CH₄", "center_um": 1.6, "width_um": 0.08, "kind": "absorption", "verified": false },
+    { "name": "H₂O", "center_um": 1.9, "width_um": 0.12, "kind": "absorption", "verified": false },
+    { "name": "CH₄", "center_um": 2.2, "width_um": 0.1, "kind": "absorption", "verified": false },
+    { "name": "PAH", "center_um": 3.3, "width_um": 0.1, "kind": "emission", "verified": false },
+    { "name": "CO₂", "center_um": 4.26, "width_um": 0.06, "kind": "emission", "verified": false },
+    { "name": "CO", "center_um": 4.67, "width_um": 0.06, "kind": "emission", "verified": false }
+  ],
+  "glossary": {
+    "Paδ": "Glowing hydrogen gas, usually heated by young hot stars",
+    "Paβ": "Glowing hydrogen gas, usually heated by young hot stars",
+    "PAH": "Soot-like carbon molecules in dust, lit up by nearby starlight"
+  },
+  "labels": {
+    "brown_dwarf": "Too cold to be a star: water and methane in its air",
+    "comet": "Ice turning to gas",
+    "asteroid": "A rock reflecting sunlight",
+    "star": "A normal star"
+  }
+}

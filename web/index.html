@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blink102</title>
+  <meta name="description" content="Flip through the sky in SPHEREx's infrared colors and see what each spot is made of.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="rail-toggle" class="icon" aria-label="Show fields" aria-controls="rail" aria-expanded="false">☰</button>
+    <div class="brand">
+      <h1>Blink102</h1>
+      <span id="field-name" class="field-name"></span>
+    </div>
+    <div class="views" role="group" aria-label="View">
+      <button data-view="flip" title="One color at a time, full screen (F)">Flip</button>
+      <button data-view="stack" title="All colors side by side (S)">Stack</button>
+    </div>
+  </header>
+
+  <div id="app" class="app">
+    <!-- Left rail: what to look at and how to read it -->
+    <aside id="rail" class="rail">
+      <section>
+        <h2>Fields</h2>
+        <ul id="fields" class="fields"></ul>
+      </section>
+      <section class="explainer">
+        <h2>How to read this</h2>
+        <!-- B: final explainer copy goes here -->
+        <p>SPHEREx photographs the sky in many infrared colors that our eyes can't see. Each layer is the same patch of sky in one color.</p>
+        <p>Press <b>▶</b> or <b>Blink</b> to flip between colors. Things that switch on and off are made of something that shines in that color.</p>
+        <p><b>Click any spot</b> to see how bright it is in every layer.</p>
+      </section>
+      <p id="credit" class="credit"></p>
+    </aside>
+
+    <!-- Stage: the image fills the page -->
+    <main id="stage" class="stage">
+      <div id="flip" class="flip">
+        <img id="frame" alt="">
+        <div id="marker" class="marker" hidden></div>
+      </div>
+      <div id="stack" class="stack" hidden></div>
+      <p id="hint" class="hint">Click a bright patch to see its colors</p>
+      <div id="msg" class="msg" hidden></div>
+    </main>
+
+    <!-- Right panel: opens when you click a spot -->
+    <aside id="info" class="info" hidden>
+      <button id="info-close" class="icon close" aria-label="Close">✕</button>
+      <h2>Colors at this spot</h2>
+      <div id="spectrum"></div>
+      <p id="spectrum-label" class="label"></p>
+      <p id="spectrum-note" class="muted"></p>
+    </aside>
+  </div>
+
+  <!-- Bottom: wavelength axis (later also time, when the backend is in) -->
+  <footer class="timeline">
+    <button id="play" class="icon" aria-label="Play">▶</button>
+    <button id="blink" aria-pressed="false" title="Flip between this layer and the next (B)">Blink</button>
+    <div id="ticks" class="ticks" role="group" aria-label="Layers"></div>
+    <span id="now" class="now"></span>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

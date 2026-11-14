@@ -1,0 +1,158 @@
+/* Layout only. Visual design comes later, so colors and type are kept as tokens. */
+:root {
+  --bg: #07090f;
+  --panel: rgba(17, 21, 33, 0.92);
+  --line: #262d40;
+  --text: #e6e9f2;
+  --muted: #8a93ab;
+  --accent: #6cb4ff;
+  --rail-w: 260px;
+  --info-w: 360px;
+  --bar-h: 52px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  display: grid;
+  grid-template-rows: var(--bar-h) 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+button {
+  font: inherit; color: inherit; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px;
+}
+button:hover { border-color: var(--accent); }
+button.active, button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #04121f; }
+button.icon { width: 34px; height: 34px; padding: 0; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 8px; }
+.muted { color: var(--muted); font-size: 13px; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 12px; border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; flex: 1; min-width: 0; }
+.brand h1 { margin: 0; font-size: 18px; }
+.field-name { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.views { display: flex; gap: 4px; }
+#rail-toggle { display: none; }
+
+/* ---------- three columns: rail | stage | info ---------- */
+.app {
+  display: grid;
+  grid-template-columns: var(--rail-w) 1fr 0;
+  min-height: 0;
+  transition: grid-template-columns 0.2s;
+}
+.app.info-open { grid-template-columns: var(--rail-w) 1fr var(--info-w); }
+
+.rail {
+  overflow-y: auto; padding: 16px;
+  border-right: 1px solid var(--line); background: var(--panel);
+  display: flex; flex-direction: column; gap: 20px;
+}
+.fields { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.fields button { width: 100%; text-align: left; }
+.explainer p { margin: 0 0 8px; }
+.credit { margin-top: auto; font-size: 11px; color: var(--muted); }
+
+.stage { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #000; }
+
+.flip { position: absolute; inset: 0; cursor: crosshair; }
+.flip img { width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; }
+.marker {
+  position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+  border: 2px solid var(--accent); border-radius: 50%; pointer-events: none;
+}
+
+/* Stack view: layers fanned out left to right, like NASA's release image */
+.stack {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 24px; perspective: 1400px;
+}
+.stack .card {
+  --overlap: -40px;
+  flex: 0 1 200px; margin-left: var(--overlap);
+  padding: 0; border: 0; background: none; text-align: center;
+  transform: translateY(calc(var(--i) * -14px)) rotateY(-12deg);
+  transition: transform 0.2s;
+}
+.stack .card:first-child { margin-left: 0; }
+.stack .card:hover, .stack .card.active { transform: translateY(calc(var(--i) * -14px - 12px)) rotateY(0); z-index: 1; }
+.stack .card img {
+  width: 100%; display: block; border: 3px solid #555; border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+.stack .card.active img { border-color: var(--accent); }
+.stack .wl { display: block; font-weight: 700; margin-bottom: 6px; }
+.stack .feat { display: block; font-weight: 700; margin-top: 6px; min-height: 1.5em; }
+
+.hint {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); margin: 0;
+  padding: 6px 14px; border-radius: 99px; background: var(--panel); border: 1px solid var(--line);
+  pointer-events: none;
+}
+.msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); background: rgba(0, 0, 0, 0.6); padding: 16px; text-align: center; }
+
+.info {
+  position: relative; overflow-y: auto; padding: 16px;
+  border-left: 1px solid var(--line); background: var(--panel);
+}
+.info .close { position: absolute; top: 10px; right: 10px; }
+.label { font-weight: 600; color: var(--accent); margin: 10px 0 4px; }
+
+/* ---------- bottom timeline ---------- */
+.timeline {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-top: 1px solid var(--line);
+}
+.ticks { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+.ticks button { flex: 1 0 auto; border-bottom: 3px solid var(--tint, var(--line)); white-space: nowrap; }
+.ticks button.active { background: var(--tint); border-color: var(--tint); color: #000; }
+.now { color: var(--muted); white-space: nowrap; min-width: 120px; text-align: right; }
+
+/* ---------- spectrum chart ---------- */
+#spectrum svg { width: 100%; height: auto; display: block; }
+#spectrum .axis { stroke: var(--muted); }
+#spectrum .tick { fill: var(--muted); font-size: 10px; }
+#spectrum .band { fill: var(--accent); opacity: 0.12; }
+#spectrum .band.emission { fill: #ffb547; }
+#spectrum .band-label { fill: var(--muted); font-size: 9px; }
+#spectrum .line { fill: none; stroke: var(--text); stroke-width: 1.5; opacity: 0.6; }
+#spectrum .err { stroke: var(--muted); }
+
+/* ---------- tablet / phone: rail becomes a drawer, info becomes a bottom sheet ---------- */
+@media (max-width: 900px) {
+  #rail-toggle { display: inline-block; }
+  .app, .app.info-open { grid-template-columns: 1fr; }
+  .rail {
+    position: fixed; z-index: 10; top: var(--bar-h); bottom: 0; left: 0; width: min(85vw, var(--rail-w));
+    transform: translateX(-100%); transition: transform 0.2s;
+  }
+  .rail.open { transform: none; }
+  .info {
+    position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; max-height: 60dvh;
+    border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0;
+  }
+  .stack .card { --overlap: -60px; }
+  .stack .wl, .stack .feat { font-size: 11px; }
+  .now { display: none; }
+}
+
+/* ?embed=1 hides chrome for <iframe> use */
+body.embed .topbar, body.embed .rail { display: none; }
+body.embed { grid-template-rows: 0 1fr auto; }
+body.embed .app { grid-template-columns: 1fr 0; }
+body.embed .app.info-open { grid-template-columns: 1fr var(--info-w); }
