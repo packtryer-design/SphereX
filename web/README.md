@@ -72,7 +72,7 @@ The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so an
 | `GET /api/frames?ra=&dec=&fov=&mode=epoch` | One aligned PNG per visit |
 | `GET /api/frames?...&mode=diff&ref=N` | Each visit minus visit N, over shared detectors |
 | `GET /api/frames?...&mode=rgb` | Three visits as one colour image |
-| `GET /api/spectrum?ra=&dec=&field_ra=&field_dec=&fov=` | One point per exposure (wavelength, flux, error, date) |
+| `GET /api/surface-spectrum?ra=&dec=&field_ra=&field_dec=&fov=` | Surface brightness, one point per exposure (wavelength, flux, error, date). Right for nebulae. Person C's `/api/spectrum` does aperture photometry for stars |
 | `GET /api/resolve?name=` | Coordinates for a name, from SIMBAD or NED |
 
 Frames carry `detectors`, `mjd_start` and `mjd_end` (and `ref_epoch` in diff mode, `epochs` in rgb mode) on top of the original contract in [docs/PLAN.md](../docs/PLAN.md).

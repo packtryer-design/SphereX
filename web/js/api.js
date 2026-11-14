@@ -44,7 +44,8 @@ export async function getFrames({ ra, dec, fov, mode, ref }, signal) {
   return data;
 }
 
-// Spectrum at (ra, dec), reusing the cutouts of the open field (field_ra, field_dec, fov).
-export const getSpectrum = (q, signal) => getJSON(api("spectrum", q), signal);
+// Surface-brightness spectrum at (ra, dec), right for nebulae, reusing the open field's
+// cutouts (field_ra, field_dec, fov). /api/spectrum is Person C's aperture photometry for stars.
+export const getSpectrum = (q, signal) => getJSON(api("surface-spectrum", q), signal);
 
 export const resolveName = (name, signal) => getJSON(api("resolve", { name }), signal);

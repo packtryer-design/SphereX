@@ -15,7 +15,11 @@ from api.imaging.config import CACHE_DIR
 from api.imaging.pipeline import build_frames
 from api.imaging.visits import list_visits
 from api.resolve import resolve
-from api.science.spectrum import build_spectrum
+from api.science.asteroids import build_asteroids
+from api.science.features import load_features
+from api.science.ghosts import build_ghosts
+from api.science.spectrum import build_spectrum, load_targets
+from api.science.surface import build_surface_spectrum
 
 WEB_DIR = Path(__file__).resolve().parents[1] / "web"
 
@@ -56,13 +60,28 @@ def frames(
 def spectrum(
     ra: float = Query(ge=0, lt=360),
     dec: float = Query(ge=-90, le=90),
+    target: str | None = Query(None, pattern="^[a-z0-9-]{1,40}$"),
+) -> dict[str, Any]:
+    """Point sources: flux vs wavelength at (ra, dec), one point per frame, plus binned +
+    molecule bands. Aperture photometry with a sky annulus."""
+    try:
+        return build_spectrum(ra, dec, target)
+    except RuntimeError as e:
+        raise HTTPException(503, str(e)) from e
+
+
+@app.get("/api/surface-spectrum")
+def surface_spectrum(
+    ra: float = Query(ge=0, lt=360),
+    dec: float = Query(ge=-90, le=90),
     field_ra: float | None = Query(None, ge=0, lt=360),
     field_dec: float | None = Query(None, ge=-90, le=90),
     fov: float = Query(0.1, ge=0.02, le=0.5),
 ) -> dict[str, Any]:
-    """Spectrum at (ra, dec). Pass the open field's centre and fov to reuse its cutouts."""
+    """Extended objects (nebulae): surface brightness at (ra, dec), one point per frame.
+    Pass the open field's centre and fov to reuse its cutouts."""
     try:
-        return build_spectrum(
+        return build_surface_spectrum(
             ra,
             dec,
             ra if field_ra is None else field_ra,
@@ -71,6 +90,39 @@ def spectrum(
         )
     except RuntimeError as e:
         raise HTTPException(503, str(e)) from e
+
+
+@app.get("/api/ghosts")
+def ghosts(
+    ra: float = Query(ge=0, lt=360),
+    dec: float = Query(ge=-90, le=90),
+    fov: float = Query(0.1, ge=0.02, le=0.5),
+) -> dict[str, Any]:
+    """Gaia DR3 stars moved to each SPHEREx epoch's date."""
+    try:
+        return build_ghosts(ra, dec, fov)
+    except Exception as e:  # Gaia archive or IRSA down
+        raise HTTPException(503, f"ghosts unavailable: {e}") from e
+
+
+@app.get("/api/asteroids")
+def asteroids(
+    ra: float = Query(ge=0, lt=360),
+    dec: float = Query(ge=-90, le=90),
+    fov: float = Query(0.1, ge=0.02, le=0.5),
+) -> dict[str, Any]:
+    """Known asteroids/comets (SkyBoT) in the field at each frame time."""
+    try:
+        return build_asteroids(ra, dec, fov)
+    except Exception as e:  # SkyBoT or IRSA down
+        raise HTTPException(503, f"asteroids unavailable: {e}") from e
+
+
+@app.get("/api/targets")
+def targets() -> dict[str, Any]:
+    """Demo targets with 2026 positions and the feature profile each uses."""
+    feats = load_features()["targets"]
+    return {"targets": [t | {"profile": feats.get(t["id"])} for t in load_targets().values()]}
 
 
 @app.get("/api/resolve")

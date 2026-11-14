@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from api.imaging import pipeline, visits
 from api.imaging.cutouts import Cutout
-from api.science import spectrum
+from api.science import surface
 from astropy.wcs import WCS
 
 
@@ -72,7 +72,7 @@ def test_list_visits_with_no_data(monkeypatch: pytest.MonkeyPatch) -> None:
     assert visits.list_visits(10.0, 20.0)["visits"] == []
 
 
-def test_spectrum_reads_each_cutout(monkeypatch: pytest.MonkeyPatch, tmp_path: Any) -> None:
+def test_surface_spectrum_reads_each_cutout(monkeypatch: pytest.MonkeyPatch, tmp_path: Any) -> None:
     ra, dec = 150.0, 2.0
     w = WCS(naxis=2)
     w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
@@ -92,9 +92,9 @@ def test_spectrum_reads_each_cutout(monkeypatch: pytest.MonkeyPatch, tmp_path: A
         )
 
     cuts = [cut(2.0, 1.5, 0.0), cut(1.0, 0.9, 0.5), cut(3.0, 1.2, 200.0)]
-    monkeypatch.setattr(spectrum, "CACHE_DIR", tmp_path)
-    monkeypatch.setattr(spectrum, "fetch_cutouts", lambda *a: (cuts, 0))
-    s = spectrum.build_spectrum(ra, dec, ra, dec, 0.05)
+    monkeypatch.setattr(surface, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(surface, "fetch_cutouts", lambda *a: (cuts, 0))
+    s = surface.build_surface_spectrum(ra, dec, ra, dec, 0.05)
     assert [p["wavelength_um"] for p in s["points"]] == [0.9, 1.2, 1.5]  # sorted by wavelength
     assert [p["flux"] for p in s["points"]] == [1.0, 3.0, 2.0]
     assert [p["epoch"] for p in s["points"]] == [1, 2, 1]

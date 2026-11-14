@@ -30,7 +30,9 @@ web/  (static HTML/JS)                       api/  (FastAPI)
         └ any name ─────────────────────────► /api/resolve    SIMBAD, then NED
  Explore / Observations ────────────────────► /api/frames     cutouts → common grid → stack per visit
                                                               → PNG (epoch | diff | rgb | single)
- Spectrum ──────────────────────────────────► /api/spectrum   one point per exposure, same cutouts
+ Spectrum ──────────────────────────────────► /api/surface-spectrum   nebulae, same cutouts
+                                              /api/spectrum   stars (aperture photometry)
+                                              /api/ghosts, /api/asteroids   Gaia + SkyBoT
 ```
 
 - [web/README.md](web/README.md): the front end, its views, and the API it uses.

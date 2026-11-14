@@ -1,7 +1,7 @@
 """Pre-build images for the catalog so the live demo never waits on IRSA.
 
-Usage:  python scripts/warm_cache.py                 # every object in web/data/objects.json
-        python scripts/warm_cache.py orion ring      # just these catalog ids
+Usage:  python scripts/warm_cache.py                 # web/data/objects.json + data/targets.json
+        python scripts/warm_cache.py orion wise-0855 # just these ids (from either list)
         python scripts/warm_cache.py RA DEC [FOV]    # one position
 """
 
@@ -35,11 +35,15 @@ if len(args) >= 2 and is_number(args[0]) and is_number(args[1]):
     targets = [{"name": "cli", "ra": float(args[0]), "dec": float(args[1]), "fov": fov}]
 else:
     catalog = json.loads((ROOT / "web" / "data" / "objects.json").read_text(encoding="utf-8"))
-    targets = [
-        o
-        for o in catalog["objects"]
-        if (not args or o["id"] in args) and o.get("visits", {}).get("n", 1) > 0
-    ]
+    everything = [o for o in catalog["objects"] if o.get("visits", {}).get("n", 1) > 0]
+    science = ROOT / "data" / "targets.json"  # Person C's demo targets, at 2026 positions
+    if science.exists():
+        for t in json.loads(science.read_text(encoding="utf-8"))["targets"]:
+            ra, dec = t.get("ra_2026", t["ra"]), t.get("dec_2026", t["dec"])
+            everything.append(
+                {"id": t["id"], "name": t["name"], "ra": ra, "dec": dec, "fov": t.get("fov", 0.1)}
+            )
+    targets = [o for o in everything if not args or o["id"] in args]
 
 for t in targets:
     for mode in MODES:
