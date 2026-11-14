@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.imaging.config import CACHE_DIR
-from api.imaging.pipeline import build_frames
+from api.imaging.pipeline import build_frames, seed_cache
 from api.imaging.visits import list_visits
 from api.resolve import resolve
 from api.science.asteroids import build_asteroids
@@ -26,6 +26,7 @@ WEB_DIR = Path(__file__).resolve().parents[1] / "web"
 app = FastAPI(title="Blink")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])  # public read-only
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
+seed_cache()
 app.mount("/cache", StaticFiles(directory=CACHE_DIR), name="cache")
 
 

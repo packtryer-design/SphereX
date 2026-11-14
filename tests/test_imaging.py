@@ -1,7 +1,15 @@
+from pathlib import Path
 from typing import Any
 
 import numpy as np
-from api.imaging.pipeline import _matched_diff, align, make_rgb, split_epochs, target_grid
+from api.imaging.pipeline import (
+    _matched_diff,
+    align,
+    make_rgb,
+    seed_cache,
+    split_epochs,
+    target_grid,
+)
 from astropy.wcs import WCS
 
 
@@ -71,3 +79,20 @@ def test_still_star_is_white() -> None:
     a = np.random.default_rng(0).random((5, 5))
     rgb = make_rgb(a, a, a)
     assert np.array_equal(rgb[..., 0], rgb[..., 1]) and np.array_equal(rgb[..., 1], rgb[..., 2])
+
+
+def test_seed_cache_fills_gaps_without_overwriting(tmp_path: Path) -> None:
+    demo, cache = tmp_path / "demo", tmp_path / "cache"
+    (demo / "responses").mkdir(parents=True)
+    (demo / "png" / "k").mkdir(parents=True)
+    (demo / "responses" / "a.json").write_text("demo")
+    (demo / "responses" / "b.json").write_text("demo")
+    (demo / "png" / "k" / "000.png").write_text("png")
+    (cache / "responses").mkdir(parents=True)
+    (cache / "responses" / "a.json").write_text("newer")
+
+    assert seed_cache(demo, cache) == 2
+    assert (cache / "responses" / "a.json").read_text() == "newer"  # never overwritten
+    assert (cache / "responses" / "b.json").read_text() == "demo"
+    assert (cache / "png" / "k" / "000.png").exists()
+    assert seed_cache(demo, cache) == 0  # second start: nothing to do

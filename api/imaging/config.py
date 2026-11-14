@@ -5,6 +5,9 @@ from pathlib import Path
 COLLECTIONS = ["spherex_dr1", "spherex_qr3"]
 
 CACHE_DIR = Path(os.environ.get("BLINK_CACHE", "cache"))
+# Committed snapshot of finished results for the demo objects (scripts/demo_snapshot.py).
+# The server copies it into CACHE_DIR at startup, so a fresh deploy is warm without IRSA.
+DEMO_DIR = Path(__file__).resolve().parents[2] / "cache" / "demo"
 PIXEL_SCALE_ARCSEC = 6.15  # s_pixel_scale reported by IRSA for every frame
 MAX_WORKERS = 6  # IRSA answers 503 "Server busy" readily; keep this modest
 EPOCH_GAP_DAYS = 30  # recon: in-epoch gaps reach 25 d, between-epoch gaps exceed 100 d

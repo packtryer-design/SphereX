@@ -23,10 +23,10 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Done when |
 |---|---|---|
-| A1 | **Merge the spectra-warming PR** (`feat/warm-spectra`). `warm_cache.py` now also builds `/api/spectrum` for the science targets. Each spectrum uses its own ~4 MB cutouts, so a cold one on stage means about 350 slow downloads. | Merged, then the 6 science targets re-run: `python scripts/warm_cache.py barnards-star eps-indi-b wise-0855 rw-aur r-dra` |
-| A2 | **Finish the cache warm** (running: demo objects first, then all 45) | Log shows `=== ALL DONE ===`, and every demo object opens instantly |
-| A3 | **Deploy publicly** (API and website are one process: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`). **Nothing is public yet.** | A public URL opens Barnard's Star |
-| A4 | **Demo snapshot:** copy the cached responses and PNGs for the demo path into `cache/demo/` and commit them | Demo works with Wi-Fi off |
+| A1 | ✅ **Spectra warming:** `warm_cache.py` also builds `/api/spectrum` for the science targets. Each spectrum uses its own ~4 MB cutouts, so a cold one on stage meant ~350 slow downloads. Spectra for the 5 science targets are being built on A's machine now. | Done in code. Spectra finished: see A2 |
+| A2 | ⏳ **Finish the cache warm** (running on A's machine: demo objects first, then all 45). IRSA is slow, and Orion had 2 frames fail after 6 retries; they get retried on the next run. | Log shows `=== ALL DONE ===` and every demo object opens instantly |
+| A3 | 🟡 **Deploy publicly. Ready, needs an account login.** The `Dockerfile` runs API + site in one container on any host. Steps: **(1)** create a free *Web Service* on Render (or Fly.io / Cloud Run / HF Spaces) from this repo; it detects the `Dockerfile`; **(2)** no settings needed (`$PORT` is honoured, cache goes to `/tmp`); **(3)** open `<url>/?o=barnards-star`. Not built in Docker yet (Docker Desktop was off), but the same command was tested locally. | A public URL opens Barnard's Star |
+| A4 | 🟡 **Demo snapshot. Mechanism done and tested**: the server copies `cache/demo/` into its cache at startup, and a fresh server with an empty cache served Barnard's Star in ~25 ms with zero downloads. **Still to do:** once A2 finishes, run `python scripts/demo_snapshot.py` and commit `cache/demo/`. | `cache/demo/` holds every demo object, committed |
 | A5 | *Only if T1 picks it:* SPHEREx Watch RSS feed (~3 h) | `/api/watch.xml?ra=&dec=` opens in a feed reader |
 | A6 | *Only if the comet is in the demo:* 3I/ATLAS needs a position per frame date from JPL Horizons. It's skipped today. | Comet frames line up on the comet |
 
