@@ -43,7 +43,7 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 | B5 | Phone layout check, `<iframe>` embed example | Works at phone width |
 | B6 | README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
 
-**Done in PR c/frontend-fixes (C, on B's files):** stars, brown dwarfs and the young/variable stars now use `/api/spectrum` (PSF fit, saturation note, WISE W2 check, per-band status: seen / not clear / too faint / not measured). Nebulae stay on `surface-spectrum`. `objects.json` takes the 2026 positions from `data/targets.json` and now lists all 5 science targets. Point spectra start as soon as the visit list arrives instead of waiting for the images. Also fixed (A's file): two requests fetching the same cutout at once crashed on Windows (`WinError 32`) in `api/imaging/cutouts.py`.
+**Done in PR #18 (C, on B's files):** stars, brown dwarfs and the young/variable stars now use `/api/spectrum` (PSF fit, saturation note, WISE W2 check, per-band status: seen / not clear / too faint / not measured). Nebulae stay on `surface-spectrum`. `objects.json` takes the 2026 positions from `data/targets.json` and now lists all 5 science targets. Point spectra start as soon as the visit list arrives instead of waiting for the images. Also fixed (A's file): two requests fetching the same cutout at once crashed on Windows (`WinError 32`) in `api/imaging/cutouts.py`.
 
 **Already verified in a browser:** Sequence, Blink, Side by side, Swipe, Difference, Color-time, Observations and About all work on Barnard's Star. Difference and Color-time clearly show its motion.
 
@@ -59,6 +59,33 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 | C4 | **Rewrite `PITCH.md` and `SUBMISSION.md` to the story from T1.** Keep the strong honest results: Barnard's Star motion, the WISE 0855 W2 agreement within 14%, saturation handled openly. | Pitch matches the site |
 | C5 | **Rehearse the pitch 3 times with A and B** (06:00–09:00) | Done 3 times, timed |
 | C6 | **Submit on spaceappschallenge.org and confirm the Google Form** (09:00–10:00) | Confirmation emails received |
+
+---
+
+## 🔧 Fixed this evening (PRs #17 and #18)
+
+| Item | Owner | What was fixed | PR |
+|---|---|---|---|
+| B1 | B (done by C) | Stars, brown dwarfs, young and variable stars use `/api/spectrum`: PSF fit, saturation note, WISE W2 check. Shaded bands come from the API's own features at their real wavelength ranges, each marked seen / not clear / too faint to tell / not measured. Nebulae stay on `surface-spectrum`. | #18 |
+| B2 | B (done by C) | `objects.json` uses the 2026 positions from `data/targets.json`, so the warmed cache is hit. All 5 science targets listed (new kinds: brown dwarf, young star, variable star). | #18 |
+| B3 | B (done by C) | Spectrum tab shows a waiting message instead of a blank chart. Star spectra start as soon as the visit list arrives instead of waiting for the images. | #18 |
+| B4 | B (done by C) | Favicon added; browser console clean. | #18 |
+| Bug | A (found by C) | Two requests fetching the same cutout at once crashed on Windows (`PermissionError WinError 32`). Each download now uses its own temp file in `api/imaging/cutouts.py`. | #18 |
+| C1 | C | Field guide for the spectrum API: [SPECTRUM_API.md](SPECTRUM_API.md). | #17 |
+| C2 | C | `scipy` listed in `pyproject.toml`. | #17 |
+| C3 | C | QR3 ePSF note in `SUBMISSION.md` and `psf.py`. | #17 |
+| Doc | C | WISE 0855 offset corrected: about 3.5′ since J2000, not 1.5′. | #17 |
+
+Merge #17 first: #18 is built on it.
+
+## ⏭️ Still open, by owner (none of these can be fixed in code)
+
+| Owner | Items | Why it isn't code |
+|---|---|---|
+| Team | T1–T4 | Decisions: the story, the demo path, CodeQL (repo setting), the brief's name |
+| A | A2, A3, A4 | A2 runs on A's machine; A3 needs a hosting account login; A4 waits on A2. A5/A6 only if T1/T2 pick them. |
+| B | B5, B6 | Phone check, embed example, README GIF and the backup screen recording |
+| C | C4, C5, C6 | C4 waits on T1; C5 is rehearsal with A and B; C6 is the submission |
 
 ---
 
