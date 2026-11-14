@@ -4,7 +4,8 @@ from api.science.features import _excess
 from api.science.ghosts import clean_catwise
 from api.science.psf import fit, render
 from api.science.spectrum import SYS_FRAC, photometry
-from tests.test_science import _cutout
+
+from test_science import _cutout
 
 
 def _gauss_epsf(sigma=0.8, ovs=5, n=33):
