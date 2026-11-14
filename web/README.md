@@ -1,67 +1,78 @@
-# web/ (Person B)
+# web/
 
-Static HTML/JS with no build step and no dependencies. It deploys anywhere that serves files (Netlify Drop, GitHub Pages, Vercel).
+The Blink front end: static HTML, CSS and ES modules, with no build step and no dependencies.
 
-## Run locally
+## Run it
 
 ```sh
-make web            # or: python -m http.server 8080 --directory web
+make serve     # API + front end on http://localhost:8000
 ```
 
-Open http://localhost:8080. ES modules don't load from `file://`, so use the server.
+`make web` serves the front end alone on port 8080. Search, the catalog and the About tab work there, but images and spectra need the API. To point a static deploy at an API elsewhere, add `?api=https://your-api-host`.
 
-## Layout
-
-One full page. The visual design comes later; this fixes the structure.
+## What the user sees
 
 ```
-┌ top bar ── Blink102 · field name ──────────────── [Flip] [Stack] ┐
-├ rail ─────────┬ stage (image fills it) ──────────┬ info (on click) ┤
-│ Fields        │  Flip:  one layer, full size      │ Colors at this  │
-│ How to read   │  Stack: all layers fanned out     │ spot: chart +   │
-│ Credit        │  click → marker + spectrum        │ plain label     │
-├ bottom ───────┴──────────────────────────────────┴─────────────────┤
-│ ▶  Blink  [0.85 µm][1.0 µm · Paδ][1.1][1.3 · Paβ][3.3 · PAH][5.0]   │
-└────────────────────────────────────────────────────────────────────┘
+┌ Blink  [ Search nebulae: Orion, Ring, NGC 7293… ]                         ┐
+├ Orion Nebula  Emission nebula in Orion    Explore │ Observations │ Spectrum │ About ┤
+│                                                                           │
+│                 the image, as large as the screen allows                  │
+│                                                                           │
+│ 6–17 Sep 2025                                         [legend / caveat]   │
+│ Visit 1 of 3 · 123 exposures · all 6 detectors                            │
+├───────────────────────────────────────────────────────────────────────────┤
+│ (Sequence) Blink  Side by side  Swipe  Difference  Colour-time             │
+│ ▶   ●───────── 6 months ─────────●───────── 6 months ─────────●            │
+│     Sep 2025                    Mar 2026                    Sep 2026       │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
-Below 900px the rail becomes a drawer (☰) and the info panel a bottom sheet.
+- **Home** lists every catalog object by kind, with how many SPHEREx visits each has.
+- **Search** matches names, catalog ids (M 42, NGC 7293) and constellations instantly. "Look up …" finds anything else by name through SIMBAD or NED.
+- **Explore** is the viewer. The timeline places visits by their real dates, so the gaps are true to scale.
+  - **Sequence** crossfades from visit to visit. Use ▶ to play, or ← → to step.
+  - **Blink** flips quickly between visits A and B.
+  - **Side by side** and **Swipe** show A and B together. Drag the divider in Swipe.
+  - **Difference** shows B minus A, computed by the API only over the detectors both visits share.
+  - **Colour-time** puts three visits in red, green and blue. Anything that is the same in all three comes out white.
+  - Click any spot to see its brightness at every visit.
+- **Observations** shows a card for each visit: dates, exposures, which of the six detectors were used, and the gap since the previous visit. It ends with a short guide to telling real change from artifacts.
+- **Spectrum** has one dot per exposure, coloured by visit, with reference lines for nebulae shaded.
+- **About** gives what kind of object it is, what to expect over time, its position, size and catalog names, with links to SIMBAD and IRSA.
 
-Keys: ← → change layer · space play · b blink · f / s flip or stack · Esc close.
+The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so any view can be shared. Positions found by name lookup use `?ra=&dec=&fov=&name=`. Add `&embed=1` to hide the header for an `<iframe>`.
 
-## Adding NASA images
+## Honest data, by design
 
-Each field is a folder in `data/` with its images and a `layers.json`:
-
-```json
-{
-  "id": "my-field",
-  "name": "Cygnus X (SPHEREx)",
-  "credit": "NASA/JPL-Caltech",
-  "layers": [
-    { "png": "0.85.jpg", "wavelength_um": 0.85, "feature": null, "tint": "#4f8dff" },
-    { "png": "1.0.jpg",  "wavelength_um": 1.0,  "feature": "Paδ", "tint": "#4fe0ff" }
-  ]
-}
-```
-
-Then add `{ "id": "my-field", "name": "…" }` to `data/datasets.json`. Any number of layers works. All images in a field must show the same area at the same size, because clicking reads the same pixel from every layer.
-
-`data/demo-field/` is a generated placeholder (`make demo-data`). Delete it once real images are in.
+- **Dates are real.** They come from IRSA (`/api/visits`). Most of the sky gets a visit about every six months. Near the ecliptic poles SPHEREx passes almost monthly, but each pass may use only some detectors.
+- **Like-for-like comparisons.** Every visit is reprojected onto one grid and shares one brightness scale. When two visits used different detectors, the viewer says so, because the difference may be colour rather than change.
+- **Nothing is invented.** If SPHEREx hasn't observed a position, or only caught it at a detector edge, the page says so instead of showing anything.
 
 ## Files
 
 | File | What it does |
 |---|---|
-| `js/api.js` | The only file that knows where data comes from: `data/` now, the Python API later |
-| `js/state.js` | `?field=&layer=&view=` in the URL so links can be shared |
-| `js/main.js` | Layout wiring: fields, flip/stack, play/blink, click → info panel |
-| `js/sample.js` | Reads the brightness at one spot in every layer, in the browser |
-| `js/spectrum.js` | SVG spectrum chart with known bands shaded |
-| `data/features.json` | Band positions and plain-language glossary. Placeholder until C checks it |
+| `js/main.js` | App wiring: home, opening objects, tabs, views, timeline, click-a-spot, tab contents |
+| `js/api.js` | The only file that knows where data comes from |
+| `js/state.js` | View state ↔ URL |
+| `js/viewer.js` | Crossfading image panes; pixel → sky position |
+| `js/search.js` | Search box (catalog matches + name lookup) |
+| `js/spectrum.js` | SVG charts: spectrum and brightness over time |
+| `js/sample.js` | Reads brightness at one spot from each visit's image, in the browser |
+| `js/kinds.js` | Plain-language text for each kind of object; SPHEREx detector ranges |
+| `js/time.js` | MJD → readable dates and gaps |
+| `data/objects.json` | The catalog. Built by `make objects` from SIMBAD + IRSA, so don't edit it by hand. To add an object, add a line to `OBJECTS` in `scripts/build_objects.py` |
+| `data/features.json` | Reference lines shaded on the spectrum (laboratory wavelengths) |
 
-## Later: the backend
+## API used
 
-Frames from `/api/frames` have the same shape as layers (`png`, `wavelength_um`) plus `mjd`/`epoch`, so they feed the same viewer. The bottom bar then steps through time as well as color. `getFrames`/`getSpectrum` in `js/api.js` are ready for `?api=http://localhost:8000`.
+| Endpoint | Returns |
+|---|---|
+| `GET /api/visits?ra=&dec=` | Real visit dates, exposure counts and detectors. Fast, no image downloads |
+| `GET /api/frames?ra=&dec=&fov=&mode=epoch` | One aligned PNG per visit |
+| `GET /api/frames?...&mode=diff&ref=N` | Each visit minus visit N, over shared detectors |
+| `GET /api/frames?...&mode=rgb` | Three visits as one colour image |
+| `GET /api/spectrum?ra=&dec=&field_ra=&field_dec=&fov=` | One point per exposure (wavelength, flux, error, date) |
+| `GET /api/resolve?name=` | Coordinates for a name, from SIMBAD or NED |
 
-Embed with `?embed=1`, e.g. `<iframe src="https://…/?field=demo-field&view=stack&embed=1" width="900" height="600"></iframe>`.
+Frames carry `detectors`, `mjd_start` and `mjd_end` (and `ref_epoch` in diff mode, `epochs` in rgb mode) on top of the original contract in [docs/PLAN.md](../docs/PLAN.md).

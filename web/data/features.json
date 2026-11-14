@@ -1,25 +1,19 @@
 {
-  "_note": "PLACEHOLDER. Person C replaces this with the paper-checked version. Nothing here is verified yet.",
+  "_about": "Reference lines for nebulae, shaded on the spectrum. Wavelengths are laboratory vacuum values (hydrogen lines follow from the Rydberg formula). The shaded width is SPHEREx's resolution at that wavelength (lambda / R), so a band shows where the line would land in SPHEREx data. It is not a detection. Person C: add paper references, as in data/features.json on the c/science branch.",
   "bands": [
-    { "name": "Paδ", "center_um": 1.005, "width_um": 0.03, "kind": "emission", "verified": false },
-    { "name": "Paβ", "center_um": 1.282, "width_um": 0.03, "kind": "emission", "verified": false },
-    { "name": "H₂O", "center_um": 1.4, "width_um": 0.1, "kind": "absorption", "verified": false },
-    { "name": "CH₄", "center_um": 1.6, "width_um": 0.08, "kind": "absorption", "verified": false },
-    { "name": "H₂O", "center_um": 1.9, "width_um": 0.12, "kind": "absorption", "verified": false },
-    { "name": "CH₄", "center_um": 2.2, "width_um": 0.1, "kind": "absorption", "verified": false },
-    { "name": "PAH", "center_um": 3.3, "width_um": 0.1, "kind": "emission", "verified": false },
-    { "name": "CO₂", "center_um": 4.26, "width_um": 0.06, "kind": "emission", "verified": false },
-    { "name": "CO", "center_um": 4.67, "width_um": 0.06, "kind": "emission", "verified": false }
+    { "name": "Paδ", "center_um": 1.0052, "what": "hydrogen" },
+    { "name": "Paγ", "center_um": 1.0941, "what": "hydrogen" },
+    { "name": "Paβ", "center_um": 1.2822, "what": "hydrogen" },
+    { "name": "Paα", "center_um": 1.8756, "what": "hydrogen" },
+    { "name": "H₂", "center_um": 2.1218, "what": "h2" },
+    { "name": "Brγ", "center_um": 2.1661, "what": "hydrogen" },
+    { "name": "Brβ", "center_um": 2.6259, "what": "hydrogen" },
+    { "name": "PAH", "center_um": 3.29, "what": "pah" },
+    { "name": "Brα", "center_um": 4.0523, "what": "hydrogen" }
   ],
   "glossary": {
-    "Paδ": "Glowing hydrogen gas, usually heated by young hot stars",
-    "Paβ": "Glowing hydrogen gas, usually heated by young hot stars",
-    "PAH": "Soot-like carbon molecules in dust, lit up by nearby starlight"
-  },
-  "labels": {
-    "brown_dwarf": "Too cold to be a star: water and methane in its air",
-    "comet": "Ice turning to gas",
-    "asteroid": "A rock reflecting sunlight",
-    "star": "A normal star"
+    "hydrogen": "Glowing hydrogen gas. Hot young stars strip electrons off hydrogen atoms, and the gas gives off these colours as the atoms recombine. Strong in emission and planetary nebulae.",
+    "h2": "Hydrogen molecules heated by shock waves or ultraviolet light, common at the edges of star-forming clouds.",
+    "pah": "Large carbon-rich molecules (polycyclic aromatic hydrocarbons) on tiny dust grains, glowing when starlight warms them."
   }
 }

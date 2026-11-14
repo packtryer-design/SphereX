@@ -3,68 +3,155 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blink102</title>
-  <meta name="description" content="Flip through the sky in SPHEREx's infrared colors and see what each spot is made of.">
+  <title>Blink</title>
+  <meta name="description" content="Search a nebula and compare NASA SPHEREx observations of it across time.">
+  <meta name="color-scheme" content="dark">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <button id="rail-toggle" class="icon" aria-label="Show fields" aria-controls="rail" aria-expanded="false">☰</button>
-    <div class="brand">
-      <h1>Blink102</h1>
-      <span id="field-name" class="field-name"></span>
-    </div>
-    <div class="views" role="group" aria-label="View">
-      <button data-view="flip" title="One color at a time, full screen (F)">Flip</button>
-      <button data-view="stack" title="All colors side by side (S)">Stack</button>
+  <header class="top">
+    <button id="home-link" class="brand" title="All objects">Blink</button>
+    <div class="search" id="search">
+      <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+        placeholder="Search nebulae: Orion, Ring, NGC 7293…"
+        role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list" aria-label="Search for an object">
+      <ul id="search-results" class="search-results" role="listbox" hidden></ul>
     </div>
   </header>
 
-  <div id="app" class="app">
-    <!-- Left rail: what to look at and how to read it -->
-    <aside id="rail" class="rail">
-      <section>
-        <h2>Fields</h2>
-        <ul id="fields" class="fields"></ul>
-      </section>
-      <section class="explainer">
-        <h2>How to read this</h2>
-        <!-- B: final explainer copy goes here -->
-        <p>SPHEREx photographs the sky in many infrared colors that our eyes can't see. Each layer is the same patch of sky in one color.</p>
-        <p>Press <b>▶</b> or <b>Blink</b> to flip between colors. Things that switch on and off are made of something that shines in that color.</p>
-        <p><b>Click any spot</b> to see how bright it is in every layer.</p>
-      </section>
-      <p id="credit" class="credit"></p>
-    </aside>
+  <!-- Home: browse the catalog -->
+  <section id="home" class="home" hidden>
+    <div class="home-intro">
+      <h1>Watch the sky change</h1>
+      <p>Pick a nebula and step through every visit NASA's SPHEREx telescope has made to it. Each image is the same patch of sky on the same grid, so anything that moved or changed stands out.</p>
+    </div>
+    <div id="catalog" class="catalog"></div>
+    <p class="credit">Images: NASA/JPL-Caltech/IPAC SPHEREx, via IRSA. Coordinates and object types: SIMBAD.</p>
+  </section>
 
-    <!-- Stage: the image fills the page -->
-    <main id="stage" class="stage">
-      <div id="flip" class="flip">
-        <img id="frame" alt="">
-        <div id="marker" class="marker" hidden></div>
+  <!-- One object, four tabs -->
+  <section id="object" class="object" hidden>
+    <nav class="object-bar">
+      <div class="object-title">
+        <h1 id="obj-name"></h1>
+        <span id="obj-sub" class="muted"></span>
       </div>
-      <div id="stack" class="stack" hidden></div>
-      <p id="hint" class="hint">Click a bright patch to see its colors</p>
-      <div id="msg" class="msg" hidden></div>
-    </main>
+      <div class="tabs" role="tablist" aria-label="Sections">
+        <button role="tab" id="tab-explore" data-tab="explore" aria-controls="panel-explore">Explore</button>
+        <button role="tab" id="tab-observations" data-tab="observations" aria-controls="panel-observations">Observations</button>
+        <button role="tab" id="tab-spectrum" data-tab="spectrum" aria-controls="panel-spectrum">Spectrum</button>
+        <button role="tab" id="tab-about" data-tab="about" aria-controls="panel-about">About</button>
+      </div>
+    </nav>
 
-    <!-- Right panel: opens when you click a spot -->
-    <aside id="info" class="info" hidden>
-      <button id="info-close" class="icon close" aria-label="Close">✕</button>
-      <h2>Colors at this spot</h2>
-      <div id="spectrum"></div>
-      <p id="spectrum-label" class="label"></p>
-      <p id="spectrum-note" class="muted"></p>
-    </aside>
-  </div>
+    <!-- Explore: the viewer -->
+    <div role="tabpanel" id="panel-explore" class="panel explore" aria-labelledby="tab-explore">
+      <div class="stage">
+        <div id="viewer" class="viewer" data-view="sequence">
+          <figure class="pane" id="pane-a"><img class="layer" alt=""><img class="layer" alt=""><figcaption class="pane-label"></figcaption></figure>
+          <figure class="pane" id="pane-b"><img class="layer" alt=""><img class="layer" alt=""><figcaption class="pane-label"></figcaption></figure>
+          <div id="swipe-handle" class="swipe-handle" role="slider" tabindex="0" aria-label="Swipe position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden></div>
+          <div id="marker" class="marker" hidden></div>
+        </div>
 
-  <!-- Bottom: wavelength axis (later also time, when the backend is in) -->
-  <footer class="timeline">
-    <button id="play" class="icon" aria-label="Play">▶</button>
-    <button id="blink" aria-pressed="false" title="Flip between this layer and the next (B)">Blink</button>
-    <div id="ticks" class="ticks" role="group" aria-label="Layers"></div>
-    <span id="now" class="now"></span>
-  </footer>
+        <div class="stamp" id="stamp" aria-live="polite">
+          <div id="stamp-date" class="stamp-date"></div>
+          <div id="stamp-sub" class="stamp-sub"></div>
+        </div>
+        <p id="caveat" class="caveat" hidden></p>
+        <div id="legend" class="legend" hidden></div>
+        <div id="msg" class="msg" hidden></div>
+
+        <aside id="spot" class="spot" hidden aria-label="This spot over time">
+          <button id="spot-close" class="icon close" aria-label="Close">✕</button>
+          <h2>This spot over time</h2>
+          <p id="spot-pos" class="muted mono"></p>
+          <div id="spot-chart" class="chart"></div>
+          <p class="fine">Brightness as displayed, read from each visit's image. Every visit uses the same brightness scale.</p>
+          <button id="spot-spectrum" class="link-button">Spectrum at this spot →</button>
+        </aside>
+      </div>
+
+      <div class="controls">
+        <div class="views" role="radiogroup" aria-label="How to compare">
+          <button role="radio" data-view="sequence" title="Step through visits in order">Sequence</button>
+          <button role="radio" data-view="blink" title="Flip quickly between two visits">Blink</button>
+          <button role="radio" data-view="side" title="Two visits next to each other">Side by side</button>
+          <button role="radio" data-view="swipe" title="Drag a divider across two visits">Swipe</button>
+          <button role="radio" data-view="diff" title="What changed between two visits">Difference</button>
+          <button role="radio" data-view="rgb" title="Three visits as red, green and blue">Colour-time</button>
+        </div>
+        <div class="timeline">
+          <button id="play" class="icon play" aria-label="Play">▶</button>
+          <div id="pair" class="pair" hidden>
+            <label>A <select id="pick-a" aria-label="Visit A"></select></label>
+            <label>B <select id="pick-b" aria-label="Visit B"></select></label>
+          </div>
+          <div id="track" class="track" role="group" aria-label="Visits by date"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observations: every visit -->
+    <div role="tabpanel" id="panel-observations" class="panel scroll" aria-labelledby="tab-observations" hidden>
+      <div class="page">
+        <header class="page-head">
+          <h2 id="obs-title">Observations</h2>
+          <p id="obs-summary" class="lede"></p>
+        </header>
+        <div id="obs-list" class="obs-list"></div>
+        <section class="explain">
+          <h3>Is a difference real?</h3>
+          <p>Before reading a change between two visits as something happening in space, rule out these first:</p>
+          <ul>
+            <li><b>Different detectors.</b> SPHEREx has six detectors, each covering a different range of infrared colours. If two visits don't use the same detectors, they show the object in different colours. Blink warns you when that happens, and its Difference view only subtracts detectors both visits share.</li>
+            <li><b>Noise.</b> Faint, grainy differences that don't form a shape are usually noise. A real change keeps its shape from one visit to the next.</li>
+            <li><b>Partial visits.</b> Some visits caught only part of the field, or used fewer exposures. They are noisier and can have blank edges.</li>
+            <li><b>Processing.</b> All visits share one alignment grid and one brightness scale, so one visit can't look brighter just because it was scaled differently. Bright stars can still leave artifacts, such as ghosts and spikes, that differ between visits.</li>
+          </ul>
+          <p>Things that really do change over months: <b>nearby stars moving across the sky</b>, <b>variable stars</b>, and <b>asteroids or comets passing through</b>. A nebula's gas is light-years across, so it won't visibly change between visits.</p>
+        </section>
+      </div>
+    </div>
+
+    <!-- Spectrum -->
+    <div role="tabpanel" id="panel-spectrum" class="panel scroll" aria-labelledby="tab-spectrum" hidden>
+      <div class="page">
+        <header class="page-head">
+          <h2>Spectrum</h2>
+          <p class="lede">How bright one spot is in each infrared colour. Each dot is one SPHEREx exposure, coloured by visit.</p>
+        </header>
+        <div class="spec-where">
+          <span id="spec-pos" class="mono"></span>
+          <button id="spec-centre" class="link-button" hidden>Use field centre</button>
+          <span class="muted">Click a spot in Explore to measure there instead.</span>
+        </div>
+        <div id="spec-chart" class="chart big"></div>
+        <div id="spec-legend" class="spec-legend"></div>
+        <p id="spec-msg" class="muted"></p>
+        <section class="explain">
+          <h3>Shaded bands</h3>
+          <p id="bands-note" class="fine"></p>
+          <dl id="bands-list" class="bands-list"></dl>
+        </section>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div role="tabpanel" id="panel-about" class="panel scroll" aria-labelledby="tab-about" hidden>
+      <div class="page">
+        <header class="page-head">
+          <h2 id="about-name"></h2>
+          <p id="about-kind" class="lede"></p>
+        </header>
+        <p id="about-text"></p>
+        <h3>Over time</h3>
+        <p id="about-time"></p>
+        <dl id="about-facts" class="facts"></dl>
+        <p id="about-links" class="links"></p>
+      </div>
+    </div>
+  </section>
 
   <script type="module" src="js/main.js"></script>
 </body>
