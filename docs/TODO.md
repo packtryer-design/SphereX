@@ -12,10 +12,10 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Why | Done when |
 |---|---|---|---|
-| T1 | **Agree on one story.** "Blink: nebulae over time" (what's built) vs SPHEREx Watch + classroom lab ([IDEAS.md](IDEAS.md)) | The pitch, demo path and remaining features depend on it. `PITCH.md` and `SUBMISSION.md` still describe the older wavelength-first pitch. | One sentence agreed and written at the top of `PITCH.md` |
-| T2 | **Agree the 3-step demo path** (which objects, which views, in what order) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
-| T3 | **CodeQL check:** make the repo public and enable code scanning, *or* delete `.github/workflows/codeql.yml` and close PR #8 | It fails because code scanning isn't enabled on a private repo. It's a settings question, not a code bug. | No red ❌ on PRs |
-| T4 | Update the team brief (`SPHEREx_Team_Brief.docx`) to the final name | It still says Blink102 | Name matches the site |
+| T1 | ✅ **Decided: lead with Planet X, show Blink as the tool, end with "What's next".** (1) Story 3, Planet X (`/track.html`, PR #19): Pluto tracked against JPL Horizons, the blind search finds Pluto, a simulated planet appears only when stacked. (2) Story 1, the Blink explorer: "anyone can do this for any star", on Barnard's Star, covering the challenge's required features and test targets. (3) Story 2 (SPHEREx Watch, classroom lab) is **not built**; it's the "What's next?" slide, with a deeper planet search. | The pitch and demo path follow from it. `PITCH.md` and `SUBMISSION.md` still describe the older pitch (C4). | Done |
+| T2 | ⏳ **Exact demo path:** decided while preparing the pitch, following T1's order (Pluto → blind search → planted planet → Barnard's Star in Blink) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
+| T3 | ✅ **CodeQL:** the repo is public, and CodeQL passes on PRs. Close Copilot's draft PR #8, which is no longer needed. | — | Done |
+| T4 | ✅ **Team brief:** no change needed. It never named the project ("Blink102" never appeared; only the phrases "blink compare" and "imaged 102 times"). | — | Done |
 
 ---
 
@@ -82,10 +82,10 @@ Merge #17 first: #18 is built on it.
 
 | Owner | Items | Why it isn't code |
 |---|---|---|
-| Team | T1–T4 | Decisions: the story, the demo path, CodeQL (repo setting), the brief's name |
+| Team | T2 | The demo path, decided while preparing the pitch |
 | A | A2, A3, A4 | A2 runs on A's machine; A3 needs a hosting account login; A4 waits on A2. A5/A6 only if T1/T2 pick them. |
 | B | B5, B6 | Phone check, embed example, README GIF and the backup screen recording |
-| C | C4, C5, C6 | C4 waits on T1; C5 is rehearsal with A and B; C6 is the submission |
+| C | C4, C5, C6 | C4 can start (T1 decided); C5 is rehearsal with A and B; C6 is the submission |
 
 ---
 
