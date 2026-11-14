@@ -16,6 +16,7 @@ from api.imaging.config import CACHE_DIR, EPOCH_GAP_DAYS, MAX_EPOCH_DAYS, PIXEL_
 from api.imaging.cutouts import Cutout, fetch_cutouts
 
 MODES = ("single", "epoch", "rgb", "diff")
+RESPONSE_VERSION = 2  # bump when the response shape changes, so old cached JSON is ignored
 
 
 def target_grid(
@@ -84,10 +85,19 @@ def _wavelength_at(c: Cutout, ra: float, dec: float) -> float | None:
 
 
 def build_frames(
-    ra: float, dec: float, fov: float, mode: str = "single", detector: str = "all"
+    ra: float,
+    dec: float,
+    fov: float,
+    mode: str = "single",
+    detector: str = "all",
+    ref: int | None = None,
 ) -> dict[str, Any]:
+    """`ref` (diff mode only): the epoch every other epoch is compared against. Default: first."""
     ra, dec, fov = round(ra, 4), round(dec, 4), round(fov, 3)
-    key = f"{ra:.4f}_{dec:+.4f}_{fov:.3f}_{mode}_{detector}"
+    ref = ref if mode == "diff" and ref != 1 else None  # epoch 1 is the default reference
+    key = f"v{RESPONSE_VERSION}_{ra:.4f}_{dec:+.4f}_{fov:.3f}_{mode}_{detector}"
+    if ref is not None:
+        key += f"_ref{ref}"
     cached = CACHE_DIR / "responses" / f"{key}.json"
     if cached.exists():
         return dict(json.loads(cached.read_text()))
@@ -129,7 +139,7 @@ def build_frames(
             frames, zs = [frames[i] for i in keep], [zs[i] for i in keep]
         images, out = zs, frames
     else:
-        images, out = _combine(frames, zs, mode, detector)
+        images, out = _combine(frames, zs, mode, detector, ref)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -151,7 +161,11 @@ def build_frames(
 
 
 def _combine(
-    frames: list[dict[str, Any]], zs: list[np.ndarray], mode: str, detector: str
+    frames: list[dict[str, Any]],
+    zs: list[np.ndarray],
+    mode: str,
+    detector: str,
+    ref: int | None = None,
 ) -> tuple[list[Any], list[dict[str, Any]]]:
     groups: dict[tuple[int, int], list[int]] = defaultdict(list)
     for i, f in enumerate(frames):
@@ -163,11 +177,18 @@ def _combine(
     epochs = sorted({e for e, _ in stack})
     dets = sorted({d for _, d in stack}) if detector == "all" else [int(detector)]
 
-    def meta(e: int) -> dict[str, Any]:
-        idx = [i for d in dets for i in groups.get((e, d), [])]
+    def meta(e: int, use: list[int] | None = None) -> dict[str, Any]:
+        used = [d for d in (use if use is not None else dets) if (e, d) in groups]
+        idx = [i for d in used for i in groups[(e, d)]]
         waves = [frames[i]["wavelength_um"] for i in idx if frames[i]["wavelength_um"]]
+        mjds = [frames[i]["mjd"] for i in idx]
         return {
-            "mjd": round(float(np.mean([frames[i]["mjd"] for i in idx])), 4),
+            "mjd": round(float(np.mean(mjds)), 4),
+            "mjd_start": round(float(min(mjds)), 4),
+            "mjd_end": round(float(max(mjds)), 4),
+            # Which detectors (wavelength ranges) went into this image. Epochs with different
+            # detectors are not like-for-like: differences may be colour, not change.
+            "detectors": used,
             "epoch": e,
             "detector": None if detector == "all" else int(detector),
             "wavelength_um": None if detector == "all" or not waves else float(np.median(waves)),
@@ -190,19 +211,25 @@ def _combine(
         pick = (
             [have[0], have[len(have) // 2], have[-1]] if len(have) > 2 else [have[0], *have[1:] * 2]
         )
-        m = meta(pick[-1]) | {"epoch": None, "n_frames": sum(meta(e)["n_frames"] for e in pick)}
+        m = meta(pick[-1]) | {
+            "epoch": None,
+            "epochs": pick,  # red, green, blue
+            "n_frames": sum(meta(e)["n_frames"] for e in pick),
+        }
         return [[epoch_image(e) for e in pick]], [m]
-    # diff: per detector first, so wavelength differences cancel
+    # diff: per detector first, and only detectors both epochs have, so wavelength differences
+    # cancel instead of showing up as fake "change"
+    base = ref if ref in have else have[0] if have else None
     images, out = [], []
-    for e in have[1:]:
-        ds = [
-            stack[(e, d)] - stack[(have[0], d)]
-            for d in dets
-            if (e, d) in stack and (have[0], d) in stack
-        ]
-        if ds:
+    for e in have:
+        if e == base:
+            continue
+        shared = [d for d in dets if (e, d) in stack and (base, d) in stack]
+        if shared:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                images.append(np.nanmean(ds, axis=0))
-            out.append(meta(e))
+                images.append(
+                    np.nanmean([stack[(e, d)] - stack[(base, d)] for d in shared], axis=0)
+                )
+            out.append(meta(e, shared) | {"ref_epoch": base})
     return images, out
