@@ -53,6 +53,31 @@ def build_track(body: str, mjd: float, days: float = 2.0, fov: float = 0.1) -> d
     if cached.exists():
         return dict(json.loads(cached.read_text()))
 
+    frames, zs, ra0, dec0, shape, failed = aligned_track(body, mjd, days, fov)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        vmax = float(np.nanpercentile(np.stack(zs), 99.5)) if zs else 1.0
+    for i, (z, f) in enumerate(zip(zs, frames, strict=True)):
+        f["png"] = _save_png(stretch(z, -2, vmax), f"png/{key}/{i:03d}.png")
+
+    resp = {
+        "body": body,
+        "name": BODIES[body][2],
+        "target": {"ra": round(ra0, 6), "dec": round(dec0, 6), "fov": fov, "size_px": shape[0]},
+        "window": {"mjd_start": mjd - days, "mjd_end": mjd + days},
+        "frames": frames,
+        "source": "Positions: NASA JPL Horizons (geocentric). Images: NASA/IPAC IRSA SPHEREx.",
+    }
+    if not failed:  # a partial result must not be frozen in the cache
+        cached.parent.mkdir(parents=True, exist_ok=True)
+        cached.write_text(json.dumps(resp))
+    return resp
+
+
+def aligned_track(
+    body: str, mjd: float, days: float, fov: float
+) -> tuple[list[dict[str, Any]], list[np.ndarray], float, float, tuple[int, int], int]:
+    """Frames in the window on one fixed grid (sigma units), with the body's predicted spot."""
     t, ra, dec = ephemeris(body, mjd - days, mjd + days)
     ra = np.degrees(np.unwrap(np.radians(ra)))  # safe interpolation across RA = 0/360
     ra0, dec0 = float(np.interp(mjd, t, ra)) % 360, float(np.interp(mjd, t, dec))
@@ -83,21 +108,4 @@ def build_track(body: str, mjd: float, days: float = 2.0, fov: float = 0.1) -> d
                 },
             }
         )
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        vmax = float(np.nanpercentile(np.stack(zs), 99.5)) if zs else 1.0
-    for i, (z, f) in enumerate(zip(zs, frames, strict=True)):
-        f["png"] = _save_png(stretch(z, -2, vmax), f"png/{key}/{i:03d}.png")
-
-    resp = {
-        "body": body,
-        "name": BODIES[body][2],
-        "target": {"ra": round(ra0, 6), "dec": round(dec0, 6), "fov": fov, "size_px": shape[0]},
-        "window": {"mjd_start": mjd - days, "mjd_end": mjd + days},
-        "frames": frames,
-        "source": "Positions: NASA JPL Horizons (geocentric). Images: NASA/IPAC IRSA SPHEREx.",
-    }
-    if not failed:  # a partial result must not be frozen in the cache
-        cached.parent.mkdir(parents=True, exist_ok=True)
-        cached.write_text(json.dumps(resp))
-    return resp
+    return frames, zs, ra0, dec0, shape, failed

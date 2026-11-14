@@ -24,6 +24,16 @@
                        background: var(--surface-2); color: var(--text); cursor: pointer; }
     .controls button:focus-visible, .controls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .note { font-size: .9rem; color: var(--muted); margin-top: 12px; }
+    .px { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
+    .px h2 { font-size: 1.25rem; margin: 0 0 8px; }
+    .result { color: var(--text) !important; font-weight: 500; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .grid figure { margin: 0; }
+    .pic { position: relative; }
+    .px-ring { width: 18%; }
+    .grid img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: 6px; display: block; }
+    .grid figcaption { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -46,6 +56,24 @@
       <label><input id="show-ring" type="checkbox" checked> Show predicted position</label>
     </div>
     <p class="note" id="note"></p>
+
+    <section class="px" aria-labelledby="px-title">
+      <h2 id="px-title">Could SPHEREx find a new planet?</h2>
+      <p>A planet far beyond Pluto would be too faint to see in any single image. Astronomers
+        add images up while shifting each one along a guessed path: only something moving
+        that way builds up, while the noise averages out. We tried every plausible path, blind.</p>
+      <p id="px-pluto" class="result">Searching…</p>
+      <p>To test how far this goes, we <strong>planted a simulated planet</strong>, moving like a
+        world 300 times farther from the Sun than Earth, into the real images, and searched again.</p>
+      <div class="grid">
+        <figure><div class="pic"><img id="px-single" alt="One SPHEREx image: the simulated planet is not visible"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>One image: nothing to see</figcaption></figure>
+        <figure><div class="pic"><img id="px-plain_stack" alt="All images added without shifting: a faint streak"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Added as they are: a smear</figcaption></figure>
+        <figure><div class="pic"><img id="px-shift_stack" alt="Images shifted along the planet's path and added: a clear dot"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Shifted along its path: found</figcaption></figure>
+      </div>
+      <p id="px-limit" class="result"></p>
+      <p class="note">Black patches: bright stars masked out before searching. The planted planet is
+        simulated, to test the method; this is not a discovery.</p>
+    </section>
   </main>
 
   <script type="module">
@@ -82,6 +110,28 @@
     $("show-ring").onchange = (e) => { $("ring").hidden = !e.target.checked; };
     show(0);
     reduced ? pause() : play();
+
+    // Planet search (slow the first time: tries ~500 paths x 3 tests; cached after)
+    const px = await fetch(api.replace("/api/track?", "/api/planetx?")).then((x) => x.ok ? x.json() : null);
+    if (!px) { $("px-pluto").textContent = "The planet search is unavailable right now."; }
+    else {
+      const p = px.pluto, f1 = px.faintest_recovered;
+      $("px-pluto").textContent = p.found_blind
+        ? `Without being told where to look, the search found Pluto (signal ${p.snr}× the noise), ` +
+          `moving ${p.motion_arcsec_day}″ a day; NASA JPL predicts ${p.true_motion_arcsec_day}″.`
+        : "The blind search did not single out Pluto in this window.";
+      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = px.images[k];
+      const X = px.planet_x, m = px.size_px;  // ring where the simulated planet was planted
+      document.querySelectorAll(".px-ring").forEach((r) => {
+        r.style.left = `${((X.x + 0.5) / m) * 100}%`;
+        r.style.top = `${((m - 1 - X.y + 0.5) / m) * 100}%`;
+      });
+      $("px-limit").textContent = f1
+        ? `It found the planted planet down to ${f1.pluto_ratio}× fainter than Pluto, using ` +
+          `${px.n_frames} images over ${px.window_days} days. Fainter than that, it was lost in the noise. ` +
+          `${Math.round(px.masked_frac * 100)}% of this crowded field is hidden behind bright stars.`
+        : "Even the brightest planted planet was not recovered here.";
+    }
   </script>
 </body>
 </html>
