@@ -71,7 +71,7 @@ files = ["src", "tests"]
 
 # Hackathon speed: api/ and untyped astro libraries are not strict-checked.
 [[tool.mypy.overrides]]
-module = ["api.*", "astroquery.*", "reproject.*"]
+module = ["api.*", "astropy.*", "astroquery.*", "reproject.*"]
 ignore_errors = true
 ignore_missing_imports = true
 
