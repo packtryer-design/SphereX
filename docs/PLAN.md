@@ -97,6 +97,8 @@ A and C share one FastAPI app (`api/main.py`) and one cutout cache. **A writes t
 
 ### Person A: backend, imaging
 
+Detailed plan: [BACKEND_IMAGING.md](BACKEND_IMAGING.md)
+
 | When | Task | Done when |
 |---|---|---|
 | 11:00–13:00 | Run the IRSA intro and cutouts notebooks on Barnard's Star. Report frames per epoch and per detector, the time field and the pixel scale. Write `get_cutouts(ra, dec, fov)` with parallel fetching and a disk cache. | **C can call `get_cutouts`** |
