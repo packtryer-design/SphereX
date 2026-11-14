@@ -32,14 +32,14 @@ Blink102 is a browser-based blink comparator for NASA's SPHEREx all-sky infrared
 
 **What it does.** Three views of the same SPHEREx data:
 1. *Blink*: single frames, per-epoch stacks, an RGB "rainbow trail" (three epochs in red/green/blue — still stars go white, movers leave colour), and difference images.
-2. *Spectrum*: every SPHEREx frame sees a source at one wavelength, so aperture photometry on all frames covering it gives its 0.75–5 µm spectrum. Bands are measured against a power-law continuum and labelled "seen" only at ≥3σ.
-3. *Is this new?*: Gaia DR3 positions propagated with proper motion and parallax to each SPHEREx epoch, plus IMCCE SkyBoT known asteroids/comets at each frame time.
+2. *Spectrum*: every SPHEREx frame sees a source at one wavelength, so PSF photometry (SPHEREx ePSFs, fitting nearby Gaia stars at the same time) on all frames covering it gives its 0.75–5 µm spectrum, with a 3 % systematic error floor. Bands are measured against a power-law continuum and labelled "seen" only at ≥3σ.
+3. *Is this new?*: Gaia DR3 and CatWISE2020 (infrared, finds cold brown dwarfs Gaia misses) positions propagated with proper motion to each SPHEREx epoch, plus IMCCE SkyBoT known asteroids/comets at each frame time.
 
 **Benefits.** Makes a brand-new NASA survey explorable by students and citizen scientists, teaches how astronomers identify what things are made of, and sets up a volunteer flagging loop for moving-object candidates (the way most known nearby brown dwarfs were found).
 
 **How we built it.** Python FastAPI backend (astropy, astroquery, reproject), static web front end. Data queried live from IRSA (SIA + cutout service), cached server-side.
 
-**Honesty rules we built in.** No discovery claims; "candidate for review" is the strongest wording. Blends are reported (e.g. a G=16.3 star 7″ from WISE 0855). Every molecule label cites a journal paper.
+**Honesty rules we built in.** No discovery claims; "candidate for review" is the strongest wording. Blends are reported and fitted out (e.g. a G=16.3 star 7″ from WISE 0855: fitted jointly, its light no longer pollutes the brown dwarf's spectrum). Every molecule label cites a journal paper.
 
 **Use of AI.** `[fill in — Space Apps asks teams to disclose AI tools; e.g. "Claude Code assisted with writing and testing backend code; all science choices were checked by the team."]`
 
@@ -49,7 +49,9 @@ Blink102 is a browser-based blink comparator for NASA's SPHEREx all-sky infrared
 
 ## Space agency partner & other data
 
-- ESA Gaia DR3 (ghost markers) — https://gea.esac.esa.int/archive/
+- ESA Gaia DR3 (ghost markers) — https://gea.esac.esa.int/archive/ (IRSA mirror as fallback)
+- CatWISE2020, Marocco et al. 2021, ApJS 253, 8 (infrared ghost markers) — via IRSA TAP
+- SPHEREx ePSF calibration files (PSF photometry) — IRSA
 - IMCCE SkyBoT (known solar-system objects) — https://ssp.imcce.fr/webservices/skybot/
 - SIMBAD (target coordinates) — CDS Strasbourg
 
