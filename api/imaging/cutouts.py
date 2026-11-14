@@ -9,6 +9,7 @@ import json
 import logging
 import random
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
@@ -91,9 +92,14 @@ def _fetch(
         if data is None:
             return None
         path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(".tmp.npz")
+        # Unique tmp name: two requests can fetch the same cutout at once (Windows then
+        # refuses to replace a file the other one still holds open).
+        tmp = path.with_suffix(f".{uuid.uuid4().hex}.tmp.npz")
         np.savez_compressed(tmp, **_slim(data), mjd=mjd, detector=det)
-        tmp.replace(path)  # atomic: a crash never leaves a half-written cache file
+        try:
+            tmp.replace(path)  # atomic: a crash never leaves a half-written cache file
+        except PermissionError:  # the other request won the race: its copy is identical
+            tmp.unlink(missing_ok=True)
     z = np.load(path)
     return Cutout(
         img=z["img"],

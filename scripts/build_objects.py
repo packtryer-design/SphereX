@@ -12,6 +12,7 @@ import json
 import socket
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from astropy.coordinates import SkyCoord, get_constellation
@@ -125,6 +126,45 @@ def visit_summary(ra: float, dec: float) -> dict[str, object] | None:
     }
 
 
+TARGETS = ROOT / "data" / "targets.json"  # Person C's point-source science targets
+# targets.json kind -> web/js/kinds.js kind
+SCIENCE_KIND = {"barnards-star": "moving_star", "rw-aur": "young_star", "r-dra": "variable_star"}
+
+
+def merge_science_targets(objects: list[dict[str, Any]], with_visits: bool) -> None:
+    """Point-source targets use the SAME 2026 position as /api/spectrum (data/targets.json),
+    so the site's requests hit the warmed cache. Missing ones are added."""
+    by_id = {o["id"]: o for o in objects}
+    for t in json.loads(TARGETS.read_text(encoding="utf-8"))["targets"]:
+        if t.get("ra_2026") is None:  # 3I/ATLAS: no fixed position
+            continue
+        ra, dec = float(t["ra_2026"]), float(t["dec_2026"])
+        o = by_id.get(t["id"])
+        if o is None:
+            o = {
+                "id": t["id"],
+                "name": t["name"],
+                "kind": SCIENCE_KIND.get(t["id"], t["kind"]),
+                "simbad_id": t.get("simbad_id"),
+                "simbad_type": t.get("otype"),
+                "aliases": [],
+                "size_arcmin": None,
+                "fov": t.get("fov", 0.1),
+            }
+            objects.append(o)
+        o["ra"], o["dec"] = round(ra, 5), round(dec, 5)
+        o["constellation"] = str(get_constellation(SkyCoord(ra, dec, unit="deg")))
+        o["coord_epoch"] = 2026.0
+        if t.get("pmra_mas_yr") is not None:
+            o["pm_mas_yr"] = [t["pmra_mas_yr"], t["pmdec_mas_yr"]]
+        o["spectrum"] = "point"  # the site asks /api/spectrum, not /api/surface-spectrum
+        if with_visits and "visits" not in o:
+            summary = visit_summary(round(ra, 4), round(dec, 4))
+            if summary is not None:
+                o["visits"] = summary
+            print(f"{o['name']}: {summary}", flush=True)
+
+
 def main() -> None:
     with_visits = "--no-visits" not in sys.argv
     t = simbad_table([o[2] for o in OBJECTS])
@@ -166,6 +206,7 @@ def main() -> None:
                 o["visits"] = summary
             print(f"{name}: {summary}", flush=True)
         objects.append(o)
+    merge_science_targets(objects, with_visits)
 
     OUT.write_text(
         json.dumps(

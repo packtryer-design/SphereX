@@ -43,6 +43,24 @@ export const KINDS = {
     about: "A nearby star that moves noticeably across the sky from year to year. It isn't a nebula. It's here because its change over time is real and well known, which makes it a useful check on what genuine change looks like in SPHEREx.",
     overTime: "Its position shifts between visits. In Colour-time view it leaves a coloured trail, and in Difference view it shows as a dark and bright pair, while stars that stay still cancel out.",
   },
+  brown_dwarf: {
+    label: "Brown dwarf",
+    plural: "Brown dwarfs",
+    about: "An object too small to burn hydrogen like a star, so it slowly cools. The coldest ones have water and methane in their air, which carve deep dips into their infrared spectrum, and most of their light comes out near 4 to 5 µm, right where SPHEREx looks.",
+    overTime: "Nearby brown dwarfs move across the sky by several arcseconds a year, so they can shift between visits. Use the Spectrum tab to see the molecules in their air.",
+  },
+  young_star: {
+    label: "Young star",
+    plural: "Young stars",
+    about: "A star still growing, with a disk of gas and dust around it. The warm disk glows in the infrared, so the star looks brighter at long SPHEREx wavelengths than a grown-up star would.",
+    overTime: "Young stars flicker as material falls onto them, so their brightness can change between visits.",
+  },
+  variable_star: {
+    label: "Pulsating red giant",
+    plural: "Variable stars",
+    about: "An old, swollen star that slowly pulsates, getting brighter and fainter over months. It's very bright in the infrared, often too bright for SPHEREx's detectors.",
+    overTime: "Its brightness changes a lot between visits. When it's too bright the detector saturates, and Blink leaves those frames out rather than guessing.",
+  },
   unknown: {
     label: "Object",
     plural: "Other",
@@ -80,6 +98,9 @@ export function kindFromType(type) {
   if (t === "SNR") return "supernova_remnant";
   if (t === "RNe") return "reflection";
   if (t === "DNe") return "dark";
+  if (t === "BD*") return "brown_dwarf";
+  if (t === "Mi*" || t === "LP*") return "variable_star";
+  if (t === "TT*" || t === "Or*" || t === "Y*O") return "young_star";
   return "unknown";
 }
 

@@ -1,4 +1,4 @@
-import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, resolveName, OfflineError } from "./api.js";
+import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, getPointSpectrum, resolveName, OfflineError } from "./api.js";
 import { readState, writeState, TABS } from "./state.js";
 import { Pane, skyAt, formatRaDec } from "./viewer.js";
 import { sampleLayers } from "./sample.js";
@@ -174,6 +174,7 @@ async function openObject(o, opts = {}) {
   frameCache.clear();
   spectrumKey = null;
   spectrumData = null;
+  renderBands();
   hiddenVisits.clear();
   paneA.clear();
   paneB.clear();
@@ -222,6 +223,9 @@ async function openObject(o, opts = {}) {
   renderPair();
   renderObservations();
   syncUrl();
+  // A star's spectrum uses its own small cutouts, not the images: no need to wait for them.
+  if (obj.spectrum === "point") { if (state.tab === "spectrum") loadSpectrum(); }
+  else ui.specMsg.textContent = "Waiting for the images to finish building: the spectrum reuses their downloads.";
 
   const exposures = visits.reduce((n, x) => n + x.n_frames, 0);
   showMsg("loading", `Building images of ${visits.length} visit${visits.length > 1 ? "s" : ""}`,
@@ -731,14 +735,25 @@ function renderObservations(err) {
 
 // ---------- spectrum tab ----------
 
-function renderBands() {
-  ui.bandsNote.textContent = "Each shaded band marks where a line common in nebulae would fall in SPHEREx data. A band is a reference, not a detection: the line is only there if the points rise inside it.";
-  ui.bandsList.replaceChildren(...features.bands.flatMap((b) => {
-    const dt = Object.assign(document.createElement("dt"), { textContent: `${b.name} · ${b.center_um} µm` });
-    const dd = Object.assign(document.createElement("dd"), { textContent: features.glossary[b.what] ?? "" });
-    return [dt, dd];
-  }));
+function renderBands(s = null) {
+  const own = s?.point && s.features?.bands?.length;
+  ui.bandsNote.textContent = own
+    ? `${s.features.label ? `${s.features.label}: e` : "E"}ach shaded band marks a feature expected for this kind of object. The status after it comes from the points themselves: seen, not clear, too faint to tell, or not measured (no usable exposures in that band).`
+    : "Each shaded band marks where a line common in nebulae would fall in SPHEREx data. A band is a reference, not a detection: the line is only there if the points rise inside it.";
+  const STATUS = { seen: "seen", not_clear: "not clear", too_faint: "too faint to tell", no_coverage: "not measured" };
+  const rows = own
+    ? s.features.bands.map((b) => [`${b.molecule === "none" ? "Window" : b.molecule} · ${b.lo}–${b.hi} µm · ${STATUS[b.status] ?? b.status}`, `${b.plain.replace(/\.$/, "")}. Source: ${b.ref}.`])
+    : features.bands.map((b) => [`${b.name} · ${b.center_um} µm`, features.glossary[b.what] ?? ""]);
+  ui.bandsList.replaceChildren(...rows.flatMap(([t, d]) => [
+    Object.assign(document.createElement("dt"), { textContent: t }),
+    Object.assign(document.createElement("dd"), { textContent: d }),
+  ]));
 }
+
+// A point source's features are wide bands with their own lo/hi; nebula lines are narrow.
+const chartBands = (s) => s?.point && s.features?.bands?.length
+  ? s.features.bands.map((b) => ({ name: b.molecule === "none" ? "window" : b.molecule, center_um: b.center_um, lo: b.lo, hi: b.hi }))
+  : features.bands;
 
 async function loadSpectrum(force = false) {
   if (!obj || !ctrl) return;
@@ -757,11 +772,18 @@ async function loadSpectrum(force = false) {
   spectrumData = null;
   ui.specChart.replaceChildren();
   ui.specLegend.replaceChildren();
-  ui.specMsg.textContent = "Measuring every exposure at this spot… This reuses the images' downloads, so it's quick once the images are built.";
+  // Catalog point sources (stars, brown dwarfs) get Person C's PSF spectrum of the object
+  // itself; a clicked spot or a nebula gets the surface-brightness spectrum.
+  const point = obj.spectrum === "point" && !spot;
+  ui.specMsg.textContent = point
+    ? "Measuring the star in every SPHEREx exposure… The first time this can take a few minutes (hundreds of small downloads); after that it opens instantly."
+    : "Measuring every exposure at this spot… This reuses the images' downloads, so it's quick once the images are built. The first time can take a minute or two.";
   const my = token;
   let s;
   try {
-    s = await getSpectrum({ ra: pos.ra, dec: pos.dec, field_ra: obj.ra, field_dec: obj.dec, fov: obj.fov }, ctrl.signal);
+    s = point
+      ? await getPointSpectrum({ ra: obj.ra, dec: obj.dec, target: obj.id }, ctrl.signal)
+      : await getSpectrum({ ra: pos.ra, dec: pos.dec, field_ra: obj.ra, field_dec: obj.dec, fov: obj.fov }, ctrl.signal);
   } catch (err) {
     if (err.name === "AbortError" || my !== token || key !== spectrumKey) return;
     spectrumKey = null;
@@ -775,6 +797,7 @@ async function loadSpectrum(force = false) {
 
 function drawSpectrumNow() {
   const s = spectrumData;
+  renderBands(s);
   if (!s) return;
   if (!s.points.length) {
     ui.specChart.replaceChildren();
@@ -786,7 +809,7 @@ function drawSpectrumNow() {
     return { ...p, group: i ?? -1, color: i != null ? visits[i].color : "#999" };
   });
   const groups = [...new Set(pts.map((p) => p.group))].sort((a, b) => a - b);
-  drawSpectrum(ui.specChart, pts.filter((p) => !hiddenVisits.has(p.group)), features.bands, { yLabel: `brightness (${s.unit})` });
+  drawSpectrum(ui.specChart, pts.filter((p) => !hiddenVisits.has(p.group)), chartBands(s), { yLabel: `brightness (${s.unit})` });
   ui.specLegend.replaceChildren(...groups.map((g) => {
     const b = document.createElement("button");
     const v = visits[g];
@@ -802,7 +825,21 @@ function drawSpectrumNow() {
     });
     return b;
   }));
-  ui.specMsg.textContent = `${pts.length} exposures, coloured by visit. Surface brightness in ${s.unit} with zodiacal light (sunlit dust in the Solar System) removed, averaged over 3×3 pixels. Where visits overlap, they agree unless something changed.${s.saturation_note ? ` ${s.saturation_note}` : ""}`;
+  ui.specMsg.textContent = s.point ? pointSpectrumText(s, pts.length) : `${pts.length} exposures, coloured by visit. Surface brightness in ${s.unit} with zodiacal light (sunlit dust in the Solar System) removed, averaged over 3×3 pixels. Where visits overlap, they agree unless something changed.${s.saturation_note ? ` ${s.saturation_note}` : ""}`;
+}
+
+// Plain-language summary of Person C's point-source spectrum (fields: docs/SPECTRUM_API.md).
+function pointSpectrumText(s, n) {
+  const parts = [`${n} of ${s.n_frames} exposures, coloured by visit. Brightness of the star itself in ${s.unit}, fitted with SPHEREx's own star shape (PSF), with a 3% calibration margin on each error bar.`];
+  for (const b of s.blends ?? []) {
+    parts.push(b.fitted
+      ? `A nearby star (G=${b.g_mag}, ${b.sep_arcsec}″ away) was fitted at the same time, so its light is taken out.`
+      : `A nearby star (G=${b.g_mag}, ${b.sep_arcsec}″ away) is too close to separate and may add some light.`);
+  }
+  const w = s.w2_check;
+  if (w) parts.push(`Check against NASA's WISE at 4.6 µm: SPHEREx ${w.spherex_mJy.toFixed(2)} mJy vs WISE ${w.wise_mJy.toFixed(2)} mJy (${Math.round(w.ratio * 100)}%)${w.wise_saturated ? ", WISE saturated" : ""}.`);
+  if (s.saturation_note) parts.push(s.saturation_note);
+  return parts.join(" ");
 }
 
 // ---------- about tab ----------
