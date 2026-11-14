@@ -70,10 +70,17 @@ def get_cutouts(ra: float, dec: float, fov: float) -> list[Cutout]:
     return fetch_cutouts(ra, dec, fov)[0]
 
 
-def fetch_cutouts(ra: float, dec: float, fov: float) -> tuple[list[Cutout], int]:
-    """Cutouts plus the number of frames that failed to download."""
+def fetch_cutouts(
+    ra: float, dec: float, fov: float, mjd_range: tuple[float, float] | None = None
+) -> tuple[list[Cutout], int]:
+    """Cutouts plus the number of frames that failed to download.
+
+    `mjd_range`: only frames taken in this window (moving targets need a few days, not all).
+    """
     ra, dec, fov = round(ra, 4), round(dec, 4), round(fov, 3)  # stable cache keys
     frames = query_frames(ra, dec)
+    if mjd_range:
+        frames = [f for f in frames if mjd_range[0] <= f[1] <= mjd_range[1]]
     size = round(fov * 1.5, 4)  # margin so rotated frames still fill the output square
     with httpx.Client(timeout=120) as client, ThreadPoolExecutor(MAX_WORKERS) as pool:
         results = list(pool.map(lambda f: _fetch(client, *f, ra, dec, size), frames))

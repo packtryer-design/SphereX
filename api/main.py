@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from api.imaging.config import CACHE_DIR
 from api.imaging.pipeline import build_frames, seed_cache
+from api.imaging.track import BODIES, build_track
 from api.imaging.visits import list_visits
 from api.resolve import resolve
 from api.science.asteroids import build_asteroids
@@ -40,6 +41,20 @@ def visits(
         return list_visits(ra, dec)
     except RuntimeError as e:
         raise HTTPException(503, str(e)) from e
+
+
+@app.get("/api/track")
+def track(
+    body: str = Query("pluto", pattern=f"^({'|'.join(BODIES)})$"),
+    mjd: float = Query(60956.0, ge=60700, le=70000),  # SPHEREx data starts mid-2025
+    days: float = Query(2.0, gt=0, le=5),
+    fov: float = Query(0.1, ge=0.02, le=0.5),
+) -> dict[str, Any]:
+    """A Solar System body followed through SPHEREx frames, with JPL Horizons positions."""
+    try:
+        return build_track(body, mjd, days, fov)
+    except Exception as e:  # IRSA or JPL Horizons down, nothing cached
+        raise HTTPException(503, f"tracking unavailable: {e}") from e
 
 
 @app.get("/api/frames")
