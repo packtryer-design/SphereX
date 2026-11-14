@@ -1,0 +1,74 @@
+{
+  "_fake": true,
+  "target": {
+    "ra": 269.44627,
+    "dec": 4.7682,
+    "fov": 0.1
+  },
+  "frames": [
+    {
+      "png": "/fixtures/png/fake_00.png",
+      "mjd": 60800.0,
+      "epoch": 1,
+      "detector": 1,
+      "wavelength_um": 1.05,
+      "flagged_frac": 0.004
+    },
+    {
+      "png": "/fixtures/png/fake_01.png",
+      "mjd": 60891.3,
+      "epoch": 1,
+      "detector": 2,
+      "wavelength_um": 1.8,
+      "flagged_frac": 0.046
+    },
+    {
+      "png": "/fixtures/png/fake_02.png",
+      "mjd": 60982.6,
+      "epoch": 2,
+      "detector": 3,
+      "wavelength_um": 2.55,
+      "flagged_frac": 0.019
+    },
+    {
+      "png": "/fixtures/png/fake_03.png",
+      "mjd": 61073.9,
+      "epoch": 2,
+      "detector": 4,
+      "wavelength_um": 3.3,
+      "flagged_frac": 0.047
+    },
+    {
+      "png": "/fixtures/png/fake_04.png",
+      "mjd": 61165.2,
+      "epoch": 3,
+      "detector": 5,
+      "wavelength_um": 4.05,
+      "flagged_frac": 0.039
+    },
+    {
+      "png": "/fixtures/png/fake_05.png",
+      "mjd": 61256.5,
+      "epoch": 3,
+      "detector": 6,
+      "wavelength_um": 4.8,
+      "flagged_frac": 0.036
+    },
+    {
+      "png": "/fixtures/png/fake_06.png",
+      "mjd": 61347.8,
+      "epoch": 4,
+      "detector": 1,
+      "wavelength_um": 1.05,
+      "flagged_frac": 0.014
+    },
+    {
+      "png": "/fixtures/png/fake_07.png",
+      "mjd": 61439.1,
+      "epoch": 4,
+      "detector": 2,
+      "wavelength_um": 1.8,
+      "flagged_frac": 0.017
+    }
+  ]
+}
