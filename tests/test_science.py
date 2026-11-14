@@ -1,9 +1,8 @@
 import numpy as np
-from astropy.wcs import WCS
-
 from api.imaging.cutouts import Cutout
 from api.science.ghosts import propagate
 from api.science.spectrum import MJY_SR_TO_MJY, bin_spectrum, photometry, position_at
+from astropy.wcs import WCS
 
 
 def _cutout(star_x=12.0, star_y=12.0, amp=100.0, sky=5.0, n=25):
@@ -15,8 +14,15 @@ def _cutout(star_x=12.0, star_y=12.0, amp=100.0, sky=5.0, n=25):
     yy, xx = np.mgrid[0:n, 0:n]
     star = amp * np.exp(-0.5 * ((xx - star_x) ** 2 + (yy - star_y) ** 2) / 0.6**2)
     img = sky + star
-    return Cutout(img=img, var=np.full_like(img, 0.01), wave=np.full_like(img, 2.5),
-                  wcs=w, mjd=61000.0, detector=3, url="test"), star
+    return Cutout(
+        img=img,
+        var=np.full_like(img, 0.01),
+        wave=np.full_like(img, 2.5),
+        wcs=w,
+        mjd=61000.0,
+        detector=3,
+        url="test",
+    ), star
 
 
 def test_photometry_recovers_star_flux_and_removes_sky():

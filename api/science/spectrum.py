@@ -91,7 +91,7 @@ def bin_spectrum(points: list[dict], r: float = BIN_R) -> list[dict]:
     er = np.array([p["err"] for p in points])
     edges = np.exp(np.arange(np.log(0.75), np.log(5.0) + 1 / r, 1 / r))
     out = []
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in zip(edges[:-1], edges[1:], strict=True):
         m = (wl >= lo) & (wl < hi)
         if m.sum() == 0:
             continue
@@ -108,12 +108,14 @@ def bin_spectrum(points: list[dict], r: float = BIN_R) -> list[dict]:
         if f.size > 2:  # don't trust the formal error if the points scatter more
             chi2 = float(np.sum(wt * (f - mean) ** 2) / (f.size - 1))
             err *= max(1.0, np.sqrt(chi2))
-        out.append({
-            "wavelength_um": round(float(np.mean(w)), 4),
-            "flux": round(mean, 5),
-            "err": round(err, 5),
-            "n": int(f.size),
-        })
+        out.append(
+            {
+                "wavelength_um": round(float(np.mean(w)), 4),
+                "flux": round(mean, 5),
+                "err": round(err, 5),
+                "n": int(f.size),
+            }
+        )
     return out
 
 
@@ -131,10 +133,12 @@ def blends(ra: float, dec: float, mjds: list[float], target: dict | None) -> lis
     tra, tdec = position_at(target, ra, dec, mid)
     pos = propagate(stars, np.array([mid])) if stars else []
     out = []
-    for s, p in zip(stars, pos):
+    for s, p in zip(stars, pos, strict=True):
         d = float(np.hypot((p[0, 0] - tra) * np.cos(np.radians(tdec)), p[0, 1] - tdec)) * 3600
         if 1.0 < d <= (AP_R + 1) * PIXEL_SCALE_ARCSEC:  # < 1": that's the target itself
-            out.append({"source_id": s["source_id"], "g_mag": s["g_mag"], "sep_arcsec": round(d, 1)})
+            out.append(
+                {"source_id": s["source_id"], "g_mag": s["g_mag"], "sep_arcsec": round(d, 1)}
+            )
     return sorted(out, key=lambda b: b["sep_arcsec"])
 
 

@@ -1,5 +1,4 @@
 import numpy as np
-
 from api.science.features import interpret, load_features
 
 
@@ -10,7 +9,10 @@ def _spectrum(dips=(), bumps=(), noise=0.01):
         flux *= 1 - 0.5 * np.exp(-0.5 * ((wl - c) / 0.05) ** 2)
     for c in bumps:
         flux *= 1 + 0.5 * np.exp(-0.5 * ((wl - c) / 0.04) ** 2)
-    return [{"wavelength_um": w, "flux": f, "err": noise * f, "epoch": 1} for w, f in zip(wl, flux)]
+    return [
+        {"wavelength_um": w, "flux": f, "err": noise * f, "epoch": 1}
+        for w, f in zip(wl, flux, strict=True)
+    ]
 
 
 def status(result, band_id):
@@ -50,7 +52,7 @@ def test_unknown_target_returns_none():
 def test_brown_dwarf_bright_window_is_excess():
     wl = np.linspace(0.75, 5.0, 102)
     pts = _spectrum()
-    for p, w in zip(pts, wl):
+    for p, w in zip(pts, wl, strict=True):
         if 4.0 <= w <= 4.5:
             p["flux"] *= 4
     assert status(interpret(pts, "wise-0855"), "window_4.4") == "seen"

@@ -49,7 +49,11 @@ def main() -> None:
         )
     (ROOT / "frames.json").write_text(
         json.dumps(
-            {"_fake": True, "target": {"ra": 269.44627, "dec": 4.7682, "fov": 0.1}, "frames": frames},
+            {
+                "_fake": True,
+                "target": {"ra": 269.44627, "dec": 4.7682, "fov": 0.1},
+                "frames": frames,
+            },
             indent=2,
         )
         + "\n",
@@ -59,15 +63,24 @@ def main() -> None:
     # Spectrum: cool-object continuum with water / methane dips, bright 4-5 um.
     wl = np.linspace(0.75, 5.0, 102)
     f = np.exp(-((wl - 1.25) ** 2) / 0.3) + 1.6 * np.exp(-((wl - 4.4) ** 2) / 0.25) + 0.05
-    for c, d, w in [(1.4, 0.6, 0.06), (1.9, 0.6, 0.08), (1.65, 0.4, 0.05),
-                    (2.2, 0.4, 0.06), (3.3, 0.7, 0.1)]:
+    for c, d, w in [
+        (1.4, 0.6, 0.06),
+        (1.9, 0.6, 0.08),
+        (1.65, 0.4, 0.05),
+        (2.2, 0.4, 0.06),
+        (3.3, 0.7, 0.1),
+    ]:
         f *= 1 - d * np.exp(-((wl - c) ** 2) / (2 * w**2))
     f *= 0.01
     err = 0.05 * f + 0.0003
     noisy = f + rng.normal(0, err)
     pts = [
-        {"wavelength_um": round(float(w), 4), "flux": round(float(v), 6),
-         "err": round(float(e), 6), "epoch": 1}
+        {
+            "wavelength_um": round(float(w), 4),
+            "flux": round(float(v), 6),
+            "err": round(float(e), 6),
+            "epoch": 1,
+        }
         for w, v, e in zip(wl, noisy, err, strict=True)
     ]
     (ROOT / "spectrum.json").write_text(

@@ -49,6 +49,7 @@ addopts = "-ra --cov=my_package --cov-report=term-missing"
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+extend-exclude = ["notebooks"]  # exploratory, not production code
 target-version = "py310"
 
 [tool.ruff.lint]

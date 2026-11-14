@@ -32,8 +32,14 @@ def skybot(mjd: float, ra: float, dec: float, radius_deg: float) -> list[dict]:
     r = httpx.get(
         SKYBOT_URL,
         params={
-            "-ep": mjd + MJD_TO_JD, "-ra": ra, "-dec": dec, "-rd": radius_deg,
-            "-mime": "json", "-output": "basic", "-loc": "500", "-from": "Blink102",
+            "-ep": mjd + MJD_TO_JD,
+            "-ra": ra,
+            "-dec": dec,
+            "-rd": radius_deg,
+            "-mime": "json",
+            "-output": "basic",
+            "-loc": "500",
+            "-from": "Blink102",
         },
         timeout=60,
     )
@@ -47,15 +53,19 @@ def skybot(mjd: float, ra: float, dec: float, radius_deg: float) -> list[dict]:
         vmag = row.get("VMag (mag)")
         if vmag is not None and vmag > VMAG_LIMIT:
             continue
-        out.append({
-            "name": row["Name"],
-            "number": row.get("Num"),
-            "class": row.get("Class"),
-            "vmag": vmag,
-            "ra": round(float(Angle(row["RA (hms)"], unit="hourangle").deg), 6),
-            "dec": round(float(Angle(row["DEC (dms)"], unit="deg").deg), 6),
-            "rate_arcsec_h": round(float(np.hypot(row["dRA (arcsec/h)"], row["dDEC (arcsec/h)"])), 2),
-        })
+        out.append(
+            {
+                "name": row["Name"],
+                "number": row.get("Num"),
+                "class": row.get("Class"),
+                "vmag": vmag,
+                "ra": round(float(Angle(row["RA (hms)"], unit="hourangle").deg), 6),
+                "dec": round(float(Angle(row["DEC (dms)"], unit="deg").deg), 6),
+                "rate_arcsec_h": round(
+                    float(np.hypot(row["dRA (arcsec/h)"], row["dDEC (arcsec/h)"])), 2
+                ),
+            }
+        )
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(out))
     return out
@@ -87,15 +97,26 @@ def build_asteroids(ra: float, dec: float, fov: float) -> dict[str, Any]:
             dx = (o["ra"] - ra) * np.cos(np.radians(dec))
             if abs(dx) > half or abs(o["dec"] - dec) > half:
                 continue
-            obj = objects.setdefault(o["name"], {k: o[k] for k in ("name", "number", "class", "vmag")} | {"positions": []})
-            obj["positions"].append({
-                "mjd": round(t, 3), "epoch": slots[t], "ra": o["ra"], "dec": o["dec"],
-                "rate_arcsec_h": o["rate_arcsec_h"],
-            })
+            obj = objects.setdefault(
+                o["name"],
+                {k: o[k] for k in ("name", "number", "class", "vmag")} | {"positions": []},
+            )
+            obj["positions"].append(
+                {
+                    "mjd": round(t, 3),
+                    "epoch": slots[t],
+                    "ra": o["ra"],
+                    "dec": o["dec"],
+                    "rate_arcsec_h": o["rate_arcsec_h"],
+                }
+            )
     objs = sorted(objects.values(), key=lambda o: o["vmag"] if o["vmag"] is not None else 99)
     return {
         "target": target,
-        "source": "IMCCE SkyBoT (geocentric; SPHEREx is in low Earth orbit, so near-Earth objects can be off by a few arcsec)",
+        "source": (
+            "IMCCE SkyBoT (geocentric; SPHEREx is in low Earth orbit, "
+            "so near-Earth objects can be off by a few arcsec)"
+        ),
         "times": [{"mjd": round(t, 3), "epoch": slots[t]} for t in times],
         "objects": objs,
     }
