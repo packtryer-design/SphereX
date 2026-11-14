@@ -12,7 +12,13 @@ from astropy.wcs import WCS
 from PIL import Image
 from reproject import reproject_interp
 
-from api.imaging.config import CACHE_DIR, EPOCH_GAP_DAYS, MAX_EPOCH_DAYS, PIXEL_SCALE_ARCSEC
+from api.imaging.config import (
+    CACHE_DIR,
+    EPOCH_GAP_DAYS,
+    MAX_DLAMBDA,
+    MAX_EPOCH_DAYS,
+    PIXEL_SCALE_ARCSEC,
+)
 from api.imaging.cutouts import Cutout, fetch_cutouts
 
 MODES = ("single", "epoch", "rgb", "diff")
@@ -192,17 +198,41 @@ def _combine(
         )
         m = meta(pick[-1]) | {"epoch": None, "n_frames": sum(meta(e)["n_frames"] for e in pick)}
         return [[epoch_image(e) for e in pick]], [m]
-    # diff: per detector first, so wavelength differences cancel
+    return _matched_diff(frames, zs, have, dets, meta)
+
+
+def _matched_diff(
+    frames: list[dict[str, Any]],
+    zs: list[np.ndarray],
+    epochs: list[int],
+    dets: list[int],
+    meta: Any,
+) -> tuple[list[Any], list[dict[str, Any]]]:
+    """Later epochs minus the first, using only frame pairs at the same wavelength.
+
+    SPHEREx sees a spot at a different wavelength in every frame, so subtracting
+    mismatched frames makes any coloured star look like it changed. Each frame is
+    paired with the first-epoch frame from the same detector at the closest
+    wavelength, kept only if they differ by < MAX_DLAMBDA.
+    """
+    usable = [
+        i for i, f in enumerate(frames) if f["detector"] in dets and f["wavelength_um"] is not None
+    ]
+    ref = [i for i in usable if frames[i]["epoch"] == epochs[0]]
     images, out = [], []
-    for e in have[1:]:
-        ds = [
-            stack[(e, d)] - stack[(have[0], d)]
-            for d in dets
-            if (e, d) in stack and (have[0], d) in stack
-        ]
-        if ds:
+    for e in epochs[1:]:
+        diffs = []
+        for i in (i for i in usable if frames[i]["epoch"] == e):
+            wl, det = frames[i]["wavelength_um"], frames[i]["detector"]
+            same_det = [j for j in ref if frames[j]["detector"] == det]
+            if not same_det:
+                continue
+            j = min(same_det, key=lambda j: abs(frames[j]["wavelength_um"] - wl))
+            if abs(frames[j]["wavelength_um"] - wl) / wl < MAX_DLAMBDA:
+                diffs.append(zs[i] - zs[j])
+        if diffs:  # an epoch with no matching wavelengths is left out, not faked
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                images.append(np.nanmean(ds, axis=0))
-            out.append(meta(e))
+                images.append(np.nanmedian(diffs, axis=0))  # median: drops cosmic rays
+            out.append(meta(e) | {"n_frames": 2 * len(diffs)})
     return images, out
