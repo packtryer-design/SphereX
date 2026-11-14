@@ -15,6 +15,10 @@ import numpy as np
 FEATURES_PATH = Path(__file__).resolve().parents[2] / "data" / "features.json"
 SEEN_SIGMA = 3.0
 REF_BAND = (2.0, 2.3)  # um, continuum reference for "excess" bands
+BLEND_NOTE = (
+    "Another star sits inside the 12-arcsec aperture, so its light is mixed in. "
+    "Treat short-wavelength bands with care; 6-arcsec pixels cannot split them."
+)
 
 
 @lru_cache(maxsize=1)
@@ -52,22 +56,27 @@ def _wmean(f: np.ndarray, e: np.ndarray) -> tuple[float, float]:
 def _band_contrast(wl, fx, er, lo, hi, side):
     """Return (contrast, sigma) where contrast = in-band / continuum - 1.
 
-    Continuum = straight line through weighted means of the two side windows.
+    Continuum = power law through weighted means of the two side windows.
     """
     inb = (wl >= lo) & (wl <= hi)
-    left = (wl >= lo - side) & (wl < lo)
-    right = (wl > hi) & (wl <= hi + side)
+    for s in (side, 2 * side, 3 * side):  # widen across detector gaps
+        left = (wl >= lo - s) & (wl < lo)
+        right = (wl > hi) & (wl <= hi + s)
+        if left.sum() >= 1 and right.sum() >= 1:
+            break
     if inb.sum() < 1 or left.sum() < 1 or right.sum() < 1:
         return None
     fl, el = _wmean(fx[left], er[left])
     fr, er_ = _wmean(fx[right], er[right])
     xl, xr = wl[left].mean(), wl[right].mean()
     fin, ein = _wmean(fx[inb], er[inb])
-    t = (wl[inb].mean() - xl) / (xr - xl)
-    cont = (1 - t) * fl + t * fr
-    econt = np.hypot((1 - t) * el, t * er_)
-    if cont <= 0:
+    if fl <= 0 or fr <= 0:
         return None
+    # power law through the side windows (straight in log-log): a smooth stellar
+    # slope then gives zero contrast instead of a fake dip
+    t = np.log(wl[inb].mean() / xl) / np.log(xr / xl)
+    cont = fl ** (1 - t) * fr**t
+    econt = cont * np.hypot((1 - t) * el / fl, t * er_ / fr)
     ratio = fin / cont
     sig = abs(ratio) * np.hypot(ein / fin if fin else np.inf, econt / cont)
     return ratio - 1.0, float(sig)
@@ -123,7 +132,9 @@ def measure(points: list[dict], profile: str) -> list[dict]:
     return out
 
 
-def interpret(points: list[dict], target_id: str | None = None, kind: str | None = None) -> dict | None:
+def interpret(
+    points: list[dict], target_id: str | None = None, kind: str | None = None, blended: bool = False
+) -> dict | None:
     """Full payload for /api/spectrum's `features` field."""
     profile = profile_for(target_id, kind)
     if profile is None:
@@ -136,4 +147,5 @@ def interpret(points: list[dict], target_id: str | None = None, kind: str | None
         "plain": prof["plain"],
         "seen": sum(b["status"] == "seen" for b in bands),
         "bands": bands,
+        "caveat": BLEND_NOTE if blended else None,
     }

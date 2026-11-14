@@ -33,7 +33,7 @@
         {"id": "ch4_2.2", "molecule": "CH4 + H2", "lo": 2.15, "hi": 2.45, "type": "absorption", "plain": "Methane plus hydrogen pressure absorption", "ref": "burgasser2006"},
         {"id": "h2o_2.7", "molecule": "H2O", "lo": 2.55, "hi": 3.00, "type": "absorption", "plain": "Strongest water band", "ref": "cushing2005"},
         {"id": "ch4_3.3", "molecule": "CH4", "lo": 3.15, "hi": 3.55, "type": "absorption", "plain": "Strongest methane band", "ref": "kirkpatrick2005"},
-        {"id": "window_4.4", "molecule": "none", "lo": 3.95, "hi": 4.45, "type": "emission", "plain": "Clear window: light from deep hot layers escapes, so the object is brightest here", "ref": "skemer2016"},
+        {"id": "window_4.4", "molecule": "none", "lo": 4.00, "hi": 4.45, "type": "excess", "plain": "Clear window: far brighter here than a normal star would be, because light from deep hot layers escapes", "ref": "skemer2016"},
         {"id": "co_4.6", "molecule": "CO", "lo": 4.50, "hi": 4.80, "type": "absorption", "plain": "Carbon monoxide stirred up from deep layers", "ref": "noll1997"}
       ]
     },
