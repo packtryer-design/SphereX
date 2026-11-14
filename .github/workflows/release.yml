@@ -1,0 +1,27 @@
+name: Release
+
+# Publishes to PyPI when you publish a GitHub Release.
+# Setup: on pypi.org, add this repo as a "trusted publisher" (no API token needed),
+# and create a GitHub environment named "pypi".
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install build
+      - run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
