@@ -19,6 +19,7 @@ dependencies = [
     "astropy",
     "astroquery",
     "reproject",
+    "scipy",  # psf.py (map_coordinates); was only arriving via reproject
     "pillow",
     "fastapi",
     "uvicorn",

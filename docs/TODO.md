@@ -37,7 +37,7 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 | # | Task | Done when |
 |---|---|---|
 | B1 | 🔴 **Wire C's spectrum into the Spectrum tab.** The site only calls `/api/surface-spectrum` (the nebula method), so C's PSF photometry, WISE check and saturation note never show. Stars and brown dwarfs should use `/api/spectrum?ra=&dec=&target=<id>`; nebulae stay on `surface-spectrum`. | Barnard's Star shows C's spectrum with its saturation note, and WISE 0855 shows its WISE W2 check |
-| B2 | 🟠 **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. | `?o=barnards-star` opens instantly after warming |
+| B2 | 🟠 **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. **Also add the 4 missing science targets** (eps-indi-b, wise-0855, rw-aur, r-dra); see [SPECTRUM_API.md](SPECTRUM_API.md). | `?o=barnards-star` opens instantly after warming, and `?o=wise-0855` opens |
 | B3 | Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
 | B4 | Add a favicon (the only 404 in the browser console) | Console is clean |
 | B5 | Phone layout check, `<iframe>` embed example | Works at phone width |
@@ -51,9 +51,9 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Done when |
 |---|---|---|
-| C1 | **Help B with B1:** tell B which fields from `/api/spectrum` to show and how (`saturation_note`, `w2_check`, `blends`, binned points) | B1 merged |
-| C2 | Add `scipy` to `dependencies` in `pyproject.toml`. `psf.py` imports it, and it only works today because `reproject` happens to install it. | Listed in `pyproject.toml` |
-| C3 | Add a sentence to the docs: the ePSF calibration files come from QR3 and are also applied to DR1 frames | Noted in `SUBMISSION.md` or the code |
+| C1 | 🟡 Field guide written: [SPECTRUM_API.md](SPECTRUM_API.md). **Help B with B1:** tell B which fields from `/api/spectrum` to show and how (`saturation_note`, `w2_check`, `blends`, binned points) | B1 merged |
+| C2 | ✅ Add `scipy` to `dependencies` in `pyproject.toml`. `psf.py` imports it, and it only works today because `reproject` happens to install it. | Listed in `pyproject.toml` |
+| C3 | ✅ Add a sentence to the docs: the ePSF calibration files come from QR3 and are also applied to DR1 frames | Noted in `SUBMISSION.md` or the code |
 | C4 | **Rewrite `PITCH.md` and `SUBMISSION.md` to the story from T1.** Keep the strong honest results: Barnard's Star motion, the WISE 0855 W2 agreement within 14%, saturation handled openly. | Pitch matches the site |
 | C5 | **Rehearse the pitch 3 times with A and B** (06:00–09:00) | Done 3 times, timed |
 | C6 | **Submit on spaceappschallenge.org and confirm the Google Form** (09:00–10:00) | Confirmation emails received |
