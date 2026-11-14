@@ -23,7 +23,7 @@ Use `ra_2026`/`dec_2026` from `data/targets.json`. Other coordinates make a diff
 
 ## Catalog gap (part of B2)
 
-`web/data/objects.json` has only **barnards-star** of the 6 science targets. `eps-indi-b`, `wise-0855`, `rw-aur` and `r-dra` are missing, so `?o=wise-0855` doesn't open. Searching by name doesn't help either: it gives SIMBAD's J2000 position, and WISE 0855 has moved about 1.5′ since then, so the spectrum would miss it. Add the 4 entries using `ra_2026`/`dec_2026` from `data/targets.json`. `3i-atlas` has no fixed position (A6).
+`web/data/objects.json` has only **barnards-star** of the 6 science targets. `eps-indi-b`, `wise-0855`, `rw-aur` and `r-dra` are missing, so `?o=wise-0855` doesn't open. Searching by name doesn't help either: it gives SIMBAD's J2000 position, and WISE 0855 moves 8″ a year (about 3.5′ since 2000), so the spectrum would miss it completely. Add the 4 entries using `ra_2026`/`dec_2026` from `data/targets.json`. `3i-atlas` has no fixed position (A6).
 
 ## Quick checks once wired
 
