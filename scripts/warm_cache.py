@@ -39,7 +39,11 @@ else:
     science = ROOT / "data" / "targets.json"  # Person C's demo targets, at 2026 positions
     if science.exists():
         for t in json.loads(science.read_text(encoding="utf-8"))["targets"]:
-            ra, dec = t.get("ra_2026", t["ra"]), t.get("dec_2026", t["dec"])
+            # `or`, not get(..., default): the keys exist but are null for the comet
+            ra, dec = t.get("ra_2026") or t["ra"], t.get("dec_2026") or t["dec"]
+            if ra is None:  # 3I/ATLAS moves: needs per-frame JPL Horizons positions
+                logging.warning("skipping %s: no fixed position", t["name"])
+                continue
             everything.append(
                 {"id": t["id"], "name": t["name"], "ra": ra, "dec": dec, "fov": t.get("fov", 0.1)}
             )
