@@ -49,9 +49,9 @@ Rule: **no discovery claims.** The strongest wording we use is "candidate for re
 
 | Question | Answer |
 |---|---|
-| Is the spectrum calibrated? | Fluxes are PSF fits with SPHEREx's official ePSFs on IRSA's calibrated, zodi-subtracted images (MJy/sr → mJy); aperture photometry only where a fit fails. A 3 % systematic floor is added to every error bar. Good for shape; absolute level ~10 %. |
+| Is the spectrum calibrated? | Fluxes are PSF fits with SPHEREx's official ePSFs on IRSA's calibrated, zodi-subtracted images (MJy/sr → mJy); aperture photometry only where a fit fails. A 3 % systematic floor is added to every error bar. Good for shape; absolute level ~10 %. Each spectrum is cross-checked against AllWISE W2 (4.6 µm): WISE 0855 agrees within 14 %. |
 | How do you know it's water? | Band depth vs a power-law continuum fitted either side, ≥ 3σ. Band edges from Cushing 2005, Burgasser 2006 (cited in-app). For WISE 0855, SPHEREx sees the *effect* (light only escaping at 4–5 µm) rather than individual dips — it is ~25th mag below 2 µm. |
 | Isn't WISE 0855 blended? | Yes — a G=16.3 star sits 7″ away, 1 pixel. We fit both stars together with the SPHEREx PSF, so the neighbour's light is split off (254 of 258 points). Before that, the "brown dwarf" showed 0.9 mJy below 2 µm — all of it the neighbour. After: zero below 4 µm, ~0.5 mJy at 4.4–5 µm, consistent with WISE W2. |
 | How do you check asteroids? | IMCCE SkyBoT at each frame time; next step is cross-checking with JPL SBIdent. |
 | What about Planet X itself? | Too faint/slow for a 6″ pixel in one year; the same blink + ghost logic is how a wide survey would find it. |
-| Data source? | SPHEREx DR1 / quick release spectral images, IRSA SIA + cutout service; Gaia DR3 + CatWISE2020 for ghosts (CatWISE sees cold brown dwarfs Gaia can't). |
+| Data source? | SPHEREx DR1 / quick release spectral images, IRSA SIA + cutout service; Gaia DR3 + CatWISE2020 for ghosts (CatWISE sees cold brown dwarfs Gaia can't); AllWISE W2 as flux sanity check. |

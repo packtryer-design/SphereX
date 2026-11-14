@@ -34,7 +34,17 @@ MJY_SR_TO_MJY = PIX_SR * 1e9  # MJy/sr in one pixel -> mJy
 BIN_R = 40  # resolving power of the binned spectrum (SPHEREx is R~35-130)
 SYS_FRAC = 0.03  # calibration floor, SPHEREx Explanatory Supplement Eq. 19
 NEIGHBOUR_PX = 4.0  # Gaia stars this close are fitted together with the target
+RESOLVE_PX = 0.5  # closer than this two PSFs are degenerate: light stays mixed (unresolved)
+SELF_ARCSEC = 1.0  # Gaia star this close to the target position is the target itself
 CORE_PX = 1.0  # flagged pixel this close to the source: skip the frame, don't guess
+W2_BAND = (4.2, 5.0)  # um, part of WISE W2 (4.0-5.3) that SPHEREx covers well
+W2_ZERO_MJY = 171787.0  # W2 Vega zero point, 171.787 Jy (Jarrett et al. 2011, ApJ 735, 112)
+ALLWISE_MJD = 55400.0  # ~2010.5, mean AllWISE epoch
+W2_MATCH_ARCSEC = 4.0
+SAT_NOTE = (
+    "Too bright for SPHEREx: the star saturated the detector in {} of {} frames, "
+    "and those frames are left out rather than guessed."
+)
 
 
 def _with_floor(flux: float, err: float) -> float:
@@ -94,6 +104,16 @@ def photometry(c: Cutout, ra: float, dec: float) -> dict[str, float] | None:
     }
 
 
+def _core_flagged(c: Cutout, ra: float, dec: float) -> bool:
+    """Flagged (NaN) pixel on the source: almost always saturation for our targets."""
+    x, y = (float(v) for v in c.wcs.all_world2pix(ra, dec, 0))
+    ny, nx = c.img.shape
+    if not (0 <= x < nx and 0 <= y < ny):
+        return False
+    yy, xx = np.mgrid[0:ny, 0:nx]
+    return bool(np.isnan(c.img[np.hypot(xx - x, yy - y) <= CORE_PX]).any())
+
+
 def psf_photometry(
     c: Cutout, ra: float, dec: float, neighbours: list[tuple[float, float]] = ()
 ) -> dict[str, float] | None:
@@ -102,8 +122,7 @@ def psf_photometry(
     ny, nx = c.img.shape
     if not (2 <= x < nx - 2 and 2 <= y < ny - 2):
         return None
-    yy, xx = np.mgrid[0:ny, 0:nx]
-    if np.isnan(c.img[np.hypot(xx - x, yy - y) <= CORE_PX]).any():
+    if _core_flagged(c, ra, dec):
         return None
     wave = float(c.wave[int(round(y)), int(round(x))])
     if not np.isfinite(wave):
@@ -121,6 +140,8 @@ def psf_photometry(
     if r is None or not np.isfinite(r["amp"][0]):
         return None
     flux, err = float(r["amp"][0]), float(r["err"][0])
+    if np.isfinite(r["fit_ql"]):
+        err *= max(1.0, r["fit_ql"])  # residuals above noise: PSF model is off, widen the error
     return {
         "wavelength_um": round(wave, 4),
         "flux": flux * MJY_SR_TO_MJY,
@@ -185,16 +206,57 @@ def blends(ra: float, dec: float, mjds: list[float], target: dict | None) -> lis
     out = []
     for s, p in zip(stars, pos, strict=True):
         d = float(np.hypot((p[0, 0] - tra) * np.cos(np.radians(tdec)), p[0, 1] - tdec)) * 3600
-        if 1.0 < d <= (AP_R + 1) * PIXEL_SCALE_ARCSEC:  # < 1": that's the target itself
+        if SELF_ARCSEC < d <= (AP_R + 1) * PIXEL_SCALE_ARCSEC:
             out.append(
                 {
                     "source_id": s["source_id"],
                     "g_mag": s["g_mag"],
                     "sep_arcsec": round(d, 1),
-                    "fitted": d <= NEIGHBOUR_PX * PIXEL_SCALE_ARCSEC,  # separated by the PSF fit
+                    # separated by the PSF fit; closer than RESOLVE_PX it stays mixed in
+                    "fitted": RESOLVE_PX * PIXEL_SCALE_ARCSEC
+                    < d
+                    <= NEIGHBOUR_PX * PIXEL_SCALE_ARCSEC,
                 }
             )
     return sorted(out, key=lambda b: b["sep_arcsec"])
+
+
+def w2_check(
+    ra: float, dec: float, binned: list[dict], target: dict | None
+) -> dict[str, Any] | None:
+    """Compare our 4.2-5.0 um flux with WISE's W2 band (4.6 um) from AllWISE.
+
+    Independent check that the photometry is on the right scale. Expect agreement within
+    ~20%: W2 runs to 5.3 um where SPHEREx stops, and variable stars change between 2010
+    and 2025.
+    """
+    from api.science.catalogs import allwise_cached
+
+    band = [b for b in binned if W2_BAND[0] <= b["wavelength_um"] <= W2_BAND[1]]
+    if len(band) < 3:
+        return None
+    wra, wdec = position_at(target, ra, dec, ALLWISE_MJD)
+    try:
+        rows = allwise_cached(round(wra, 4), round(wdec, 4), W2_MATCH_ARCSEC / 3600)
+    except Exception:  # IRSA busy: skip the check, don't fail the spectrum
+        return None
+    rows = [r for r in rows if r["w2_mag"] is not None and r["ra"] is not None]
+    if not rows:
+        return None
+    cosd = np.cos(np.radians(wdec))
+    w = min(rows, key=lambda r: np.hypot((r["ra"] - wra) * cosd, r["dec"] - wdec))
+    ours = float(np.mean([b["flux"] for b in band]))
+    ours_err = float(np.sqrt(np.sum([b["err"] ** 2 for b in band])) / len(band))
+    wise = W2_ZERO_MJY * 10 ** (-0.4 * w["w2_mag"])
+    return {
+        "catalog_id": w["source_id"],
+        "w2_mag": w["w2_mag"],
+        "wise_mJy": round(wise, 4),
+        "spherex_mJy": round(ours, 4),
+        "spherex_err": round(ours_err, 4),
+        "ratio": round(ours / wise, 3) if wise > 0 else None,
+        "wise_saturated": w["w2_sat"] > 0.05,  # W2 then unreliable: compare loosely
+    }
 
 
 def _neighbour_track(ra: float, dec: float, mjds: list[float]):
@@ -213,12 +275,13 @@ def _neighbour_track(ra: float, dec: float, mjds: list[float]):
     t = np.array([min(mjds), max(mjds)])
     pos = propagate(stars, t)  # linear between the ends is plenty within a year
     reach = NEIGHBOUR_PX * PIXEL_SCALE_ARCSEC / 3600
+    inner = RESOLVE_PX * PIXEL_SCALE_ARCSEC / 3600
 
     def at(mjd: float, tra: float, tdec: float) -> list[tuple[float, float]]:
         f = 0.0 if t[1] == t[0] else (mjd - t[0]) / (t[1] - t[0])
         p = pos[:, 0] + f * (pos[:, 1] - pos[:, 0])
         d = np.hypot((p[:, 0] - tra) * np.cos(np.radians(tdec)), p[:, 1] - tdec)
-        keep = (d > 1.0 / 3600) & (d <= reach)  # < 1": the target itself
+        keep = (d > inner) & (d <= reach)  # inner: target itself, or unresolvable twin
         return [(float(a), float(b)) for a, b in p[keep]]
 
     return at
@@ -226,7 +289,7 @@ def _neighbour_track(ra: float, dec: float, mjds: list[float]):
 
 def build_spectrum(ra: float, dec: float, target_id: str | None = None) -> dict[str, Any]:
     ra, dec = round(ra, 4), round(dec, 4)
-    key = f"v2_{ra:.4f}_{dec:+.4f}_{target_id or 'none'}"  # v2: PSF fit + 3% floor
+    key = f"v4_{ra:.4f}_{dec:+.4f}_{target_id or 'none'}"  # v4: + fit_ql errors, saturation count
     cached = CACHE_DIR / "spectra" / f"{key}.json"
     if cached.exists():
         return dict(json.loads(cached.read_text()))
@@ -234,12 +297,15 @@ def build_spectrum(ra: float, dec: float, target_id: str | None = None) -> dict[
     target = load_targets().get(target_id) if target_id else None
     cuts, failed = fetch_cutouts(ra, dec, SPEC_FOV)
     points = []
+    n_sat = 0
     nb = _neighbour_track(ra, dec, [c.mjd for c in cuts])
     for c in cuts:
         pra, pdec = position_at(target, ra, dec, c.mjd)
         p = psf_photometry(c, pra, pdec, nb(c.mjd, pra, pdec)) or photometry(c, pra, pdec)
         if p:
             points.append(p | {"mjd": round(c.mjd, 4), "detector": c.detector})
+        elif _core_flagged(c, pra, pdec):
+            n_sat += 1
     if points:
         epochs = split_epochs(np.array([p["mjd"] for p in points]))
         for p, e in zip(points, epochs, strict=True):
@@ -254,6 +320,8 @@ def build_spectrum(ra: float, dec: float, target_id: str | None = None) -> dict[
         "units": {"wavelength": "um", "flux": "mJy"},
         "n_frames": len(cuts),
         "n_failed": failed,
+        "n_saturated": n_sat,
+        "saturation_note": SAT_NOTE.format(n_sat, len(cuts)) if n_sat > len(cuts) / 2 else None,
         "points": points,
         "binned": binned,
         "features": None,
@@ -263,6 +331,7 @@ def build_spectrum(ra: float, dec: float, target_id: str | None = None) -> dict[
             "aperture": sum(p["method"] == "aperture" for p in points),
             "sys_floor": SYS_FRAC,
         },
+        "w2_check": w2_check(ra, dec, binned, target),
     }
     if target_id:
         ph = resp["photometry"]

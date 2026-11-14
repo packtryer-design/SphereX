@@ -175,3 +175,42 @@ def test_excess_lower_limit_when_reference_undetected():
     fx2 = np.array([1.0, 1.0, 1.0, 1.0])
     *_, limit2 = _excess(wl, fx2, er, 4.2, 4.4)
     assert not limit2
+
+
+def test_w2_check_matches_allwise(monkeypatch):
+    from api.science.spectrum import W2_ZERO_MJY, w2_check
+
+    row = {
+        "source_id": "AllWISE X",
+        "ra": 10.0,
+        "dec": 0.0,
+        "w2_mag": 13.7,
+        "w2_err": 0.03,
+        "w2_sat": 0.0,
+    }
+    monkeypatch.setattr(catalogs, "allwise_cached", lambda *a: [row])
+    wise = W2_ZERO_MJY * 10 ** (-0.4 * 13.7)
+    binned = [{"wavelength_um": w, "flux": wise, "err": 0.02} for w in (4.3, 4.5, 4.7, 4.9)]
+    r = w2_check(10.0, 0.0, binned, None)
+    assert abs(r["ratio"] - 1) < 1e-3 and not r["wise_saturated"]
+    assert w2_check(10.0, 0.0, binned[:2], None) is None  # too little 4-5 um coverage
+
+
+def test_one_bad_point_cannot_hijack_band_mean():
+    from api.science.features import _wmean
+
+    f = np.array([1900.0, 2000.0, 2100.0, 1950.0, 2050.0, 38.0])
+    e = np.array([60.0, 60.0, 60.0, 60.0, 60.0, 1.2])  # failed fit, tiny error bar
+    mean, _ = _wmean(f, e)
+    assert 1900 < mean < 2100
+
+
+def test_saturated_core_is_counted_not_measured():
+    from api.science.spectrum import _core_flagged, psf_photometry
+
+    c, _ = _cutout()
+    c.img[11:14, 11:14] = np.nan  # saturated pixels come back flagged
+    ra, dec = 100.0, 10.0
+    assert _core_flagged(c, ra, dec)
+    assert psf_photometry(c, ra, dec) is None and photometry(c, ra, dec) is None
+    assert not _core_flagged(_cutout()[0], ra, dec)

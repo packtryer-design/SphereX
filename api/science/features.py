@@ -15,6 +15,7 @@ import numpy as np
 FEATURES_PATH = Path(__file__).resolve().parents[2] / "data" / "features.json"
 SEEN_SIGMA = 3.0
 REF_BAND = (2.0, 2.3)  # um, continuum reference for "excess" bands
+CLIP_MAD = 5.0
 BLEND_NOTE = (
     "Another star sits inside the 12-arcsec aperture, so its light is mixed in. "
     "Treat short-wavelength bands with care; 6-arcsec pixels cannot split them."
@@ -53,6 +54,14 @@ def _arrays(points: list[dict]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def _wmean(f: np.ndarray, e: np.ndarray) -> tuple[float, float]:
+    """Inverse-variance mean after dropping points > CLIP_MAD robust sigmas from the median:
+    one failed fit with a small error bar would otherwise outweigh dozens of good ones."""
+    if f.size >= 5:
+        med = np.median(f)
+        mad = 1.4826 * np.median(np.abs(f - med))
+        if mad > 0:
+            keep = np.abs(f - med) <= CLIP_MAD * mad
+            f, e = f[keep], e[keep]
     w = 1.0 / e**2
     return float(np.sum(w * f) / np.sum(w)), float(np.sqrt(1.0 / np.sum(w)))
 

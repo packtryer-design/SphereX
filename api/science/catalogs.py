@@ -133,6 +133,26 @@ def catwise_cone(ra: float, dec: float, radius: float) -> list[dict]:
     return out
 
 
+def allwise_cone(ra: float, dec: float, radius: float) -> list[dict]:
+    """AllWISE W2 photometry (epoch ~2010.5), for the spectrum's flux sanity check.
+    AllWISE rather than CatWISE: CatWISE splits fast movers like WISE 0855 into pieces."""
+    q = (
+        "SELECT designation, ra, dec, w2mpro, w2sigmpro, w2sat "
+        f"{_cone('allwise_p3as_psd', ra, dec, radius)}"
+    )
+    return [
+        {
+            "source_id": "AllWISE " + r["designation"].strip(),
+            "ra": _num(r["ra"]),
+            "dec": _num(r["dec"]),
+            "w2_mag": _num(r.get("w2mpro")),
+            "w2_err": _num(r.get("w2sigmpro")),
+            "w2_sat": _num(r.get("w2sat")) or 0.0,  # fraction of saturated pixels
+        }
+        for r in _irsa_csv(q)
+    ]
+
+
 def _cached(kind: str, fn: Callable, ra: float, dec: float, radius: float) -> list[dict]:
     p = CACHE_DIR / kind / f"{ra:.4f}_{dec:+.4f}_{radius:.3f}.json"
     if p.exists():
@@ -149,3 +169,7 @@ def gaia_cached(ra: float, dec: float, radius: float) -> list[dict]:
 
 def catwise_cached(ra: float, dec: float, radius: float) -> list[dict]:
     return _cached("catwise", catwise_cone, ra, dec, radius)
+
+
+def allwise_cached(ra: float, dec: float, radius: float) -> list[dict]:
+    return _cached("allwise", allwise_cone, ra, dec, radius)
