@@ -46,6 +46,10 @@ else:
             if ra is None:  # 3I/ATLAS moves: needs per-frame JPL Horizons positions
                 logging.warning("skipping %s: no fixed position", t["name"])
                 continue
+            known = next((o for o in everything if o["id"] == t["id"]), None)
+            if known is not None:  # same object in the catalog: one position, one warm
+                known.update(ra=ra, dec=dec, spectrum=True)
+                continue
             everything.append(
                 {
                     "id": t["id"],

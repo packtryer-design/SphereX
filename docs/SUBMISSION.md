@@ -52,7 +52,7 @@ Blink is a browser-based blink comparator for NASA's SPHEREx all-sky infrared su
 - ESA Gaia DR3 (ghost markers) — https://gea.esac.esa.int/archive/ (IRSA mirror as fallback)
 - CatWISE2020, Marocco et al. 2021, ApJS 253, 8 (infrared ghost markers) — via IRSA TAP
 - AllWISE, Cutri et al. 2013 (W2 flux cross-check) — via IRSA TAP
-- SPHEREx ePSF calibration files (PSF photometry) — IRSA
+- SPHEREx ePSF calibration files (PSF photometry) — IRSA. These are from the QR3 release, and we also apply them to DR1 frames (the PSF comes from the optics, so it doesn't change between processing versions)
 - IMCCE SkyBoT (known solar-system objects) — https://ssp.imcce.fr/webservices/skybot/
 - SIMBAD (target coordinates) — CDS Strasbourg
 

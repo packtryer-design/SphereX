@@ -12,10 +12,10 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Why | Done when |
 |---|---|---|---|
-| T1 | **Agree on one story.** "Blink: nebulae over time" (what's built) vs SPHEREx Watch + classroom lab ([IDEAS.md](IDEAS.md)) | The pitch, demo path and remaining features depend on it. `PITCH.md` and `SUBMISSION.md` still describe the older wavelength-first pitch. | One sentence agreed and written at the top of `PITCH.md` |
-| T2 | **Agree the 3-step demo path** (which objects, which views, in what order) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
-| T3 | **CodeQL check:** make the repo public and enable code scanning, *or* delete `.github/workflows/codeql.yml` and close PR #8 | It fails because code scanning isn't enabled on a private repo. It's a settings question, not a code bug. | No red ❌ on PRs |
-| T4 | Update the team brief (`SPHEREx_Team_Brief.docx`) to the final name | It still says Blink102 | Name matches the site |
+| T1 | ✅ **Decided: lead with Planet X, show Blink as the tool, end with "What's next".** (1) Story 3, Planet X (`/track.html`, PR #19): Pluto tracked against JPL Horizons, the blind search finds Pluto, a simulated planet appears only when stacked. (2) Story 1, the Blink explorer: "anyone can do this for any star", on Barnard's Star, covering the challenge's required features and test targets. (3) Story 2 (SPHEREx Watch, classroom lab) is **not built**; it's the "What's next?" slide, with a deeper planet search. | The pitch and demo path follow from it. `PITCH.md` and `SUBMISSION.md` still describe the older pitch (C4). | Done |
+| T2 | ⏳ **Exact demo path:** decided while preparing the pitch, following T1's order (Pluto → blind search → planted planet → Barnard's Star in Blink) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
+| T3 | ✅ **CodeQL:** the repo is public, and CodeQL passes on PRs. Close Copilot's draft PR #8, which is no longer needed. | — | Done |
+| T4 | ✅ **Team brief:** no change needed. It never named the project ("Blink102" never appeared; only the phrases "blink compare" and "imaged 102 times"). | — | Done |
 
 ---
 
@@ -36,12 +36,14 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Done when |
 |---|---|---|
-| B1 | 🔴 **Wire C's spectrum into the Spectrum tab.** The site only calls `/api/surface-spectrum` (the nebula method), so C's PSF photometry, WISE check and saturation note never show. Stars and brown dwarfs should use `/api/spectrum?ra=&dec=&target=<id>`; nebulae stay on `surface-spectrum`. | Barnard's Star shows C's spectrum with its saturation note, and WISE 0855 shows its WISE W2 check |
-| B2 | 🟠 **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. | `?o=barnards-star` opens instantly after warming |
-| B3 | Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
-| B4 | Add a favicon (the only 404 in the browser console) | Console is clean |
+| B1 | ✅ **Wire C's spectrum into the Spectrum tab.** The site only calls `/api/surface-spectrum` (the nebula method), so C's PSF photometry, WISE check and saturation note never show. Stars and brown dwarfs should use `/api/spectrum?ra=&dec=&target=<id>`; nebulae stay on `surface-spectrum`. | Barnard's Star shows C's spectrum with its saturation note, and WISE 0855 shows its WISE W2 check |
+| B2 | ✅ **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. **Also add the 4 missing science targets** (eps-indi-b, wise-0855, rw-aur, r-dra); see [SPECTRUM_API.md](SPECTRUM_API.md). | `?o=barnards-star` opens instantly after warming, and `?o=wise-0855` opens |
+| B3 | ✅ Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
+| B4 | ✅ Add a favicon (the only 404 in the browser console) | Console is clean |
 | B5 | Phone layout check, `<iframe>` embed example | Works at phone width |
 | B6 | README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
+
+**Done in PR #18 (C, on B's files):** stars, brown dwarfs and the young/variable stars now use `/api/spectrum` (PSF fit, saturation note, WISE W2 check, per-band status: seen / not clear / too faint / not measured). Nebulae stay on `surface-spectrum`. `objects.json` takes the 2026 positions from `data/targets.json` and now lists all 5 science targets. Point spectra start as soon as the visit list arrives instead of waiting for the images. Also fixed (A's file): two requests fetching the same cutout at once crashed on Windows (`WinError 32`) in `api/imaging/cutouts.py`.
 
 **Already verified in a browser:** Sequence, Blink, Side by side, Swipe, Difference, Color-time, Observations and About all work on Barnard's Star. Difference and Color-time clearly show its motion.
 
@@ -51,12 +53,39 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Done when |
 |---|---|---|
-| C1 | **Help B with B1:** tell B which fields from `/api/spectrum` to show and how (`saturation_note`, `w2_check`, `blends`, binned points) | B1 merged |
-| C2 | Add `scipy` to `dependencies` in `pyproject.toml`. `psf.py` imports it, and it only works today because `reproject` happens to install it. | Listed in `pyproject.toml` |
-| C3 | Add a sentence to the docs: the ePSF calibration files come from QR3 and are also applied to DR1 frames | Noted in `SUBMISSION.md` or the code |
+| C1 | ✅ Field guide written: [SPECTRUM_API.md](SPECTRUM_API.md). **Help B with B1:** tell B which fields from `/api/spectrum` to show and how (`saturation_note`, `w2_check`, `blends`, binned points) | B1 merged |
+| C2 | ✅ Add `scipy` to `dependencies` in `pyproject.toml`. `psf.py` imports it, and it only works today because `reproject` happens to install it. | Listed in `pyproject.toml` |
+| C3 | ✅ Add a sentence to the docs: the ePSF calibration files come from QR3 and are also applied to DR1 frames | Noted in `SUBMISSION.md` or the code |
 | C4 | **Rewrite `PITCH.md` and `SUBMISSION.md` to the story from T1.** Keep the strong honest results: Barnard's Star motion, the WISE 0855 W2 agreement within 14%, saturation handled openly. | Pitch matches the site |
 | C5 | **Rehearse the pitch 3 times with A and B** (06:00–09:00) | Done 3 times, timed |
 | C6 | **Submit on spaceappschallenge.org and confirm the Google Form** (09:00–10:00) | Confirmation emails received |
+
+---
+
+## 🔧 Fixed this evening (PRs #17 and #18)
+
+| Item | Owner | What was fixed | PR |
+|---|---|---|---|
+| B1 | B (done by C) | Stars, brown dwarfs, young and variable stars use `/api/spectrum`: PSF fit, saturation note, WISE W2 check. Shaded bands come from the API's own features at their real wavelength ranges, each marked seen / not clear / too faint to tell / not measured. Nebulae stay on `surface-spectrum`. | #18 |
+| B2 | B (done by C) | `objects.json` uses the 2026 positions from `data/targets.json`, so the warmed cache is hit. All 5 science targets listed (new kinds: brown dwarf, young star, variable star). | #18 |
+| B3 | B (done by C) | Spectrum tab shows a waiting message instead of a blank chart. Star spectra start as soon as the visit list arrives instead of waiting for the images. | #18 |
+| B4 | B (done by C) | Favicon added; browser console clean. | #18 |
+| Bug | A (found by C) | Two requests fetching the same cutout at once crashed on Windows (`PermissionError WinError 32`). Each download now uses its own temp file in `api/imaging/cutouts.py`. | #18 |
+| C1 | C | Field guide for the spectrum API: [SPECTRUM_API.md](SPECTRUM_API.md). | #17 |
+| C2 | C | `scipy` listed in `pyproject.toml`. | #17 |
+| C3 | C | QR3 ePSF note in `SUBMISSION.md` and `psf.py`. | #17 |
+| Doc | C | WISE 0855 offset corrected: about 3.5′ since J2000, not 1.5′. | #17 |
+
+Merge #17 first: #18 is built on it.
+
+## ⏭️ Still open, by owner (none of these can be fixed in code)
+
+| Owner | Items | Why it isn't code |
+|---|---|---|
+| Team | T2 | The demo path, decided while preparing the pitch |
+| A | A2, A3, A4 | A2 runs on A's machine; A3 needs a hosting account login; A4 waits on A2. A5/A6 only if T1/T2 pick them. |
+| B | B5, B6 | Phone check, embed example, README GIF and the backup screen recording |
+| C | C4, C5, C6 | C4 can start (T1 decided); C5 is rehearsal with A and B; C6 is the submission |
 
 ---
 

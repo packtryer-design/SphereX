@@ -44,7 +44,7 @@ function groupBy(points) {
 // SPHEREx resolving power by wavelength: a line lands in a band about lambda / R wide.
 export const resolvingPower = (um) => (um < 2.42 ? 41 : um < 3.82 ? 35 : um < 4.42 ? 110 : 130);
 
-// points: [{wavelength_um, flux, err, group, color}]  bands: [{name, center_um}]
+// points: [{wavelength_um, flux, err, group, color}]  bands: [{name, center_um, lo?, hi?}]
 export function drawSpectrum(container, points, bands = [], { yLabel = "brightness", W = 640, H = 300 } = {}) {
   const PAD = { l: 52, r: 12, t: 30, b: 36 };
   const X_MIN = 0.7, X_MAX = 5.05;
@@ -54,8 +54,8 @@ export function drawSpectrum(container, points, bands = [], { yLabel = "brightne
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yLabel} by wavelength` });
 
   bands.forEach((b, i) => {
-    const half = b.center_um / resolvingPower(b.center_um) / 2;
-    const x0 = x(b.center_um - half), x1 = x(b.center_um + half);
+    const half = b.center_um / resolvingPower(b.center_um) / 2; // a line is one resolution element wide
+    const x0 = x(b.lo ?? b.center_um - half), x1 = x(b.hi ?? b.center_um + half); // a band has its own range
     svg.append(el("rect", { class: "band", x: x0, y: PAD.t, width: Math.max(x1 - x0, 2), height: H - PAD.t - PAD.b }));
     svg.append(el("text", { class: "band-label", x: (x0 + x1) / 2, y: PAD.t - 4 - (i % 2) * 11, "text-anchor": "middle" }, b.name));
   });
