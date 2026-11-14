@@ -1,0 +1,918 @@
+{
+ "_about": "Built by scripts/build_objects.py from SIMBAD and IRSA. Don't edit by hand.",
+ "built": "2026-11-14",
+ "objects": [
+  {
+   "id": "orion",
+   "name": "Orion Nebula",
+   "kind": "emission",
+   "simbad_id": "M 42",
+   "simbad_type": "HII",
+   "aliases": [
+    "LBN 209.13-19.35",
+    "LBN 974",
+    "M 42",
+    "Great Orion Nebula",
+    "Ori Nebula"
+   ],
+   "ra": 83.8201,
+   "dec": -5.3876,
+   "constellation": "Orion",
+   "size_arcmin": 66.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-09-06",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "crab",
+   "name": "Crab Nebula",
+   "kind": "supernova_remnant",
+   "simbad_id": "M 1",
+   "simbad_type": "SNR",
+   "aliases": [
+    "LBN 833",
+    "LBN 184.62-05.65",
+    "M 1",
+    "CRAB NEB",
+    "Crab"
+   ],
+   "ra": 83.6324,
+   "dec": 22.0174,
+   "constellation": "Taurus",
+   "size_arcmin": 7.0,
+   "fov": 0.14,
+   "visits": {
+    "n": 3,
+    "first": "2025-09-09",
+    "last": "2026-09-18",
+    "full": 3
+   }
+  },
+  {
+   "id": "lagoon",
+   "name": "Lagoon Nebula",
+   "kind": "emission",
+   "simbad_id": "M 8",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 006.06-01.23",
+    "LBN 25",
+    "M 8",
+    "Lagoon"
+   ],
+   "ra": 270.90417,
+   "dec": -24.38667,
+   "constellation": "Sagittarius",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-23",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "eagle",
+   "name": "Eagle Nebula",
+   "kind": "emission",
+   "simbad_id": "M 16",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 016.96+00.78",
+    "LBN 67",
+    "M 16",
+    "NGC 6611",
+    "IC 4703"
+   ],
+   "ra": 274.688,
+   "dec": -13.792,
+   "constellation": "Serpens",
+   "size_arcmin": 80.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-23",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "omega",
+   "name": "Omega Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 6618",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 60",
+    "LBN 015.28-00.67",
+    "M 17",
+    "NGC 6618 Horseshoe",
+    "NGC 6618",
+    "Checkmark Nebula"
+   ],
+   "ra": 275.19583,
+   "dec": -16.17167,
+   "constellation": "Sagittarius",
+   "size_arcmin": 1.63,
+   "fov": 0.1,
+   "visits": {
+    "n": 4,
+    "first": "2025-08-24",
+    "last": "2026-09-12",
+    "full": 3
+   }
+  },
+  {
+   "id": "trifid",
+   "name": "Trifid Nebula",
+   "kind": "emission",
+   "simbad_id": "M 20",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 006.99-00.17",
+    "LBN 27",
+    "M 20",
+    "NGC 6514"
+   ],
+   "ra": 270.675,
+   "dec": -22.97167,
+   "constellation": "Sagittarius",
+   "size_arcmin": 28.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-24",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "dumbbell",
+   "name": "Dumbbell Nebula",
+   "kind": "planetary",
+   "simbad_id": "M 27",
+   "simbad_type": "PN",
+   "aliases": [
+    "M 27",
+    "NGC 6853",
+    "Diabolo Nebula"
+   ],
+   "ra": 299.90151,
+   "dec": 22.7212,
+   "constellation": "Vulpecula",
+   "size_arcmin": 6.7,
+   "fov": 0.134,
+   "visits": {
+    "n": 4,
+    "first": "2025-04-24",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "ring",
+   "name": "Ring Nebula",
+   "kind": "planetary",
+   "simbad_id": "M 57",
+   "simbad_type": "PN",
+   "aliases": [
+    "M 57",
+    "NGC 6720"
+   ],
+   "ra": 283.39624,
+   "dec": 33.02913,
+   "constellation": "Lyra",
+   "size_arcmin": 1.15,
+   "fov": 0.1,
+   "visits": {
+    "n": 4,
+    "first": "2025-05-19",
+    "last": "2026-09-29",
+    "full": 3
+   }
+  },
+  {
+   "id": "owl",
+   "name": "Owl Nebula",
+   "kind": "planetary",
+   "simbad_id": "M 97",
+   "simbad_type": "PN",
+   "aliases": [
+    "M 97",
+    "NGC 3587"
+   ],
+   "ra": 168.6988,
+   "dec": 55.01902,
+   "constellation": "Ursa Major",
+   "size_arcmin": 3.33,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-04-26",
+    "last": "2026-05-14",
+    "full": 2
+   }
+  },
+  {
+   "id": "m78",
+   "name": "M78",
+   "kind": "reflection",
+   "simbad_id": "M 78",
+   "simbad_type": "RNe",
+   "aliases": [
+    "Ced 55u",
+    "M 78",
+    "NGC 2068"
+   ],
+   "ra": 86.69083,
+   "dec": 0.07917,
+   "constellation": "Orion",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-09-08",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "helix",
+   "name": "Helix Nebula",
+   "kind": "planetary",
+   "simbad_id": "NGC 7293",
+   "simbad_type": "PN",
+   "aliases": [
+    "GJ 9785",
+    "HELICAL NEB",
+    "NGC 7293"
+   ],
+   "ra": 337.41061,
+   "dec": -20.83715,
+   "constellation": "Aquarius",
+   "size_arcmin": 13.4,
+   "fov": 0.268,
+   "visits": {
+    "n": 3,
+    "first": "2025-05-13",
+    "last": "2026-06-24",
+    "full": 3
+   }
+  },
+  {
+   "id": "eskimo",
+   "name": "Eskimo Nebula",
+   "kind": "planetary",
+   "simbad_id": "NGC 2392",
+   "simbad_type": "PN",
+   "aliases": [
+    "NGC 2392"
+   ],
+   "ra": 112.29486,
+   "dec": 20.9118,
+   "constellation": "Gemini",
+   "size_arcmin": 0.34,
+   "fov": 0.1,
+   "visits": {
+    "n": 2,
+    "first": "2025-10-06",
+    "last": "2026-04-09",
+    "full": 2
+   }
+  },
+  {
+   "id": "cats-eye",
+   "name": "Cat's Eye Nebula",
+   "kind": "planetary",
+   "simbad_id": "NGC 6543",
+   "simbad_type": "PN",
+   "aliases": [
+    "Sunflower Nebula",
+    "Snail Nebula",
+    "NGC 6543"
+   ],
+   "ra": 269.63918,
+   "dec": 66.63299,
+   "constellation": "Draco",
+   "size_arcmin": 0.62,
+   "fov": 0.1,
+   "visits": {
+    "n": 17,
+    "first": "2025-04-25",
+    "last": "2026-09-28",
+    "full": 0
+   }
+  },
+  {
+   "id": "saturn",
+   "name": "Saturn Nebula",
+   "kind": "planetary",
+   "simbad_id": "NGC 7009",
+   "simbad_type": "PN",
+   "aliases": [
+    "NGC 7009"
+   ],
+   "ra": 316.04506,
+   "dec": -11.36349,
+   "constellation": "Aquarius",
+   "size_arcmin": 0.71,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-04-25",
+    "last": "2026-05-20",
+    "full": 3
+   }
+  },
+  {
+   "id": "ghost-of-jupiter",
+   "name": "Ghost of Jupiter",
+   "kind": "planetary",
+   "simbad_id": "NGC 3242",
+   "simbad_type": "PN",
+   "aliases": [
+    "Jupiter's Ghost Nebula",
+    "NGC 3242"
+   ],
+   "ra": 156.19222,
+   "dec": -18.6423,
+   "constellation": "Hydra",
+   "size_arcmin": 0.1,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-04-25",
+    "last": "2026-06-10",
+    "full": 3
+   }
+  },
+  {
+   "id": "butterfly",
+   "name": "Butterfly Nebula",
+   "kind": "planetary",
+   "simbad_id": "NGC 6302",
+   "simbad_type": "PN",
+   "aliases": [
+    "NGC 6302",
+    "Bug Nebula"
+   ],
+   "ra": 258.4354,
+   "dec": -37.1031,
+   "constellation": "Scorpius",
+   "size_arcmin": 0.47,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-01",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "carina",
+   "name": "Carina Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 3372",
+   "simbad_type": "HII",
+   "aliases": [
+    "Keyhole",
+    "NGC 3372",
+    "Car Nebula",
+    "eta Car Nebula",
+    "Keyhole Nebula"
+   ],
+   "ra": 161.25929,
+   "dec": -59.69994,
+   "constellation": "Carina",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-06-03",
+    "last": "2026-07-30",
+    "full": 3
+   }
+  },
+  {
+   "id": "tarantula",
+   "name": "Tarantula Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 2070",
+   "simbad_type": "Cl*",
+   "aliases": [
+    "NGC 2070",
+    "Tarantula",
+    "30 Dor Association",
+    "30 Dor Cluster"
+   ],
+   "ra": 84.675,
+   "dec": -69.1,
+   "constellation": "Dorado",
+   "size_arcmin": 3.5,
+   "fov": 0.1,
+   "visits": {
+    "n": 18,
+    "first": "2025-05-02",
+    "last": "2026-10-04",
+    "full": 0
+   }
+  },
+  {
+   "id": "north-america",
+   "name": "North America Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 7000",
+   "simbad_type": "Cl*",
+   "aliases": [
+    "LBN 085.75-01.48",
+    "LBN 373",
+    "NORTH AMER NEB",
+    "North America",
+    "NGC 7000"
+   ],
+   "ra": 314.69583,
+   "dec": 44.33,
+   "constellation": "Cygnus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-05-12",
+    "last": "2026-07-07",
+    "full": 3
+   }
+  },
+  {
+   "id": "pelican",
+   "name": "Pelican Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 5070",
+   "simbad_type": "HII",
+   "aliases": [
+    "IC 5070",
+    "LBN 084.46+00.02",
+    "LBN 350",
+    "Pelican"
+   ],
+   "ra": 312.75,
+   "dec": 44.36667,
+   "constellation": "Cygnus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-05-09",
+    "last": "2026-07-05",
+    "full": 3
+   }
+  },
+  {
+   "id": "elephants-trunk",
+   "name": "Elephant's Trunk region",
+   "kind": "emission",
+   "simbad_id": "IC 1396",
+   "simbad_type": "OpC",
+   "aliases": [
+    "IC 1396"
+   ],
+   "ra": 324.745,
+   "dec": 57.51389,
+   "constellation": "Cepheus",
+   "size_arcmin": 146.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-06-11",
+    "last": "2026-07-02",
+    "full": 3
+   }
+  },
+  {
+   "id": "rosette",
+   "name": "Rosette Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 2237",
+   "simbad_type": "Cl*",
+   "aliases": [
+    "NGC 2237",
+    "NGC 2244 Satellite Cluster",
+    "Rosette A"
+   ],
+   "ra": 97.65042,
+   "dec": 4.98072,
+   "constellation": "Monoceros",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 4,
+    "first": "2025-09-21",
+    "last": "2026-10-02",
+    "full": 3
+   }
+  },
+  {
+   "id": "cocoon",
+   "name": "Cocoon Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 5146",
+   "simbad_type": "OpC",
+   "aliases": [
+    "IC 5146",
+    "LBN 424",
+    "LBN 094.43-05.58"
+   ],
+   "ra": 328.372,
+   "dec": 47.246,
+   "constellation": "Cygnus",
+   "size_arcmin": 8.2,
+   "fov": 0.164,
+   "visits": {
+    "n": 3,
+    "first": "2025-06-01",
+    "last": "2026-06-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "california",
+   "name": "California Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 1499",
+   "simbad_type": "HII",
+   "aliases": [
+    "LBN 756",
+    "LBN 160.18-12.15",
+    "NGC 1499"
+   ],
+   "ra": 60.825,
+   "dec": 36.42167,
+   "constellation": "Perseus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-21",
+    "last": "2026-09-06",
+    "full": 3
+   }
+  },
+  {
+   "id": "pacman",
+   "name": "Pacman Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 281",
+   "simbad_type": "HII",
+   "aliases": [
+    "Ced 3",
+    "LBN 123.17-06.28",
+    "LBN 616",
+    "NGC 281",
+    "NGC 281W"
+   ],
+   "ra": 13.10458,
+   "dec": 56.565,
+   "constellation": "Cassiopeia",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-07-18",
+    "last": "2026-08-27",
+    "full": 3
+   }
+  },
+  {
+   "id": "heart",
+   "name": "Heart Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 1805",
+   "simbad_type": "OpC",
+   "aliases": [
+    "AFGL 333 Cloud",
+    "IC 1805",
+    "LBN 134.96+00.75",
+    "LBN 654"
+   ],
+   "ra": 38.21,
+   "dec": 61.47111,
+   "constellation": "Cassiopeia",
+   "size_arcmin": 13.3,
+   "fov": 0.266,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-08",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "soul",
+   "name": "Soul Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 1848",
+   "simbad_type": "OpC",
+   "aliases": [
+    "IC 1848",
+    "LBN 137.24+00.77",
+    "LBN 667"
+   ],
+   "ra": 42.855,
+   "dec": 60.41889,
+   "constellation": "Cassiopeia",
+   "size_arcmin": 24.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-10",
+    "last": "2026-09-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "cone",
+   "name": "Cone Nebula region",
+   "kind": "emission",
+   "simbad_id": "NGC 2264",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 202.92+02.18",
+    "LBN 911",
+    "XMAS TREE CL",
+    "NGC 2264",
+    "Christmas Tree Cluster"
+   ],
+   "ra": 100.21708,
+   "dec": 9.87694,
+   "constellation": "Monoceros",
+   "size_arcmin": 240.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 4,
+    "first": "2025-09-23",
+    "last": "2026-10-01",
+    "full": 2
+   }
+  },
+  {
+   "id": "bubble",
+   "name": "Bubble Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 7635",
+   "simbad_type": "HII",
+   "aliases": [
+    "LBN 548",
+    "NGC 7635"
+   ],
+   "ra": 350.20125,
+   "dec": 61.20167,
+   "constellation": "Cassiopeia",
+   "size_arcmin": 9.03,
+   "fov": 0.181,
+   "visits": {
+    "n": 3,
+    "first": "2025-07-05",
+    "last": "2026-07-24",
+    "full": 3
+   }
+  },
+  {
+   "id": "lobster",
+   "name": "Lobster Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 6357",
+   "simbad_type": "OpC",
+   "aliases": [
+    "the War and Peace Nebula",
+    "NGC 6357"
+   ],
+   "ra": 261.185,
+   "dec": -34.203,
+   "constellation": "Scorpius",
+   "size_arcmin": 6.2,
+   "fov": 0.124,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-18",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "cats-paw",
+   "name": "Cat's Paw Nebula",
+   "kind": "emission",
+   "simbad_id": "NGC 6334",
+   "simbad_type": "HII",
+   "aliases": [
+    "NGC 6334"
+   ],
+   "ra": 260.21842,
+   "dec": -36.13067,
+   "constellation": "Scorpius",
+   "size_arcmin": 9.15,
+   "fov": 0.183,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-18",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  },
+  {
+   "id": "seagull",
+   "name": "Seagull Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 2177",
+   "simbad_type": "RNe",
+   "aliases": [
+    "LBN 1027",
+    "LBN 223.68-01.86",
+    "IC 2177"
+   ],
+   "ra": 106.10417,
+   "dec": -10.455,
+   "constellation": "Monoceros",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-10-03",
+    "last": "2026-10-03",
+    "full": 2
+   }
+  },
+  {
+   "id": "flaming-star",
+   "name": "Flaming Star Nebula",
+   "kind": "emission",
+   "simbad_id": "IC 405",
+   "simbad_type": "Rad",
+   "aliases": [
+    "IC 405",
+    "LBN 172.16-02.02",
+    "LBN 795"
+   ],
+   "ra": 79.35,
+   "dec": 34.38333,
+   "constellation": "Auriga",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-09-04",
+    "last": "2026-09-25",
+    "full": 3
+   }
+  },
+  {
+   "id": "crescent",
+   "name": "Crescent Nebula",
+   "kind": "wind_bubble",
+   "simbad_id": "HD 192163",
+   "simbad_type": "WR*",
+   "aliases": [
+    "LBN 203",
+    "LBN 075.51+02.29",
+    "NGC 6888"
+   ],
+   "ra": 303.02726,
+   "dec": 38.35494,
+   "constellation": "Cygnus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-04-25",
+    "last": "2026-06-16",
+    "full": 3
+   }
+  },
+  {
+   "id": "western-veil",
+   "name": "Western Veil Nebula",
+   "kind": "supernova_remnant",
+   "simbad_id": "NGC 6960",
+   "simbad_type": "ISM",
+   "aliases": [
+    "LBN 191",
+    "LBN 074.53-08.42",
+    "Cirrus Nebula",
+    "Filamentary Nebula",
+    "NGC 6960",
+    "Veil Nebula"
+   ],
+   "ra": 311.40833,
+   "dec": 30.70833,
+   "constellation": "Cygnus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 4,
+    "first": "2025-05-03",
+    "last": "2026-06-27",
+    "full": 3
+   }
+  },
+  {
+   "id": "iris",
+   "name": "Iris Nebula",
+   "kind": "reflection",
+   "simbad_id": "NGC 7023",
+   "simbad_type": "OpC",
+   "aliases": [
+    "LBN 104.08+14.21",
+    "LBN 487",
+    "NGC 7023",
+    "IRIS Nebula"
+   ],
+   "ra": 315.40375,
+   "dec": 68.16333,
+   "constellation": "Cepheus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "visits": {
+    "n": 3,
+    "first": "2025-06-15",
+    "last": "2026-08-07",
+    "full": 3
+   }
+  },
+  {
+   "id": "ngc1333",
+   "name": "NGC 1333",
+   "kind": "reflection",
+   "simbad_id": "NGC 1333",
+   "simbad_type": "OpC",
+   "aliases": [
+    "Ced 16",
+    "LBN 158.31-20.44",
+    "LBN 741"
+   ],
+   "ra": 52.29708,
+   "dec": 31.31,
+   "constellation": "Perseus",
+   "size_arcmin": 480.0,
+   "fov": 0.4,
+   "visits": {
+    "n": 3,
+    "first": "2025-08-12",
+    "last": "2026-09-05",
+    "full": 3
+   }
+  },
+  {
+   "id": "horsehead",
+   "name": "Horsehead Nebula",
+   "kind": "dark",
+   "simbad_id": "NAME Horsehead Nebula",
+   "simbad_type": "DNe",
+   "aliases": [
+    "Barnard 33"
+   ],
+   "ra": 85.24583,
+   "dec": -2.45833,
+   "constellation": "Orion",
+   "size_arcmin": 6.0,
+   "fov": 0.12,
+   "visits": {
+    "n": 3,
+    "first": "2025-09-08",
+    "last": "2026-10-04",
+    "full": 3
+   }
+  },
+  {
+   "id": "barnards-star",
+   "name": "Barnard's Star",
+   "kind": "moving_star",
+   "simbad_id": "NAME Barnard's star",
+   "simbad_type": "BY*",
+   "aliases": [
+    "GJ 699",
+    "Barnard's star",
+    "Barnard Star"
+   ],
+   "ra": 269.44616,
+   "dec": 4.76964,
+   "constellation": "Ophiucus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "coord_epoch": 2026.5,
+   "pm_mas_yr": [
+    -801.551,
+    10362.394
+   ],
+   "visits": {
+    "n": 3,
+    "first": "2025-08-15",
+    "last": "2026-09-22",
+    "full": 3
+   }
+  }
+ ]
+}

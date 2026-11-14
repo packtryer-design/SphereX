@@ -1,5 +1,7 @@
+from typing import Any
+
 import numpy as np
-from api.imaging.pipeline import align, make_rgb, split_epochs, target_grid
+from api.imaging.pipeline import _matched_diff, align, make_rgb, split_epochs, target_grid
 from astropy.wcs import WCS
 
 
@@ -32,6 +34,37 @@ def test_align_puts_star_on_centre() -> None:
     py, px = np.unravel_index(np.nanargmax(out), out.shape)
     c = (shape[0] - 1) / 2
     assert abs(px - c) <= 0.5 and abs(py - c) <= 0.5
+
+
+def test_diff_cancels_colour_but_keeps_real_change() -> None:
+    def frame(epoch: int, wl: float) -> dict[str, Any]:
+        return {"epoch": epoch, "detector": 1, "wavelength_um": wl, "mjd": 0.0, "flagged_frac": 0}
+
+    # star brightness depends on wavelength; epoch 2 has an extra frame at an unmatched colour
+    frames = [
+        frame(1, 1.0),
+        frame(1, 2.0),
+        frame(2, 1.01),
+        frame(2, 2.0),
+        frame(2, 3.0),
+        frame(3, 4.0),
+    ]
+    zs = [np.full((3, 3), f["wavelength_um"] * 10) for f in frames]
+    zs[3] = zs[3] + 5.0  # a real change in epoch 2 at 2.0 um
+
+    def meta(e: int, use: list[int]) -> dict[str, Any]:
+        return {"epoch": e, "detectors": use}
+
+    images, out = _matched_diff(frames, zs, [1, 2, 3], 1, [1], meta)
+    assert [m["epoch"] for m in out] == [2]  # epoch 3 (4.0 um) has no match: left out
+    assert out[0]["n_frames"] == 4  # 1.01 pairs with 1.0, 2.0 with 2.0; 3.0 unmatched
+    assert out[0]["ref_epoch"] == 1 and out[0]["detectors"] == [1]
+    # pairs give 0.1 (colour within the match tolerance) and 5.0; median of two = 2.55
+    assert np.allclose(images[0], 2.55)
+
+    # a chosen reference visit: epoch 1 is now compared against epoch 2, sign flips
+    images, out = _matched_diff(frames, zs, [1, 2, 3], 2, [1], meta)
+    assert [m["epoch"] for m in out] == [1] and np.allclose(images[0], -2.55)
 
 
 def test_still_star_is_white() -> None:
