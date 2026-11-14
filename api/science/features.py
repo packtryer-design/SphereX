@@ -37,9 +37,13 @@ def profile_for(target_id: str | None = None, kind: str | None = None) -> str | 
 
 def _arrays(points: list[dict]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     good = [
-        p for p in points
-        if p.get("flux") is not None and p.get("err") is not None
-        and np.isfinite(p["flux"]) and np.isfinite(p["err"]) and p["err"] > 0
+        p
+        for p in points
+        if p.get("flux") is not None
+        and p.get("err") is not None
+        and np.isfinite(p["flux"])
+        and np.isfinite(p["err"])
+        and p["err"] > 0
     ]
     good.sort(key=lambda p: p["wavelength_um"])
     wl = np.array([p["wavelength_um"] for p in good], float)
@@ -111,9 +115,14 @@ def measure(points: list[dict], profile: str) -> list[dict]:
         else:
             res = _band_contrast(wl, fx, er, b["lo"], b["hi"], side)
         row = {
-            "id": b["id"], "molecule": b["molecule"], "type": b["type"],
-            "lo": b["lo"], "hi": b["hi"], "center_um": round((b["lo"] + b["hi"]) / 2, 3),
-            "plain": b["plain"], "ref": feats["refs"][b["ref"]],
+            "id": b["id"],
+            "molecule": b["molecule"],
+            "type": b["type"],
+            "lo": b["lo"],
+            "hi": b["hi"],
+            "center_um": round((b["lo"] + b["hi"]) / 2, 3),
+            "plain": b["plain"],
+            "ref": feats["refs"][b["ref"]],
         }
         if res is None:
             row.update(status="no_coverage", contrast=None, snr=None)

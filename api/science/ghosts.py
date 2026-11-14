@@ -39,15 +39,22 @@ def gaia_cone(ra: float, dec: float, radius_deg: float) -> list[dict]:
         tab = Gaia.launch_job(q).get_results()
     rows = []
     for r in tab:
-        def f(k):
+
+        def f(k, r=r):  # bind this row, not the loop variable
             v = r[k]
             return None if np.ma.is_masked(v) else float(v)
 
-        rows.append({
-            "source_id": str(r["source_id"] if "source_id" in tab.colnames else r["SOURCE_ID"]),
-            "ra": f("ra"), "dec": f("dec"), "pmra": f("pmra"), "pmdec": f("pmdec"),
-            "parallax": f("parallax"), "g_mag": round(f("phot_g_mean_mag"), 2),
-        })
+        rows.append(
+            {
+                "source_id": str(r["source_id"] if "source_id" in tab.colnames else r["SOURCE_ID"]),
+                "ra": f("ra"),
+                "dec": f("dec"),
+                "pmra": f("pmra"),
+                "pmdec": f("pmdec"),
+                "parallax": f("parallax"),
+                "g_mag": round(f("phot_g_mean_mag"), 2),
+            }
+        )
     return rows
 
 
@@ -69,8 +76,10 @@ def propagate(stars: list[dict], mjds: np.ndarray) -> np.ndarray:
     pmdec = np.array([s["pmdec"] or 0.0 for s in stars])
     plx = np.array([s["parallax"] if (s["parallax"] or 0) > 0.05 else 0.05 for s in stars])
     c = SkyCoord(
-        ra=ra * u.deg, dec=dec * u.deg,
-        pm_ra_cosdec=pmra * u.mas / u.yr, pm_dec=pmdec * u.mas / u.yr,
+        ra=ra * u.deg,
+        dec=dec * u.deg,
+        pm_ra_cosdec=pmra * u.mas / u.yr,
+        pm_dec=pmdec * u.mas / u.yr,
         distance=Distance(parallax=plx * u.mas),
         radial_velocity=0 * u.km / u.s,
         obstime=GAIA_EPOCH,
@@ -93,7 +102,11 @@ def build_ghosts(ra: float, dec: float, fov: float) -> dict[str, Any]:
     mjd = np.array(sorted(f[1] for f in frames))
     ep = split_epochs(mjd)
     epochs = [
-        {"epoch": int(e), "mjd": round(float(mjd[ep == e].mean()), 4), "n_frames": int((ep == e).sum())}
+        {
+            "epoch": int(e),
+            "mjd": round(float(mjd[ep == e].mean()), 4),
+            "n_frames": int((ep == e).sum()),
+        }
         for e in np.unique(ep)
     ]
     radius = fov * 0.75  # covers the square field's corners plus a fast mover's drift
@@ -106,13 +119,19 @@ def build_ghosts(ra: float, dec: float, fov: float) -> dict[str, Any]:
         for e, (gra, gdec) in zip(epochs, p, strict=True):
             dx = (gra - ra) * np.cos(np.radians(dec))
             if abs(dx) <= half and abs(gdec - dec) <= half:
-                ghosts.append({"epoch": e["epoch"], "ra": round(float(gra), 6), "dec": round(float(gdec), 6)})
+                ghosts.append(
+                    {"epoch": e["epoch"], "ra": round(float(gra), 6), "dec": round(float(gdec), 6)}
+                )
         if ghosts:
             pm = np.hypot(s["pmra"] or 0, s["pmdec"] or 0)
-            out.append({
-                "source_id": s["source_id"], "g_mag": s["g_mag"],
-                "pm_mas_yr": round(float(pm), 1), "parallax_mas": s["parallax"],
-                "positions": ghosts,
-            })
+            out.append(
+                {
+                    "source_id": s["source_id"],
+                    "g_mag": s["g_mag"],
+                    "pm_mas_yr": round(float(pm), 1),
+                    "parallax_mas": s["parallax"],
+                    "positions": ghosts,
+                }
+            )
     out.sort(key=lambda s: -s["pm_mas_yr"])
     return {"target": {"ra": ra, "dec": dec, "fov": fov}, "epochs": epochs, "stars": out}

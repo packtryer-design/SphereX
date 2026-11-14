@@ -102,8 +102,10 @@ def main() -> None:
         shift = SkyCoord(t["ra"], t["dec"], unit="deg").separation(
             SkyCoord(ra_now, dec_now, unit="deg")
         )
-        print(f"{slug:14s} J2000 {t['ra']:.5f} {t['dec']:.5f} -> 2026 {ra_now:.5f} {dec_now:.5f}"
-              f"  moved {shift.arcsec:.0f} arcsec")
+        print(
+            f"{slug:14s} J2000 {t['ra']:.5f} {t['dec']:.5f} -> 2026 {ra_now:.5f} {dec_now:.5f}"
+            f"  moved {shift.arcsec:.0f} arcsec"
+        )
 
     out.append(
         {
