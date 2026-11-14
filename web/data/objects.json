@@ -903,6 +903,7 @@
    "size_arcmin": null,
    "fov": 0.1,
    "target_id": "barnards-star",
+   "spectrum": "point",
    "profile": "m_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
@@ -932,6 +933,7 @@
    "size_arcmin": null,
    "fov": 0.1,
    "target_id": "eps-indi-b",
+   "spectrum": "point",
    "profile": "brown_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
@@ -958,6 +960,7 @@
    "size_arcmin": null,
    "fov": 0.1,
    "target_id": "wise-0855",
+   "spectrum": "point",
    "profile": "brown_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
@@ -984,6 +987,7 @@
    "size_arcmin": null,
    "fov": 0.1,
    "target_id": "rw-aur",
+   "spectrum": "point",
    "profile": "young_star",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
@@ -1010,6 +1014,7 @@
    "size_arcmin": null,
    "fov": 0.1,
    "target_id": "r-dra",
+   "spectrum": "point",
    "profile": "mira",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [

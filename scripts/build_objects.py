@@ -200,6 +200,7 @@ def main() -> None:
         }
         if target:
             o["target_id"] = oid  # /api/spectrum?target=<id>: PSF photometry + bands
+            o["spectrum"] = "point"  # the site asks /api/spectrum, not /api/surface-spectrum
             o["profile"] = target["profile"]
             o["coord_epoch"] = TARGET_EPOCH
             o["pm_mas_yr"] = [target.get("pmra_mas_yr"), target.get("pmdec_mas_yr")]

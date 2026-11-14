@@ -9,6 +9,10 @@ Fitting the neighbours too separates their light from the target's instead of mi
 The ePSF files hold a 21x21 grid of PSFs across each detector. Our cached cutouts don't keep
 the detector position, but SPHEREx's filter puts wavelength along detector Y, so the pixel's
 wavelength picks the grid row; we average that row's 21 PSFs.
+
+The ePSFs come from the QR3 calibration release, and we apply them to DR1 frames too: the PSF
+is set by the telescope optics, not the processing version. If they didn't match, the fit
+quality (fit_ql) would rise, and fit_ql > 1 already inflates the error bars.
 """
 
 from __future__ import annotations

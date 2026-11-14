@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blink · Track Pluto</title>
+  <meta name="description" content="Follow Pluto, the original Planet X, through NASA SPHEREx images.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .track { max-width: 760px; margin: 0 auto; padding: 16px; }
+    .track h1 { font-size: 1.5rem; margin: 8px 0 4px; }
+    .track p { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+    .sky { position: relative; aspect-ratio: 1; background: #000; border-radius: var(--radius); overflow: hidden; }
+    .sky img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+    .ring { position: absolute; width: 9%; aspect-ratio: 1; border: 2px solid var(--b);
+            border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    .ring[hidden] { display: none; }
+    .stamp { position: absolute; left: 12px; bottom: 10px; text-shadow: 0 1px 3px #000; }
+    .stamp strong { font-size: 1.15rem; display: block; }
+    .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .controls input[type=range] { flex: 1; min-width: 160px; }
+    .controls button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
+                       background: var(--surface-2); color: var(--text); cursor: pointer; }
+    .controls button:focus-visible, .controls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .note { font-size: .9rem; color: var(--muted); margin-top: 12px; }
+    .px { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
+    .px h2 { font-size: 1.25rem; margin: 0 0 8px; }
+    .result { color: var(--text) !important; font-weight: 500; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .grid figure { margin: 0; }
+    .pic { position: relative; }
+    .px-ring { width: 18%; }
+    .grid img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: 6px; display: block; }
+    .grid figcaption { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="track">
+    <a href="./">← Blink</a>
+    <h1>Pluto, the original Planet X</h1>
+    <p>In 1930 Clyde Tombaugh found Pluto by blinking two photographs: stars stay put, Pluto
+      moves. Here are NASA SPHEREx's own images of Pluto over three days. The ring is where
+      NASA JPL's orbit predicts it, worked out independently of these images.</p>
+
+    <div class="sky">
+      <img id="frame" alt="SPHEREx infrared image of the sky around Pluto">
+      <div id="ring" class="ring" aria-hidden="true"></div>
+      <div class="stamp" aria-live="polite"><strong id="when">Loading…</strong><span id="what"></span></div>
+    </div>
+
+    <div class="controls">
+      <button id="play" type="button">Pause</button>
+      <input id="scrub" type="range" min="0" value="0" aria-label="Frame">
+      <label><input id="show-ring" type="checkbox" checked> Show predicted position</label>
+    </div>
+    <p class="note" id="note"></p>
+
+    <section class="px" aria-labelledby="px-title">
+      <h2 id="px-title">Could SPHEREx find a new planet?</h2>
+      <p>A planet far beyond Pluto would be too faint to see in any single image. Astronomers
+        add images up while shifting each one along a guessed path: only something moving
+        that way builds up, while the noise averages out. We tried every plausible path, blind.</p>
+      <p id="px-pluto" class="result">Searching…</p>
+      <p>To test how far this goes, we <strong>planted a simulated planet</strong>, moving like a
+        world 300 times farther from the Sun than Earth, into the real images, and searched again.</p>
+      <div class="grid">
+        <figure><div class="pic"><img id="px-single" alt="One SPHEREx image: the simulated planet is not visible"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>One image: nothing to see</figcaption></figure>
+        <figure><div class="pic"><img id="px-plain_stack" alt="All images added without shifting: a faint streak"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Added as they are: a smear</figcaption></figure>
+        <figure><div class="pic"><img id="px-shift_stack" alt="Images shifted along the planet's path and added: a clear dot"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Shifted along its path: found</figcaption></figure>
+      </div>
+      <p id="px-limit" class="result"></p>
+      <p class="note">Black patches: bright stars masked out before searching. The planted planet is
+        simulated, to test the method; this is not a discovery.</p>
+    </section>
+  </main>
+
+  <script type="module">
+    const q = new URLSearchParams(location.search);
+    const api = (q.get("api") ?? "") + "/api/track?" + new URLSearchParams({
+      body: q.get("body") ?? "pluto", mjd: q.get("mjd") ?? "60956", days: q.get("days") ?? "2",
+    });
+    const $ = (id) => document.getElementById(id);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const r = await fetch(api).then((x) => x.ok ? x.json() : Promise.reject(x.statusText))
+      .catch((e) => { $("when").textContent = "Couldn't load the images: " + e; throw e; });
+    const f = r.frames, n = r.target.size_px, t0 = f[0].mjd;
+    f.forEach((x) => { new Image().src = x.png; });  // preload so playback doesn't stutter
+    $("scrub").max = f.length - 1;
+    $("note").textContent = `${f.length} SPHEREx exposures over ${((f.at(-1).mjd - t0) * 24).toFixed(0)} hours, ` +
+      `aligned so the stars stay still. ${r.source}`;
+
+    function show(i) {
+      const x = f[i], p = x.predicted;
+      $("frame").src = x.png;
+      $("scrub").value = i;
+      $("ring").style.left = `${((p.x + 0.5) / n) * 100}%`;
+      $("ring").style.top = `${((n - 1 - p.y + 0.5) / n) * 100}%`;  // image rows run top-down
+      $("when").textContent = `+${((x.mjd - t0) * 24).toFixed(0)} hours`;
+      $("what").textContent = `${x.wavelength_um?.toFixed(2) ?? "?"} µm infrared · detector ${x.detector}`;
+    }
+
+    let i = 0, timer = null;
+    const play = () => { timer = setInterval(() => show(i = (i + 1) % f.length), 350); $("play").textContent = "Pause"; };
+    const pause = () => { clearInterval(timer); timer = null; $("play").textContent = "Play"; };
+    $("play").onclick = () => (timer ? pause() : play());
+    $("scrub").oninput = (e) => { pause(); show(i = +e.target.value); };
+    $("show-ring").onchange = (e) => { $("ring").hidden = !e.target.checked; };
+    show(0);
+    reduced ? pause() : play();
+
+    // Planet search (slow the first time: tries ~500 paths x 3 tests; cached after)
+    const px = await fetch(api.replace("/api/track?", "/api/planetx?")).then((x) => x.ok ? x.json() : null);
+    if (!px) { $("px-pluto").textContent = "The planet search is unavailable right now."; }
+    else {
+      const p = px.pluto, f1 = px.faintest_recovered;
+      $("px-pluto").textContent = p.found_blind
+        ? `Without being told where to look, the search found Pluto (signal ${p.snr}× the noise), ` +
+          `moving ${p.motion_arcsec_day}″ a day; NASA JPL predicts ${p.true_motion_arcsec_day}″.`
+        : "The blind search did not single out Pluto in this window.";
+      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = px.images[k];
+      const X = px.planet_x, m = px.size_px;  // ring where the simulated planet was planted
+      document.querySelectorAll(".px-ring").forEach((r) => {
+        r.style.left = `${((X.x + 0.5) / m) * 100}%`;
+        r.style.top = `${((m - 1 - X.y + 0.5) / m) * 100}%`;
+      });
+      $("px-limit").textContent = f1
+        ? `It found the planted planet down to ${f1.pluto_ratio}× fainter than Pluto, using ` +
+          `${px.n_frames} images over ${px.window_days} days. Fainter than that, it was lost in the noise. ` +
+          `${Math.round(px.masked_frac * 100)}% of this crowded field is hidden behind bright stars.`
+        : "Even the brightest planted planet was not recovered here.";
+    }
+  </script>
+</body>
+</html>

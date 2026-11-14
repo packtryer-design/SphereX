@@ -45,13 +45,13 @@ export async function getFrames({ ra, dec, fov, mode, ref }, signal) {
 }
 
 // Surface-brightness spectrum at (ra, dec), right for nebulae, reusing the open field's
-// cutouts (field_ra, field_dec, fov). /api/spectrum is Person C's aperture photometry for stars.
+// cutouts (field_ra, field_dec, fov).
 export const getSpectrum = (q, signal) => getJSON(api("surface-spectrum", q), signal);
 
-// Point sources (stars, brown dwarfs): Person C's PSF photometry in mJy, plus molecule bands,
-// saturation note, WISE W2 check and blends. `target` (a data/targets.json id) adds proper
-// motion and the band profile.
+// Point-source spectrum (Person C): PSF photometry in mJy, with nearby stars fitted out, a
+// WISE W2 cross-check and a saturation note. For catalog objects with spectrum: "point".
+// See docs/SPECTRUM_API.md. `unit` is copied up so both spectra draw the same way.
 export const getPointSpectrum = ({ ra, dec, target }, signal) =>
-  getJSON(api("spectrum", { ra, dec, target }), signal);
+  getJSON(api("spectrum", { ra, dec, target }), signal).then((s) => ({ ...s, unit: s.units.flux, point: true }));
 
 export const resolveName = (name, signal) => getJSON(api("resolve", { name }), signal);

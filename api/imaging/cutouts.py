@@ -9,6 +9,7 @@ import json
 import logging
 import random
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
@@ -70,10 +71,17 @@ def get_cutouts(ra: float, dec: float, fov: float) -> list[Cutout]:
     return fetch_cutouts(ra, dec, fov)[0]
 
 
-def fetch_cutouts(ra: float, dec: float, fov: float) -> tuple[list[Cutout], int]:
-    """Cutouts plus the number of frames that failed to download."""
+def fetch_cutouts(
+    ra: float, dec: float, fov: float, mjd_range: tuple[float, float] | None = None
+) -> tuple[list[Cutout], int]:
+    """Cutouts plus the number of frames that failed to download.
+
+    `mjd_range`: only frames taken in this window (moving targets need a few days, not all).
+    """
     ra, dec, fov = round(ra, 4), round(dec, 4), round(fov, 3)  # stable cache keys
     frames = query_frames(ra, dec)
+    if mjd_range:
+        frames = [f for f in frames if mjd_range[0] <= f[1] <= mjd_range[1]]
     size = round(fov * 1.5, 4)  # margin so rotated frames still fill the output square
     with httpx.Client(timeout=120) as client, ThreadPoolExecutor(MAX_WORKERS) as pool:
         results = list(pool.map(lambda f: _fetch(client, *f, ra, dec, size), frames))
@@ -91,9 +99,14 @@ def _fetch(
         if data is None:
             return None
         path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(".tmp.npz")
+        # Unique tmp name: two requests can fetch the same cutout at once (Windows then
+        # refuses to replace a file the other one still holds open).
+        tmp = path.with_suffix(f".{uuid.uuid4().hex}.tmp.npz")
         np.savez_compressed(tmp, **_slim(data), mjd=mjd, detector=det)
-        tmp.replace(path)  # atomic: a crash never leaves a half-written cache file
+        try:
+            tmp.replace(path)  # atomic: a crash never leaves a half-written cache file
+        except PermissionError:  # the other request won the race: its copy is identical
+            tmp.unlink(missing_ok=True)
     z = np.load(path)
     return Cutout(
         img=z["img"],

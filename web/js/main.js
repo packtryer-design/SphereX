@@ -181,6 +181,7 @@ async function openObject(o, opts = {}) {
   frameCache.clear();
   spectrumKey = null;
   spectrumData = null;
+  renderBands();
   hiddenVisits.clear();
   paneA.clear();
   paneB.clear();
@@ -229,6 +230,8 @@ async function openObject(o, opts = {}) {
   renderPair();
   renderObservations();
   syncUrl();
+  // A star's spectrum uses its own small cutouts, not the images: no need to wait for them.
+  if (isPointSource() && state.tab === "spectrum") loadSpectrum();
 
   const exposures = visits.reduce((n, x) => n + x.n_frames, 0);
   showMsg("loading", `Building images of ${visits.length} visit${visits.length > 1 ? "s" : ""}`,
@@ -744,7 +747,7 @@ function renderObservations(err) {
 // (aperture photometry with a sky ring would subtract a nebula's own light).
 
 const POINT_KINDS = new Set(["moving_star", "brown_dwarf", "young_star", "variable_star"]);
-const isPointSource = () => Boolean(obj && (obj.target_id || POINT_KINDS.has(obj.kind)));
+const isPointSource = () => Boolean(obj && (obj.spectrum === "point" || obj.target_id || POINT_KINDS.has(obj.kind)));
 
 const BAND_STATUS = {
   seen: "Seen",
@@ -864,7 +867,7 @@ async function loadSpectrum(force = false) {
   let s;
   try {
     s = point
-      ? await getPointSpectrum({ ra: pos.ra, dec: pos.dec, target: spot ? null : obj.target_id }, ctrl.signal)
+      ? await getPointSpectrum({ ra: pos.ra, dec: pos.dec, target: spot ? null : (obj.target_id ?? (obj.spectrum === "point" ? obj.id : null)) }, ctrl.signal)
       : await getSpectrum({ ra: pos.ra, dec: pos.dec, field_ra: obj.ra, field_dec: obj.dec, fov: obj.fov }, ctrl.signal);
   } catch (err) {
     if (err.name === "AbortError" || my !== token || key !== spectrumKey) return;

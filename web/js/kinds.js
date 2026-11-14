@@ -46,20 +46,20 @@ export const KINDS = {
   brown_dwarf: {
     label: "Brown dwarf",
     plural: "Brown dwarfs",
-    about: "Too big to be a planet, too small to be a star: a brown dwarf can't keep hydrogen fusion going, so it slowly cools. The coldest ones have water and methane in their air, which carve deep dips in their infrared spectrum. That makes them a natural target for SPHEREx.",
-    overTime: "The nearest brown dwarfs move across the sky fast enough for SPHEREx to see the shift between visits. Their spectrum is the main attraction: open the Spectrum tab.",
+    about: "An object too small to burn hydrogen like a star, so it slowly cools. The coldest ones have water and methane in their air, which carve deep dips into their infrared spectrum, and most of their light comes out near 4 to 5 µm, right where SPHEREx looks.",
+    overTime: "Nearby brown dwarfs move across the sky by several arcseconds a year, so they can shift between visits. Use the Spectrum tab to see the molecules in their air.",
   },
   young_star: {
     label: "Young star",
     plural: "Young stars",
-    about: "A star still growing, surrounded by the disk of gas and dust it formed from. Material falling onto it makes its brightness flicker, and warm dust in the disk makes it extra bright in the infrared.",
-    overTime: "Its brightness can change from one visit to the next. Click it in Explore to see its brightness at every visit.",
+    about: "A star still growing, with a disk of gas and dust around it. The warm disk glows in the infrared, so the star looks brighter at long SPHEREx wavelengths than a grown-up star would.",
+    overTime: "Young stars flicker as material falls onto them, so their brightness can change between visits.",
   },
   variable_star: {
-    label: "Pulsating variable star",
+    label: "Pulsating red giant",
     plural: "Variable stars",
-    about: "A cool giant star that swells and shrinks, changing its brightness a lot over a cycle of months. Water in its puffed-up outer layers shows up as deep dips in its infrared spectrum.",
-    overTime: "Expect real brightness changes between visits: each visit catches the star at a different point in its cycle.",
+    about: "An old, swollen star that slowly pulsates, getting brighter and fainter over months. It's very bright in the infrared, often too bright for SPHEREx's detectors.",
+    overTime: "Its brightness changes a lot between visits. When it's too bright the detector saturates, and Blink leaves those frames out rather than guessing.",
   },
   unknown: {
     label: "Object",
@@ -101,6 +101,9 @@ export function kindFromType(type) {
   if (t === "SNR") return "supernova_remnant";
   if (t === "RNe") return "reflection";
   if (t === "DNe") return "dark";
+  if (t === "BD*") return "brown_dwarf";
+  if (t === "Mi*" || t === "LP*") return "variable_star";
+  if (t === "TT*" || t === "Or*" || t === "Y*O") return "young_star";
   return "unknown";
 }
 
