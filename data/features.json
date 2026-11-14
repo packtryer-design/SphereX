@@ -1,0 +1,89 @@
+{
+  "_about": "Spectral features SPHEREx can see (0.75-5.0 um, resolving power ~35-130, so only broad bands). Each band: lo/hi in um, type absorption = dip, emission = bump. side_um = width of continuum windows used either side when measuring depth. Refs are journal citations; check ADS before quoting on a slide.",
+  "side_um": 0.08,
+  "targets": {
+    "barnards-star": "m_dwarf",
+    "eps-indi-b": "brown_dwarf",
+    "wise-0855": "brown_dwarf",
+    "rw-aur": "young_star",
+    "r-dra": "mira",
+    "3i-atlas": "comet"
+  },
+  "refs": {
+    "kirkpatrick2005": "Kirkpatrick 2005, ARA&A 43, 195 - New spectral types L and T",
+    "cushing2005": "Cushing, Rayner & Vacca 2005, ApJ 623, 1115 - IRTF spectral sequence of M, L, T dwarfs",
+    "burgasser2006": "Burgasser et al. 2006, ApJ 637, 1067 - Unified near-infrared spectral classification of T dwarfs",
+    "noll1997": "Noll, Geballe & Marley 1997, ApJ 489, L87 - CO in the T dwarf Gl 229B",
+    "skemer2016": "Skemer et al. 2016, ApJ 826, L17 - First spectrum of the coldest brown dwarf (WISE 0855)",
+    "rayner2009": "Rayner, Cushing & Vacca 2009, ApJS 185, 289 - IRTF spectral library of cool stars",
+    "lancon2000": "Lancon & Wood 2000, A&AS 146, 217 - Library of 0.5-2.5 um spectra of luminous cool stars (incl. Miras)",
+    "hartmann2016": "Hartmann, Herczeg & Calvet 2016, ARA&A 54, 135 - Accretion onto pre-main-sequence stars",
+    "ootsubo2012": "Ootsubo et al. 2012, ApJ 752, 15 - AKARI near-IR survey of CO2 and H2O in 18 comets",
+    "demeo2009": "DeMeo et al. 2009, Icarus 202, 160 - Bus-DeMeo asteroid taxonomy to 2.45 um",
+    "takir2012": "Takir & Emery 2012, Icarus 219, 641 - 3 um hydration band on outer main-belt asteroids"
+  },
+  "profiles": {
+    "brown_dwarf": {
+      "label": "Brown dwarf",
+      "plain": "Too small to burn hydrogen. Cool enough that water and methane form in its air and carve deep dips. Most light leaks out near 4-5 um.",
+      "bands": [
+        {"id": "h2o_1.4", "molecule": "H2O", "lo": 1.33, "hi": 1.50, "type": "absorption", "plain": "Water vapour in the atmosphere", "ref": "cushing2005"},
+        {"id": "ch4_1.6", "molecule": "CH4", "lo": 1.60, "hi": 1.75, "type": "absorption", "plain": "Methane - only in T and Y dwarfs, cooler than ~1300 K", "ref": "burgasser2006"},
+        {"id": "h2o_1.9", "molecule": "H2O", "lo": 1.80, "hi": 2.05, "type": "absorption", "plain": "Water vapour", "ref": "cushing2005"},
+        {"id": "ch4_2.2", "molecule": "CH4 + H2", "lo": 2.15, "hi": 2.45, "type": "absorption", "plain": "Methane plus hydrogen pressure absorption", "ref": "burgasser2006"},
+        {"id": "h2o_2.7", "molecule": "H2O", "lo": 2.55, "hi": 3.00, "type": "absorption", "plain": "Strongest water band", "ref": "cushing2005"},
+        {"id": "ch4_3.3", "molecule": "CH4", "lo": 3.15, "hi": 3.55, "type": "absorption", "plain": "Strongest methane band", "ref": "kirkpatrick2005"},
+        {"id": "window_4.4", "molecule": "none", "lo": 3.95, "hi": 4.45, "type": "emission", "plain": "Clear window: light from deep hot layers escapes, so the object is brightest here", "ref": "skemer2016"},
+        {"id": "co_4.6", "molecule": "CO", "lo": 4.50, "hi": 4.80, "type": "absorption", "plain": "Carbon monoxide stirred up from deep layers", "ref": "noll1997"}
+      ]
+    },
+    "m_dwarf": {
+      "label": "Red dwarf star",
+      "plain": "Small cool star. Smooth curve falling toward long wavelengths, with mild water and CO dips.",
+      "bands": [
+        {"id": "h2o_1.4", "molecule": "H2O", "lo": 1.33, "hi": 1.50, "type": "absorption", "plain": "Weak water - only cool stars show it", "ref": "rayner2009"},
+        {"id": "h2o_1.9", "molecule": "H2O", "lo": 1.80, "hi": 2.05, "type": "absorption", "plain": "Weak water", "ref": "rayner2009"},
+        {"id": "co_2.3", "molecule": "CO", "lo": 2.29, "hi": 2.45, "type": "absorption", "plain": "Carbon monoxide bandheads", "ref": "rayner2009"}
+      ]
+    },
+    "mira": {
+      "label": "Mira variable (pulsating red giant)",
+      "plain": "Huge cool giant that swells and shrinks over ~250 days. Thick water layers around it make very deep dips; brightness changes a lot between epochs.",
+      "bands": [
+        {"id": "h2o_1.4", "molecule": "H2O", "lo": 1.33, "hi": 1.50, "type": "absorption", "plain": "Water in the extended atmosphere", "ref": "lancon2000"},
+        {"id": "h2o_1.9", "molecule": "H2O", "lo": 1.80, "hi": 2.05, "type": "absorption", "plain": "Water", "ref": "lancon2000"},
+        {"id": "co_2.3", "molecule": "CO", "lo": 2.29, "hi": 2.45, "type": "absorption", "plain": "Carbon monoxide bandheads", "ref": "lancon2000"},
+        {"id": "h2o_2.7", "molecule": "H2O", "lo": 2.55, "hi": 3.00, "type": "absorption", "plain": "Water", "ref": "rayner2009"},
+        {"id": "co_4.6", "molecule": "CO", "lo": 4.50, "hi": 4.80, "type": "absorption", "plain": "Carbon monoxide fundamental", "ref": "rayner2009"}
+      ]
+    },
+    "young_star": {
+      "label": "Young star with a disk",
+      "plain": "Star still forming planets. A warm dust disk adds extra infrared light, so the curve stays high past 2 um instead of falling.",
+      "bands": [
+        {"id": "excess_ir", "molecule": "dust", "lo": 3.00, "hi": 5.00, "type": "excess", "plain": "Infrared excess from warm disk dust", "ref": "hartmann2016"},
+        {"id": "bra_4.05", "molecule": "H (Br-alpha)", "lo": 4.00, "hi": 4.10, "type": "emission", "plain": "Hot hydrogen gas falling onto the star - may be too narrow for SPHEREx", "ref": "hartmann2016"}
+      ]
+    },
+    "comet": {
+      "label": "Comet",
+      "plain": "Ice ball warming near the Sun. Sunlight reflects off dust, and gases glow at their own wavelengths.",
+      "bands": [
+        {"id": "h2o_2.7", "molecule": "H2O", "lo": 2.60, "hi": 2.80, "type": "emission", "plain": "Water gas glowing in sunlight", "ref": "ootsubo2012"},
+        {"id": "org_3.4", "molecule": "organics (C-H)", "lo": 3.30, "hi": 3.55, "type": "emission", "plain": "Organic molecules such as methanol and ethane", "ref": "ootsubo2012"},
+        {"id": "co2_4.26", "molecule": "CO2", "lo": 4.20, "hi": 4.33, "type": "emission", "plain": "Carbon dioxide gas - blocked by Earth's air, only seen from space", "ref": "ootsubo2012"},
+        {"id": "co_4.67", "molecule": "CO", "lo": 4.55, "hi": 4.75, "type": "emission", "plain": "Carbon monoxide gas", "ref": "ootsubo2012"}
+      ]
+    },
+    "asteroid": {
+      "label": "Asteroid",
+      "plain": "Rock reflecting sunlight. Minerals dent the curve near 1 and 2 um; past ~3.5 um its own warmth adds light.",
+      "bands": [
+        {"id": "sil_1", "molecule": "olivine/pyroxene", "lo": 0.90, "hi": 1.10, "type": "absorption", "plain": "Iron-bearing silicate rock", "ref": "demeo2009"},
+        {"id": "pyx_2", "molecule": "pyroxene", "lo": 1.85, "hi": 2.15, "type": "absorption", "plain": "Pyroxene rock", "ref": "demeo2009"},
+        {"id": "oh_3", "molecule": "OH / H2O", "lo": 2.70, "hi": 3.10, "type": "absorption", "plain": "Water locked in minerals", "ref": "takir2012"},
+        {"id": "thermal", "molecule": "heat", "lo": 3.80, "hi": 5.00, "type": "excess", "plain": "The asteroid's own heat glow", "ref": "takir2012"}
+      ]
+    }
+  }
+}
