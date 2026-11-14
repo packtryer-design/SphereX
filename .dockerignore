@@ -1,0 +1,13 @@
+.git
+.venv
+.obsidian
+.vscode
+.github
+**/__pycache__
+.*_cache
+notebooks
+tests
+fixtures
+*.docx
+cache/*
+!cache/demo

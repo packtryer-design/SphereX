@@ -1,8 +1,10 @@
 """Turn cutouts into aligned, consistently stretched PNG frames for the flipbook."""
 
 import json
+import shutil
 import warnings
 from collections import defaultdict
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -14,6 +16,7 @@ from reproject import reproject_interp
 
 from api.imaging.config import (
     CACHE_DIR,
+    DEMO_DIR,
     EPOCH_GAP_DAYS,
     MAX_DLAMBDA,
     MAX_EPOCH_DAYS,
@@ -24,6 +27,20 @@ from api.imaging.cutouts import Cutout, fetch_cutouts
 MODES = ("single", "epoch", "rgb", "diff")
 # Bump when responses change, so old cached JSON is ignored. v3: wavelength-matched diff.
 RESPONSE_VERSION = 3
+
+
+def seed_cache(demo: Path = DEMO_DIR, cache: Path = CACHE_DIR) -> int:
+    """Copy the committed demo snapshot into the cache. Never overwrites newer results."""
+    if not demo.is_dir() or demo.resolve() == cache.resolve():
+        return 0
+    n = 0
+    for src in demo.rglob("*"):
+        dst = cache / src.relative_to(demo)
+        if src.is_file() and not dst.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            n += 1
+    return n
 
 
 def target_grid(

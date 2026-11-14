@@ -1,4 +1,5 @@
-"""Pre-build images for the catalog so the live demo never waits on IRSA.
+"""Pre-build images for the catalog, plus spectra for the science targets, so the live demo
+never waits on IRSA.
 
 Usage:  python scripts/warm_cache.py                 # web/data/objects.json + data/targets.json
         python scripts/warm_cache.py orion wise-0855 # just these ids (from either list)
@@ -14,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from api.imaging.pipeline import build_frames  # noqa: E402
+from api.science.spectrum import build_spectrum  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -45,7 +47,14 @@ else:
                 logging.warning("skipping %s: no fixed position", t["name"])
                 continue
             everything.append(
-                {"id": t["id"], "name": t["name"], "ra": ra, "dec": dec, "fov": t.get("fov", 0.1)}
+                {
+                    "id": t["id"],
+                    "name": t["name"],
+                    "ra": ra,
+                    "dec": dec,
+                    "fov": t.get("fov", 0.1),
+                    "spectrum": True,  # /api/spectrum serves these: warm it too
+                }
             )
     targets = [o for o in everything if not args or o["id"] in args]
 
@@ -59,4 +68,16 @@ for t in targets:
             continue
         logging.info(
             "%s %s: %d frames in %.0fs", t["name"], mode, len(r["frames"]), time.time() - t0
+        )
+    if t.get("spectrum"):
+        # The spectrum uses its own smaller cutouts (SPEC_FOV), which still weigh ~4 MB each
+        # because of the EPSF table: a cold spectrum on stage would mean ~350 slow downloads.
+        t0 = time.time()
+        try:
+            s = build_spectrum(t["ra"], t["dec"], t["id"])
+        except Exception as e:  # Gaia/IRSA down: keep warming the rest
+            logging.warning("%s spectrum: %s", t["name"], e)
+            continue
+        logging.info(
+            "%s spectrum: %d points in %.0fs", t["name"], len(s["points"]), time.time() - t0
         )
