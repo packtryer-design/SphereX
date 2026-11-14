@@ -76,5 +76,10 @@ module = ["api.*", "astropy.*", "astroquery.*", "reproject.*"]
 ignore_errors = true
 ignore_missing_imports = true
 
+# shortcut: tests for the (unchecked) api/science code are unchecked too; annotate after the hackathon
+[[tool.mypy.overrides]]
+module = ["tests.test_features", "tests.test_science"]
+ignore_errors = true
+
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
