@@ -41,7 +41,7 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 | B3 | ✅ Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
 | B4 | ✅ Add a favicon (the only 404 in the browser console) | Console is clean |
 | B5 | ✅ Phone layout check, `<iframe>` embed example (`/embed.html`) | Works at phone width |
-| B6 | 🟡 *Recorder done (`scripts/record_demo.py`); video + GIF follow once Barnard's Star and Orion are warm.* README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
+| B6 | ✅ *Recorded: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4) (40 s) + GIF in the README, linked in `SUBMISSION.md`. Still to do by a human: upload it (YouTube unlisted / Drive) and paste the link. Barnard's Star's spectrum step is left out until that spectrum is warm on the recording machine; re-record with `python scripts/record_demo.py`.* README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
 
 **Already verified in a browser:** Sequence, Blink, Side by side, Swipe, Difference, Color-time, Observations and About all work on Barnard's Star. Difference and Color-time clearly show its motion.
 

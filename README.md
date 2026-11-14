@@ -6,6 +6,10 @@
 
 **Search a nebula and watch how it looks across every visit NASA's SPHEREx telescope has made to it.**
 
+![Blink on Barnard's Star: SPHEREx visits in sequence, blink, difference and colour-time](docs/media/blink-demo.gif)
+
+*Real SPHEREx data: Barnard's Star moving between visits. Full 40-second demo with captions: [docs/media/blink-demo.mp4](docs/media/blink-demo.mp4).*
+
 
 In 1930 Clyde Tombaugh found Pluto by "blinking" between two photos of the same sky taken days apart. Blink does the same with SPHEREx, the infrared telescope that maps the whole sky in 102 colours about every six months. Pick an object, then step through its real observation dates. Blink between two visits, put them side by side, swipe between them, or subtract one from the other to see what changed. Spectra are there as an extra layer: click a spot to see how bright it is in each infrared colour.
 

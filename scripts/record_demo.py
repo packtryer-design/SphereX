@@ -24,6 +24,7 @@ import imageio.v2 as imageio
 import numpy as np
 from PIL import Image
 from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeout
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "media"
@@ -35,6 +36,7 @@ SLOW = 600_000  # ms: a cold object can take minutes, so waits are generous
 
 frames: list[tuple[float, bytes, bool]] = []  # (time, jpeg, part of the GIF?)
 t_start = 0.0
+paused = 0.0  # seconds spent waiting off camera: cut from the video's clock
 in_gif = False
 
 CAPTION_JS = """(t) => {
@@ -56,7 +58,20 @@ CAPTION_JS = """(t) => {
 
 
 def snap(page: Page) -> None:
-    frames.append((time.time() - t_start, page.screenshot(type="jpeg", quality=85), in_gif))
+    frames.append(
+        (time.time() - t_start - paused, page.screenshot(type="jpeg", quality=85), in_gif)
+    )
+
+
+class OffCamera:
+    """Waits inside this block don't appear in the video (no frozen frames)."""
+
+    def __enter__(self) -> None:
+        self.t0 = time.time()
+
+    def __exit__(self, *exc: object) -> None:
+        global paused
+        paused += time.time() - self.t0
 
 
 def hold(page: Page, seconds: float) -> None:
@@ -73,9 +88,10 @@ def caption(page: Page, text: str) -> None:
 
 def ready(page: Page) -> None:
     """Wait (without recording) until the viewer has finished loading."""
-    page.wait_for_timeout(300)
-    page.wait_for_selector("#msg", state="hidden", timeout=SLOW)
-    page.wait_for_timeout(500)
+    with OffCamera():
+        page.wait_for_timeout(300)
+        page.wait_for_selector("#msg", state="hidden", timeout=SLOW)
+        page.wait_for_timeout(500)
 
 
 def search(page: Page, text: str) -> None:
@@ -126,12 +142,19 @@ def record(page: Page) -> None:
     hold(page, 3.5)
     in_gif = False
 
-    caption(page, "Spectrum: what it's made of, with every caveat shown")
+    # The star's spectrum uses its own cutouts. If they aren't warm, skip this step rather
+    # than record a spinner (the wait itself isn't recorded).
     page.click('[data-tab="spectrum"]')
-    page.wait_for_selector("#spec-loading", state="hidden", timeout=SLOW)
-    hold(page, 4)
-    page.mouse.wheel(0, 500)
-    hold(page, 3)
+    try:
+        with OffCamera():
+            page.wait_for_selector("#spec-loading", state="hidden", timeout=15_000)
+    except PlaywrightTimeout:
+        print("Barnard's Star spectrum not warm: step skipped (run warm_cache.py barnards-star)")
+    else:
+        caption(page, "Spectrum: what it's made of, with every caveat shown")
+        hold(page, 4)
+        page.mouse.wheel(0, 500)
+        hold(page, 3)
 
     caption(page, "Nebulae too: the Orion Nebula across a year")
     search(page, "Orion")
@@ -144,7 +167,8 @@ def record(page: Page) -> None:
 
     caption(page, "Its spectrum: glowing hydrogen lines, measured by SPHEREx")
     page.click('[data-tab="spectrum"]')
-    page.wait_for_selector("#spec-loading", state="hidden", timeout=SLOW)
+    with OffCamera():
+        page.wait_for_selector("#spec-loading", state="hidden", timeout=SLOW)
     hold(page, 4)
 
     caption(page, "Blink: real NASA data, real dates, nothing made up")
