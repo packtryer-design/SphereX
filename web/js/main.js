@@ -778,7 +778,7 @@ function drawSpectrumNow() {
   if (!s) return;
   if (!s.points.length) {
     ui.specChart.replaceChildren();
-    ui.specMsg.textContent = "No usable exposures at this spot. It may sit on masked pixels or a detector edge.";
+    ui.specMsg.textContent = s.saturation_note ?? "No usable exposures at this spot. It may sit on masked pixels or a detector edge.";
     return;
   }
   const pts = s.points.map((p) => {
@@ -802,7 +802,7 @@ function drawSpectrumNow() {
     });
     return b;
   }));
-  ui.specMsg.textContent = `${pts.length} exposures, coloured by visit. Surface brightness in ${s.unit} with zodiacal light (sunlit dust in the Solar System) removed, averaged over 3×3 pixels. Where visits overlap, they agree unless something changed.`;
+  ui.specMsg.textContent = `${pts.length} exposures, coloured by visit. Surface brightness in ${s.unit} with zodiacal light (sunlit dust in the Solar System) removed, averaged over 3×3 pixels. Where visits overlap, they agree unless something changed.${s.saturation_note ? ` ${s.saturation_note}` : ""}`;
 }
 
 // ---------- about tab ----------

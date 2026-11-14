@@ -15,6 +15,7 @@ import numpy as np
 FEATURES_PATH = Path(__file__).resolve().parents[2] / "data" / "features.json"
 SEEN_SIGMA = 3.0
 REF_BAND = (2.0, 2.3)  # um, continuum reference for "excess" bands
+CLIP_MAD = 5.0
 BLEND_NOTE = (
     "Another star sits inside the 12-arcsec aperture, so its light is mixed in. "
     "Treat short-wavelength bands with care; 6-arcsec pixels cannot split them."
@@ -53,6 +54,14 @@ def _arrays(points: list[dict]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def _wmean(f: np.ndarray, e: np.ndarray) -> tuple[float, float]:
+    """Inverse-variance mean after dropping points > CLIP_MAD robust sigmas from the median:
+    one failed fit with a small error bar would otherwise outweigh dozens of good ones."""
+    if f.size >= 5:
+        med = np.median(f)
+        mad = 1.4826 * np.median(np.abs(f - med))
+        if mad > 0:
+            keep = np.abs(f - med) <= CLIP_MAD * mad
+            f, e = f[keep], e[keep]
     w = 1.0 / e**2
     return float(np.sum(w * f) / np.sum(w)), float(np.sqrt(1.0 / np.sum(w)))
 
@@ -87,19 +96,26 @@ def _band_contrast(wl, fx, er, lo, hi, side):
 
 
 def _excess(wl, fx, er, lo, hi):
-    """Flux above a Rayleigh-Jeans photosphere (F_nu ~ lambda^-2) pinned at 2.0-2.3 um."""
+    """Flux above a Rayleigh-Jeans photosphere (F_nu ~ lambda^-2) pinned at 2.0-2.3 um.
+
+    Returns (contrast, sigma, is_limit). If the reference band isn't detected (< 3 sigma,
+    e.g. WISE 0855 once the neighbour star is fitted out), pin to its 3-sigma upper limit:
+    the contrast is then a lower limit and sigma is how far the band sits above that.
+    """
     ref = (wl >= REF_BAND[0]) & (wl <= REF_BAND[1])
     inb = (wl >= lo) & (wl <= hi)
     if ref.sum() < 1 or inb.sum() < 1:
         return None
     fref, eref = _wmean(fx[ref], er[ref])
     fin, ein = _wmean(fx[inb], er[inb])
-    if fref <= 0:
-        return None
-    expected = fref * (wl[inb].mean() / wl[ref].mean()) ** -2
+    scale = (wl[inb].mean() / wl[ref].mean()) ** -2
+    if fref < SEEN_SIGMA * eref:
+        expected = (max(fref, 0.0) + SEEN_SIGMA * eref) * scale
+        return fin / expected - 1.0, float(ein / expected), True
+    expected = fref * scale
     ratio = fin / expected
     sig = abs(ratio) * np.hypot(ein / fin if fin else np.inf, eref / fref)
-    return ratio - 1.0, float(sig)
+    return ratio - 1.0, float(sig), False
 
 
 def measure(points: list[dict], profile: str) -> list[dict]:
@@ -125,9 +141,13 @@ def measure(points: list[dict], profile: str) -> list[dict]:
             "ref": feats["refs"][b["ref"]],
         }
         if res is None:
-            row.update(status="no_coverage", contrast=None, snr=None)
+            covered = bool(((wl >= b["lo"]) & (wl <= b["hi"])).any())
+            # covered but no positive continuum to compare against: source too faint there
+            row.update(status="too_faint" if covered else "no_coverage", contrast=None, snr=None)
         else:
-            contrast, sig = res
+            contrast, sig, *limit = res
+            if limit and limit[0]:
+                row["lower_limit"] = True  # contrast is "at least": reference band undetected
             want = -1 if b["type"] == "absorption" else 1
             snr = abs(contrast) / sig if sig > 0 else 0.0
             if np.sign(contrast) == want and snr >= SEEN_SIGMA:

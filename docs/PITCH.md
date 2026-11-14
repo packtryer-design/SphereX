@@ -27,7 +27,7 @@ Rule: **no discovery claims.** The strongest wording we use is "candidate for re
    > This circle is where the Gaia satellite predicts the star should be on that date. Star sits on its ghost: known object. A moving dot with **no** ghost and no known asteroid there is what we'd flag — a candidate for a human to review.
 4. **WISE 0855 — spectrum (≈40 s).** Open WISE 0855, click it.
    > Coldest brown dwarf known — about as cold as the North Pole. Because every SPHEREx image sees it at a different wavelength, stacking them gives its full spectrum.
-   > A normal star is brightest at short wavelengths. This thing is the opposite: almost nothing below 4 µm, then it lights up — **2.7 times brighter than a star's curve allows, at 13 sigma.** That's because **water and methane** in its air swallow the shorter wavelengths, and its heat only escapes through a clear window at 4–5 µm.
+   > A normal star is brightest at short wavelengths. This thing is the opposite: no light at all below 4 µm, then it lights up — **at 4.0–4.45 µm it is at least 68 times brighter than a star's curve allows, at 25 sigma.** That's because **water and methane** in its air swallow the shorter wavelengths, and its heat only escapes through a clear window at 4–5 µm.
    > The app only marks a band "seen" at 3 sigma, cites the paper for every label, and here it even warns us that a faint star 7 arcseconds away is mixed into the short-wavelength light. Honest science, not pretty pictures.
 
 *(If live data is slow: switch to the backup video at this exact point — same path.)*
@@ -49,9 +49,9 @@ Rule: **no discovery claims.** The strongest wording we use is "candidate for re
 
 | Question | Answer |
 |---|---|
-| Is the spectrum calibrated? | Fluxes are aperture photometry on IRSA's calibrated, zodi-subtracted images (MJy/sr → mJy). Good for shape; absolute level ~10 %. |
+| Is the spectrum calibrated? | Fluxes are PSF fits with SPHEREx's official ePSFs on IRSA's calibrated, zodi-subtracted images (MJy/sr → mJy); aperture photometry only where a fit fails. A 3 % systematic floor is added to every error bar. Good for shape; absolute level ~10 %. Each spectrum is cross-checked against AllWISE W2 (4.6 µm): WISE 0855 agrees within 14 %. |
 | How do you know it's water? | Band depth vs a power-law continuum fitted either side, ≥ 3σ. Band edges from Cushing 2005, Burgasser 2006 (cited in-app). For WISE 0855, SPHEREx sees the *effect* (light only escaping at 4–5 µm) rather than individual dips — it is ~25th mag below 2 µm. |
-| Isn't WISE 0855 blended? | Yes — a G=16.3 star sits 7″ away, 1 pixel. The API reports it (`blends`) and the app shows a caveat. The 4–5 µm flux (~0.6 mJy) matches WISE W2, so that part is the brown dwarf. |
+| Isn't WISE 0855 blended? | Yes — a G=16.3 star sits 7″ away, 1 pixel. We fit both stars together with the SPHEREx PSF, so the neighbour's light is split off (254 of 258 points). Before that, the "brown dwarf" showed 0.9 mJy below 2 µm — all of it the neighbour. After: zero below 4 µm, ~0.5 mJy at 4.4–5 µm, consistent with WISE W2. |
 | How do you check asteroids? | IMCCE SkyBoT at each frame time; next step is cross-checking with JPL SBIdent. |
 | What about Planet X itself? | Too faint/slow for a 6″ pixel in one year; the same blink + ghost logic is how a wide survey would find it. |
-| Data source? | SPHEREx DR1 / quick release spectral images, IRSA SIA + cutout service; Gaia DR3 for ghosts. |
+| Data source? | SPHEREx DR1 / quick release spectral images, IRSA SIA + cutout service; Gaia DR3 + CatWISE2020 for ghosts (CatWISE sees cold brown dwarfs Gaia can't); AllWISE W2 as flux sanity check. |
