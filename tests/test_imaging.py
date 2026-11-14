@@ -52,14 +52,19 @@ def test_diff_cancels_colour_but_keeps_real_change() -> None:
     zs = [np.full((3, 3), f["wavelength_um"] * 10) for f in frames]
     zs[3] = zs[3] + 5.0  # a real change in epoch 2 at 2.0 um
 
-    def meta(e: int) -> dict[str, Any]:
-        return {"epoch": e}
+    def meta(e: int, use: list[int]) -> dict[str, Any]:
+        return {"epoch": e, "detectors": use}
 
-    images, out = _matched_diff(frames, zs, [1, 2, 3], [1], meta)
+    images, out = _matched_diff(frames, zs, [1, 2, 3], 1, [1], meta)
     assert [m["epoch"] for m in out] == [2]  # epoch 3 (4.0 um) has no match: left out
     assert out[0]["n_frames"] == 4  # 1.01 pairs with 1.0, 2.0 with 2.0; 3.0 unmatched
+    assert out[0]["ref_epoch"] == 1 and out[0]["detectors"] == [1]
     # pairs give 0.1 (colour within the match tolerance) and 5.0; median of two = 2.55
     assert np.allclose(images[0], 2.55)
+
+    # a chosen reference visit: epoch 1 is now compared against epoch 2, sign flips
+    images, out = _matched_diff(frames, zs, [1, 2, 3], 2, [1], meta)
+    assert [m["epoch"] for m in out] == [1] and np.allclose(images[0], -2.55)
 
 
 def test_still_star_is_white() -> None:

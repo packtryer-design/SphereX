@@ -39,7 +39,7 @@ def skybot(mjd: float, ra: float, dec: float, radius_deg: float) -> list[dict]:
             "-mime": "json",
             "-output": "basic",
             "-loc": "500",
-            "-from": "Blink102",
+            "-from": "Blink",
         },
         timeout=60,
     )
