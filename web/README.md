@@ -37,10 +37,21 @@ make serve     # API + front end on http://localhost:8000
   - **Colour-time** puts three visits in red, green and blue. Anything that is the same in all three comes out white.
   - Click any spot to see its brightness at every visit.
 - **Observations** shows a card for each visit: dates, exposures, which of the six detectors were used, and the gap since the previous visit. It ends with a short guide to telling real change from artifacts.
-- **Spectrum** has one dot per exposure, coloured by visit, with reference lines for nebulae shaded.
+- **Spectrum** has one dot per exposure, coloured by visit. The method depends on the object:
+  - **Stars and brown dwarfs** (catalog objects with a `target_id`) use Person C's `/api/spectrum`: PSF photometry in mJy, a binned spectrum line, molecule bands marked *seen* only at 3σ or more, each with its paper reference, plus the saturation note, the WISE W2 cross-check and nearby Gaia stars.
+  - **Nebulae** use `/api/surface-spectrum` (surface brightness), with hydrogen and dust lines shaded for reference.
+  - While it loads, the chart says what it's waiting for, with a timer, because a cold spectrum can take minutes.
 - **About** gives what kind of object it is, what to expect over time, its position, size and catalog names, with links to SIMBAD and IRSA.
 
-The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so any view can be shared. Positions found by name lookup use `?ra=&dec=&fov=&name=`. Add `&embed=1` to hide the header for an `<iframe>`.
+The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so any view can be shared. Positions found by name lookup use `?ra=&dec=&fov=&name=`.
+
+**Embedding:** add `&embed=1` to hide the header and tabs. [`embed.html`](embed.html) (`/embed.html` on the running site) shows a live example and the code to copy:
+
+```html
+<iframe src="https://<your-blink-host>/?o=barnards-star&view=rgb&embed=1"
+        width="900" height="600" style="border:0" loading="lazy"
+        title="Blink: SPHEREx visits"></iframe>
+```
 
 ## Honest data, by design
 
@@ -61,7 +72,9 @@ The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so an
 | `js/sample.js` | Reads brightness at one spot from each visit's image, in the browser |
 | `js/kinds.js` | Plain-language text for each kind of object; SPHEREx detector ranges |
 | `js/time.js` | MJD → readable dates and gaps |
-| `data/objects.json` | The catalog. Built by `make objects` from SIMBAD + IRSA, so don't edit it by hand. To add an object, add a line to `OBJECTS` in `scripts/build_objects.py` |
+| `embed.html` | How to embed Blink, with a live example |
+| `favicon.svg` | Tab icon |
+| `data/objects.json` | The catalog. Built by `make objects` from SIMBAD + IRSA, so don't edit it by hand. To add an object, add a line to `OBJECTS` in `scripts/build_objects.py`. Science targets from `data/targets.json` are included automatically, at their `ra_2026`/`dec_2026` positions, so the site and `/api/spectrum` share one cache entry |
 | `data/features.json` | Reference lines shaded on the spectrum (laboratory wavelengths) |
 
 ## API used
@@ -72,6 +85,7 @@ The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so an
 | `GET /api/frames?ra=&dec=&fov=&mode=epoch` | One aligned PNG per visit |
 | `GET /api/frames?...&mode=diff&ref=N` | Each visit minus visit N, over shared detectors |
 | `GET /api/frames?...&mode=rgb` | Three visits as one colour image |
+| `GET /api/spectrum?ra=&dec=&target=` | Person C's point-source spectrum (stars, brown dwarfs) |
 | `GET /api/surface-spectrum?ra=&dec=&field_ra=&field_dec=&fov=` | Surface brightness, one point per exposure (wavelength, flux, error, date). Right for nebulae. Person C's `/api/spectrum` does aperture photometry for stars |
 | `GET /api/resolve?name=` | Coordinates for a name, from SIMBAD or NED |
 

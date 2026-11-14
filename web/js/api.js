@@ -48,4 +48,10 @@ export async function getFrames({ ra, dec, fov, mode, ref }, signal) {
 // cutouts (field_ra, field_dec, fov). /api/spectrum is Person C's aperture photometry for stars.
 export const getSpectrum = (q, signal) => getJSON(api("surface-spectrum", q), signal);
 
+// Point sources (stars, brown dwarfs): Person C's PSF photometry in mJy, plus molecule bands,
+// saturation note, WISE W2 check and blends. `target` (a data/targets.json id) adds proper
+// motion and the band profile.
+export const getPointSpectrum = ({ ra, dec, target }, signal) =>
+  getJSON(api("spectrum", { ra, dec, target }), signal);
+
 export const resolveName = (name, signal) => getJSON(api("resolve", { name }), signal);

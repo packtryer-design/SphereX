@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embed Blink</title>
+  <meta name="description" content="How to put a live Blink view on any web page with one iframe.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root { --bg: #05070c; --surface: #0d111b; --line: #232b3d; --text: #e8ebf3; --muted: #8f98ae; --accent: #7cc4ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 16px 48px; }
+    h1 { font-size: clamp(26px, 4vw, 34px); margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 32px 0 8px; }
+    p, li { color: var(--muted); }
+    a { color: var(--accent); }
+    .frame { position: relative; width: 100%; aspect-ratio: 3 / 2; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #000; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    pre { margin: 0; padding: 14px 16px; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font: 13px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--text); }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    .row button { font: inherit; font-size: 14px; color: var(--text); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+    .row button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #021624; }
+    code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.92em; color: var(--text); }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    td { border-top: 1px solid var(--line); padding: 6px 8px 6px 0; vertical-align: top; color: var(--muted); }
+    td:first-child { white-space: nowrap; color: var(--text); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Put Blink on your page</h1>
+    <p>One <code>&lt;iframe&gt;</code> shows a live Blink view: real SPHEREx visits, with the header hidden. Pick an example, then copy the code underneath.</p>
+
+    <div class="row" role="group" aria-label="Examples">
+      <button data-src="?o=barnards-star&amp;view=rgb&amp;embed=1" aria-pressed="true">Barnard's Star, colour-time</button>
+      <button data-src="?o=barnards-star&amp;view=blink&amp;embed=1">Barnard's Star, blink</button>
+      <button data-src="?o=orion&amp;view=sequence&amp;embed=1">Orion Nebula, sequence</button>
+      <button data-src="?o=orion&amp;view=swipe&amp;embed=1">Orion Nebula, swipe</button>
+    </div>
+
+    <div class="frame"><iframe id="demo" title="Blink: SPHEREx visits" loading="lazy" src="./?o=barnards-star&amp;view=rgb&amp;embed=1"></iframe></div>
+
+    <h2>Code</h2>
+    <pre id="code"></pre>
+
+    <h2>Options</h2>
+    <table>
+      <tr><td><code>o=orion</code></td><td>Which object. Any id from the catalog, such as <code>orion</code>, <code>ring</code>, <code>wise-0855</code> or <code>barnards-star</code>.</td></tr>
+      <tr><td><code>ra=&amp;dec=&amp;fov=&amp;name=</code></td><td>Any other position instead, in degrees.</td></tr>
+      <tr><td><code>view=</code></td><td><code>sequence</code>, <code>blink</code>, <code>side</code>, <code>swipe</code>, <code>diff</code> or <code>rgb</code> (colour-time).</td></tr>
+      <tr><td><code>a=1&amp;b=3</code></td><td>Which two visits to compare (numbered from 1, oldest first).</td></tr>
+      <tr><td><code>tab=</code></td><td><code>explore</code> (default) or <code>spectrum</code>. The tab bar is hidden when embedded.</td></tr>
+      <tr><td><code>embed=1</code></td><td>Hides the header and tabs, so only the viewer shows.</td></tr>
+    </table>
+    <p>Any view in Blink is already a link: open it, set it up the way you like, then add <code>&amp;embed=1</code> to the address.</p>
+  </main>
+  <script>
+    const base = new URL("./", location.href).href;
+    const frame = document.getElementById("demo");
+    const code = document.getElementById("code");
+    function show(src) {
+      if (frame.getAttribute("src") !== `./${src}`) frame.src = `./${src}`;
+      code.textContent = `<iframe src="${base}${src}"\n        width="900" height="600" style="border:0" loading="lazy"\n        title="Blink: SPHEREx visits"></iframe>`;
+      document.querySelectorAll("[data-src]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.src === src)));
+    }
+    document.querySelectorAll("[data-src]").forEach((b) => b.addEventListener("click", () => show(b.dataset.src)));
+    show("?o=barnards-star&view=rgb&embed=1");
+  </script>
+</body>
+</html>

@@ -36,12 +36,12 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Done when |
 |---|---|---|
-| B1 | 🔴 **Wire C's spectrum into the Spectrum tab.** The site only calls `/api/surface-spectrum` (the nebula method), so C's PSF photometry, WISE check and saturation note never show. Stars and brown dwarfs should use `/api/spectrum?ra=&dec=&target=<id>`; nebulae stay on `surface-spectrum`. | Barnard's Star shows C's spectrum with its saturation note, and WISE 0855 shows its WISE W2 check |
-| B2 | 🟠 **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. | `?o=barnards-star` opens instantly after warming |
-| B3 | Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
-| B4 | Add a favicon (the only 404 in the browser console) | Console is clean |
-| B5 | Phone layout check, `<iframe>` embed example | Works at phone width |
-| B6 | README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
+| B1 | ✅ **Wire C's spectrum into the Spectrum tab.** The site only calls `/api/surface-spectrum` (the nebula method), so C's PSF photometry, WISE check and saturation note never show. Stars and brown dwarfs should use `/api/spectrum?ra=&dec=&target=<id>`; nebulae stay on `surface-spectrum`. | Barnard's Star shows C's spectrum with its saturation note, and WISE 0855 shows its WISE W2 check |
+| B2 | ✅ **One set of coordinates per object.** The catalog's Barnard's Star (Dec 4.76964) is about 5″ from C's `targets.json` (4.7682), so they're cached separately and `?o=barnards-star` isn't warm. For the science objects, use the `ra_2026`/`dec_2026` from `data/targets.json` in `objects.json`. | `?o=barnards-star` opens instantly after warming |
+| B3 | ✅ Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
+| B4 | ✅ Add a favicon (the only 404 in the browser console) | Console is clean |
+| B5 | ✅ Phone layout check, `<iframe>` embed example (`/embed.html`) | Works at phone width |
+| B6 | 🟡 *Recorder done (`scripts/record_demo.py`); video + GIF follow once Barnard's Star and Orion are warm.* README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
 
 **Already verified in a browser:** Sequence, Blink, Side by side, Swipe, Difference, Color-time, Observations and About all work on Barnard's Star. Difference and Color-time clearly show its motion.
 

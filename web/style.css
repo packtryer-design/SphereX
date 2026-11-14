@@ -273,10 +273,35 @@ a { color: var(--accent); }
 .chart .zero { stroke: var(--line); stroke-dasharray: 3 3; }
 .chart .tick { fill: var(--muted); font-size: 10px; }
 .chart .band { fill: #ffb547; opacity: 0.13; }
+.chart .band.seen { fill: var(--accent); opacity: 0.26; }
+.chart .band.not_clear, .chart .band.opposite, .chart .band.too_faint, .chart .band.no_coverage { fill: var(--muted); opacity: 0.1; }
+.chart .binned { fill: none; stroke: var(--text); stroke-width: 2.2; stroke-linejoin: round; }
 .chart .band-label { fill: #c9a25c; font-size: 9px; }
 .chart .line { fill: none; stroke-width: 1.4; opacity: 0.55; }
 .chart .err { stroke: var(--muted); opacity: 0.45; }
 .chart.big { background: var(--surface); border-radius: var(--radius); padding: 10px; min-height: 120px; }
+.chart-wrap { position: relative; }
+.chart-msg {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  padding: 20px; border-radius: var(--radius); background: rgba(13, 17, 27, 0.92); color: var(--muted);
+}
+.chart-msg > div { max-width: 460px; }
+.chart-msg b { display: block; color: var(--text); font-size: 16px; margin-bottom: 6px; }
+.chart-msg .spinner {
+  width: 26px; height: 26px; margin: 0 auto 12px; border-radius: 50%;
+  border: 3px solid var(--line); border-top-color: var(--accent); animation: spin 0.9s linear infinite;
+}
+.chart-msg .elapsed { font-variant-numeric: tabular-nums; font-size: 13px; margin-top: 8px; }
+.spec-notes { display: grid; gap: 8px; margin-bottom: 12px; }
+.spec-notes:empty { display: none; }
+.note { margin: 0; padding: 10px 14px; border-radius: 10px; background: var(--surface); font-size: 14px; }
+.note b { color: var(--text); }
+.note.warn { background: rgba(40, 28, 6, 0.9); color: var(--warn); border: 1px solid rgba(255, 197, 107, 0.35); }
+.note.good { border-left: 3px solid #6fdc8c; }
+.note.check { border-left: 3px solid var(--warn); }
+.bands-list .status { font-weight: 400; font-size: 12px; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.bands-list .status.seen { color: var(--accent-ink); background: var(--accent); }
+.bands-list .ref { display: block; font-size: 12px; color: #6d7690; margin-top: 2px; }
 .spec-legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .spec-legend button { font-size: 13px; padding: 3px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
 .spec-legend button[aria-pressed="false"] { opacity: 0.4; }
@@ -301,6 +326,8 @@ a { color: var(--accent); }
   .tabs button { flex: 1; padding: 10px 6px; }
   .viewer[data-view="side"] { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
   .controls { padding: 10px 12px 12px; }
+  .views { flex-wrap: wrap; overflow: visible; }
+  .views button { font-size: 13px; padding: 4px 10px; }
   .timeline { flex-wrap: wrap; gap: 10px; }
   .pair { order: 2; width: 100%; }
   .pair label { flex: 1; }

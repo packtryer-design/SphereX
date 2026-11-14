@@ -897,12 +897,14 @@
     "Barnard's star",
     "Barnard Star"
    ],
-   "ra": 269.44616,
-   "dec": 4.76964,
+   "ra": 269.4462679,
+   "dec": 4.7682044,
    "constellation": "Ophiucus",
    "size_arcmin": null,
    "fov": 0.1,
-   "coord_epoch": 2026.5,
+   "target_id": "barnards-star",
+   "profile": "m_dwarf",
+   "coord_epoch": 2026.0,
    "pm_mas_yr": [
     -801.551,
     10362.394
@@ -912,6 +914,113 @@
     "first": "2025-08-15",
     "last": "2026-09-22",
     "full": 3
+   }
+  },
+  {
+   "id": "eps-indi-b",
+   "name": "Epsilon Indi B",
+   "kind": "brown_dwarf",
+   "simbad_id": "* eps Ind B",
+   "simbad_type": "BD*",
+   "aliases": [
+    "GJ 845 B",
+    "GJ 845 C"
+   ],
+   "ra": 331.0966688,
+   "dec": -56.8006492,
+   "constellation": "Indus",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "target_id": "eps-indi-b",
+   "profile": "brown_dwarf",
+   "coord_epoch": 2026.0,
+   "pm_mas_yr": [
+    3981.977,
+    -2466.832
+   ],
+   "visits": {
+    "n": 4,
+    "first": "2025-04-24",
+    "last": "2026-10-02",
+    "full": 3
+   }
+  },
+  {
+   "id": "wise-0855",
+   "name": "WISE 0855-0714",
+   "kind": "brown_dwarf",
+   "simbad_id": "WISEA J085510.74-071442.5",
+   "simbad_type": "BD*",
+   "aliases": [],
+   "ra": 133.7597653,
+   "dec": -7.2421822,
+   "constellation": "Hydra",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "target_id": "wise-0855",
+   "profile": "brown_dwarf",
+   "coord_epoch": 2026.0,
+   "pm_mas_yr": [
+    -8123.7,
+    673.2
+   ],
+   "visits": {
+    "n": 3,
+    "first": "2025-05-05",
+    "last": "2026-05-14",
+    "full": 3
+   }
+  },
+  {
+   "id": "rw-aur",
+   "name": "RW Aurigae",
+   "kind": "young_star",
+   "simbad_id": "V* RW Aur",
+   "simbad_type": "TT*",
+   "aliases": [],
+   "ra": 76.9565866,
+   "dec": 30.4012913,
+   "constellation": "Auriga",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "target_id": "rw-aur",
+   "profile": "young_star",
+   "coord_epoch": 2026.0,
+   "pm_mas_yr": [
+    7.23,
+    -20.33
+   ],
+   "visits": {
+    "n": 3,
+    "first": "2025-09-01",
+    "last": "2026-09-16",
+    "full": 3
+   }
+  },
+  {
+   "id": "r-dra",
+   "name": "R Draconis",
+   "kind": "variable_star",
+   "simbad_id": "V* R Dra",
+   "simbad_type": "Mi*",
+   "aliases": [],
+   "ra": 248.1672331,
+   "dec": 66.7550238,
+   "constellation": "Draco",
+   "size_arcmin": null,
+   "fov": 0.1,
+   "target_id": "r-dra",
+   "profile": "mira",
+   "coord_epoch": 2026.0,
+   "pm_mas_yr": [
+    -20.643,
+    6.149
+   ],
+   "visits": {
+    "n": 9,
+    "first": "2025-05-16",
+    "last": "2026-07-16",
+    "full": 1
    }
   }
  ]

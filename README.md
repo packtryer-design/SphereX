@@ -6,6 +6,7 @@
 
 **Search a nebula and watch how it looks across every visit NASA's SPHEREx telescope has made to it.**
 
+
 In 1930 Clyde Tombaugh found Pluto by "blinking" between two photos of the same sky taken days apart. Blink does the same with SPHEREx, the infrared telescope that maps the whole sky in 102 colours about every six months. Pick an object, then step through its real observation dates. Blink between two visits, put them side by side, swipe between them, or subtract one from the other to see what changed. Spectra are there as an extra layer: click a spot to see how bright it is in each infrared colour.
 
 Built for the NASA Space Apps Challenge 2026 (Sharjah), SPHEREx challenge. Team plan: [docs/PLAN.md](docs/PLAN.md).
@@ -49,7 +50,8 @@ web/  (static HTML/JS)                       api/  (FastAPI)
 |---|---|
 | `make serve` | API + front end on port 8000 |
 | `make objects` | Rebuild the catalog from SIMBAD + IRSA |
-| `make warm` | Pre-build images for every catalog object |
+| `make warm` | Pre-build images for every catalog object, plus spectra for the science targets |
+| `python scripts/record_demo.py` | Re-record the demo video and GIF from the running app (dev setup in the script) |
 | `make test` | Tests |
 | `make lint` | Ruff lint and format check |
 | `make typecheck` | Mypy |

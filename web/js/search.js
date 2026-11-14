@@ -10,7 +10,7 @@ function score(o, q) {
   fields.forEach((f, i) => {
     const n = norm(f);
     if (!n) return;
-    const weight = i === 0 ? 3 : i <= 2 + (o.aliases?.length ?? 0) ? 2 : 1;
+    const weight = i === 0 ? 3 : i <= 1 + (o.aliases?.length ?? 0) ? 2 : 1; // name > catalog ids > constellation, kind
     if (n === q) best = Math.max(best, 10 * weight);
     else if (n.startsWith(q)) best = Math.max(best, 6 * weight);
     else if (n.includes(q)) best = Math.max(best, 3 * weight);

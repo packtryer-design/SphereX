@@ -44,19 +44,23 @@ function groupBy(points) {
 // SPHEREx resolving power by wavelength: a line lands in a band about lambda / R wide.
 export const resolvingPower = (um) => (um < 2.42 ? 41 : um < 3.82 ? 35 : um < 4.42 ? 110 : 130);
 
-// points: [{wavelength_um, flux, err, group, color}]  bands: [{name, center_um}]
-export function drawSpectrum(container, points, bands = [], { yLabel = "brightness", W = 640, H = 300 } = {}) {
+// points: [{wavelength_um, flux, err, group, color}]
+// bands:  [{name, center_um}] (shaded at SPHEREx resolution) or [{name, lo, hi, status}]
+// binned: optional [{wavelength_um, flux, err}], drawn as a bold line over the points
+export function drawSpectrum(container, points, bands = [], { yLabel = "brightness", W = 640, H = 300, binned = [] } = {}) {
   const PAD = { l: 52, r: 12, t: 30, b: 36 };
   const X_MIN = 0.7, X_MAX = 5.05;
-  const [yLo, yHi] = yRange(points);
+  const [yLo, yHi] = yRange(points.length ? points : binned);
   const x = (w) => PAD.l + ((w - X_MIN) / (X_MAX - X_MIN)) * (W - PAD.l - PAD.r);
   const y = (f) => H - PAD.b - ((f - yLo) / (yHi - yLo)) * (H - PAD.t - PAD.b);
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yLabel} by wavelength` });
 
   bands.forEach((b, i) => {
-    const half = b.center_um / resolvingPower(b.center_um) / 2;
-    const x0 = x(b.center_um - half), x1 = x(b.center_um + half);
-    svg.append(el("rect", { class: "band", x: x0, y: PAD.t, width: Math.max(x1 - x0, 2), height: H - PAD.t - PAD.b }));
+    const half = (b.center_um ?? 1) / resolvingPower(b.center_um ?? 1) / 2;
+    const x0 = x(b.lo ?? b.center_um - half), x1 = x(b.hi ?? b.center_um + half);
+    const rect = el("rect", { class: `band ${b.status ?? ""}`, x: x0, y: PAD.t, width: Math.max(x1 - x0, 2), height: H - PAD.t - PAD.b });
+    if (b.title) rect.append(el("title", {}, b.title));
+    svg.append(rect);
     svg.append(el("text", { class: "band-label", x: (x0 + x1) / 2, y: PAD.t - 4 - (i % 2) * 11, "text-anchor": "middle" }, b.name));
   });
 
@@ -80,6 +84,11 @@ export function drawSpectrum(container, points, bands = [], { yLabel = "brightne
       if (p.err) svg.append(el("line", { class: "err", x1: x(p.wavelength_um), x2: x(p.wavelength_um), y1: y(p.flux - p.err), y2: y(p.flux + p.err) }));
       svg.append(el("circle", { cx: x(p.wavelength_um), cy: y(p.flux), r: points.length > 40 ? 2 : 3.5, fill: color }));
     }
+  }
+  if (binned.length > 1) {
+    const sorted = [...binned].sort((a, b) => a.wavelength_um - b.wavelength_um);
+    const d = sorted.map((p, i) => `${i ? "L" : "M"}${x(p.wavelength_um).toFixed(1)} ${y(p.flux).toFixed(1)}`).join(" ");
+    svg.append(el("path", { class: "binned", d }));
   }
   container.replaceChildren(svg);
 }
