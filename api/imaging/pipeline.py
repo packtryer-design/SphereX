@@ -12,11 +12,18 @@ from astropy.wcs import WCS
 from PIL import Image
 from reproject import reproject_interp
 
-from api.imaging.config import CACHE_DIR, EPOCH_GAP_DAYS, MAX_EPOCH_DAYS, PIXEL_SCALE_ARCSEC
+from api.imaging.config import (
+    CACHE_DIR,
+    EPOCH_GAP_DAYS,
+    MAX_DLAMBDA,
+    MAX_EPOCH_DAYS,
+    PIXEL_SCALE_ARCSEC,
+)
 from api.imaging.cutouts import Cutout, fetch_cutouts
 
 MODES = ("single", "epoch", "rgb", "diff")
-RESPONSE_VERSION = 2  # bump when the response shape changes, so old cached JSON is ignored
+# Bump when responses change, so old cached JSON is ignored. v3: wavelength-matched diff.
+RESPONSE_VERSION = 3
 
 
 def target_grid(
@@ -217,19 +224,46 @@ def _combine(
             "n_frames": sum(meta(e)["n_frames"] for e in pick),
         }
         return [[epoch_image(e) for e in pick]], [m]
-    # diff: per detector first, and only detectors both epochs have, so wavelength differences
-    # cancel instead of showing up as fake "change"
     base = ref if ref in have else have[0] if have else None
+    return _matched_diff(frames, zs, have, base, dets, meta)
+
+
+def _matched_diff(
+    frames: list[dict[str, Any]],
+    zs: list[np.ndarray],
+    epochs: list[int],
+    base: int | None,
+    dets: list[int],
+    meta: Any,
+) -> tuple[list[Any], list[dict[str, Any]]]:
+    """Every epoch minus `base`, using only frame pairs at the same wavelength.
+
+    SPHEREx sees a spot at a different wavelength in every frame, so subtracting
+    mismatched frames (even within one detector) makes any coloured star look
+    changed. Each frame is paired with the `base` frame from the same detector at
+    the closest wavelength, kept only if they differ by < MAX_DLAMBDA.
+    """
+    usable = [
+        i for i, f in enumerate(frames) if f["detector"] in dets and f["wavelength_um"] is not None
+    ]
+    ref = [i for i in usable if frames[i]["epoch"] == base]
     images, out = [], []
-    for e in have:
+    for e in epochs:
         if e == base:
             continue
-        shared = [d for d in dets if (e, d) in stack and (base, d) in stack]
-        if shared:
+        diffs, used = [], set()
+        for i in (i for i in usable if frames[i]["epoch"] == e):
+            wl, det = frames[i]["wavelength_um"], frames[i]["detector"]
+            same_det = [j for j in ref if frames[j]["detector"] == det]
+            if not same_det:
+                continue
+            j = min(same_det, key=lambda j: abs(frames[j]["wavelength_um"] - wl))
+            if abs(frames[j]["wavelength_um"] - wl) / wl < MAX_DLAMBDA:
+                diffs.append(zs[i] - zs[j])
+                used.add(det)
+        if diffs:  # an epoch with no matching wavelengths is left out, not faked
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                images.append(
-                    np.nanmean([stack[(e, d)] - stack[(base, d)] for d in shared], axis=0)
-                )
-            out.append(meta(e, shared) | {"ref_epoch": base})
+                images.append(np.nanmedian(diffs, axis=0))  # median: drops cosmic rays
+            out.append(meta(e, sorted(used)) | {"ref_epoch": base, "n_frames": 2 * len(diffs)})
     return images, out
