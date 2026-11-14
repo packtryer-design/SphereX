@@ -85,41 +85,49 @@ Browser (static HTML/JS)                Python API (FastAPI)
 
 ## 3. Who does what
 
-Folders: **A** works in `api/`, **B** in `web/`, **C** in `data/` and the docs. Use short branches and merge into `main` every couple of hours.
+There are two backend people and one frontend person.
 
-### Person A: data and backend
+| Person | Role | Folder | Owns |
+|---|---|---|---|
+| **A** | Backend: imaging | `api/imaging/` | `/api/frames`, cutouts, alignment, image stacking, RGB and difference modes, cache |
+| **C** | Backend: science | `api/science/` + `data/` | `/api/spectrum`, Gaia ghosts, SkyBoT, targets, molecule labels, pitch, submission |
+| **B** | Frontend and story | `web/` | UI, deploy, explainer copy, README, backup video |
+
+A and C share one FastAPI app (`api/main.py`) and one cutout cache. **A writes the cutout fetcher first (by 13:00)**, and C's spectrum code reuses it. Use short branches and merge into `main` every couple of hours.
+
+### Person A: backend, imaging
 
 | When | Task | Done when |
 |---|---|---|
-| 11:00–13:00 | Run the IRSA intro and cutouts notebooks on Barnard's Star. Report the frames per epoch and per detector, the time field and the pixel scale. | The team knows how many epochs exist |
-| 13:00–15:00 | Build `/api/frames` in `mode=single`: SIA query, cutouts fetched in parallel, one shared stretch, PNGs in a disk cache | A real flipbook shows in the browser |
+| 11:00–13:00 | Run the IRSA intro and cutouts notebooks on Barnard's Star. Report frames per epoch and per detector, the time field and the pixel scale. Write `get_cutouts(ra, dec, fov)` with parallel fetching and a disk cache. | **C can call `get_cutouts`** |
+| 13:00–15:00 | `/api/frames` in `mode=single`: one shared stretch, then PNGs | A real flipbook shows in the browser |
 | 15:00–19:00 | Reproject to a common grid. Add frames per epoch × detector. Add `mode=epoch`, `rgb` and `diff`. | **Barnard's Star moves** |
-| 19:00–23:00 | Build `/api/spectrum`: a pixel value from each frame, plus that frame's wavelength from its WCS | WISE 0855 spectrum JSON |
+| 19:00–23:00 | Mask pixels using FLAGS and fill `flagged_frac`. Tune the stretch so WISE 0855 shows up in the stacked images from detectors 5–6. | Every target looks clean |
 | Overnight | Script that pre-fills the cache for all targets and 3I/ATLAS. Leave it running. | The demo works without IRSA |
-| 06:00–08:00 | Fixes only. Mask pixels using FLAGS. | |
+| 06:00–08:00 | Fixes only | |
 
-### Person B: frontend
+### Person C: backend, science
 
 | When | Task | Done when |
 |---|---|---|
-| 11:00–13:00 | Page shell (input, viewer, slider, play and blink) working against `fixtures/frames.json`. **Public deploy by 13:00.** | A public URL exists |
+| 11:00–12:00 | `targets.json` with current SIMBAD coordinates. `fixtures/frames.json`. Ask mentors about epochs and moving objects. | A and B are unblocked |
+| 12:00–15:00 | `features.json`: molecule wavelengths and labels, each checked against a paper. Prototype the spectrum code in a notebook. | Labels verified |
+| 15:00–19:00 | `/api/spectrum`: a pixel value plus the wavelength from the frame's WCS for each cutout from `get_cutouts`. Error bars come from VARIANCE. | WISE 0855 spectrum JSON |
+| 19:00–23:00 | `/api/ghosts`: Gaia DR3 proper motions projected to each frame's date. Stretch: `/api/asteroids` via SkyBoT for the comet field. | A ghost sits on Barnard's Star |
+| 23:00–02:00 | Write the pitch script. Test every target as a user. | |
+| 06:00–09:00 | Rehearse the pitch 3 times with A and B | |
+| **09:00–10:00** | **Submit on spaceappschallenge.org and confirm the Google Form** | Confirmation emails received |
+
+### Person B: frontend and story
+
+| When | Task | Done when |
+|---|---|---|
+| 11:00–13:00 | Page shell (input, viewer, slider, play and blink) working against `fixtures/frames.json`. Read the judging criteria. **Public deploy by 13:00.** | A public URL exists |
 | 13:00–15:00 | Frame labels (date · detector · wavelength), mode buttons, URL state | A shared link reopens the same view |
 | 15:00–19:00 | Switch to the real API. Add the field-of-view selector and the time ↔ color switch. | Works with real data |
-| 19:00–23:00 | Spectrum chart with molecule bands drawn from `features.json` | Clicking WISE 0855 shows a labeled chart |
-| 23:00–02:00 | Aladin Lite panel with Gaia and AllWISE overlays. Ghost markers from `ghosts.json`. | A ghost sits on Barnard's Star |
-| 06:00–08:00 | Phone layout, `<iframe>` embed example, guided-tour buttons | |
-
-### Person C: science, design and story
-
-| When | Task | Done when |
-|---|---|---|
-| 11:00–12:00 | Write `targets.json` with current SIMBAD coordinates. Write `fixtures/frames.json`. Read the judging criteria and ask mentors about epochs and moving objects. | A and B are unblocked |
-| 12:00–15:00 | `features.json`: molecule wavelengths and labels, each checked against a paper | Labels verified |
-| 15:00–19:00 | `ghosts.json`: proper motions from Gaia DR3 projected to each frame's date. Stretch: SkyBoT for the comet field. | Ghosts ready for Barnard's Star and Eps Ind |
-| 19:00–23:00 | Explainer copy, guided-tour text, pitch draft | |
-| 23:00–02:00 | Test every target as a user and file bugs. Draft the README. | |
-| 06:00–09:00 | **Record the backup demo video**, write the README with a GIF, rehearse 3 times with A and B | |
-| **09:00–10:00** | **Submit on spaceappschallenge.org and confirm the Google Form** | Confirmation emails received |
+| 19:00–23:00 | Spectrum chart with molecule bands from `features.json`. Write the explainer copy. | Clicking WISE 0855 shows a labeled chart |
+| 23:00–02:00 | Aladin Lite panel with Gaia and AllWISE overlays. Ghost markers from `/api/ghosts`. Guided-tour buttons and text. | Guided tour works |
+| 06:00–09:00 | Phone layout, `<iframe>` embed example, README with GIF, **record the backup demo video** | |
 
 ---
 
@@ -129,12 +137,12 @@ Folders: **A** works in `api/`, **B** in `web/`, **C** in `data/` and the docs. 
 |---|---|
 | **13:00** | Is the public URL live? Do the real epoch counts change the plan? |
 | **15:00** | Real-data flipbook works end to end (ugly is fine) |
-| **19:00** | Barnard's Star visibly moves. **If it doesn't, everyone helps A.** |
+| **19:00** | Barnard's Star visibly moves. **If it doesn't, C stops the science work and helps A.** |
 | **23:00** | Agree what's done and what's cut. Anything not working by now is dropped. |
 | **08:00** | **Feature freeze.** Fixes only from here. |
 | **10:00** | Submitted |
 
-**Sleep:** C sleeps 23:30–05:30. A and B sleep 02:00–06:00, after the cache-warming script is running.
+**Sleep:** all three sleep 02:00–06:00. A starts the cache-warming script before going to sleep.
 
 ---
 
