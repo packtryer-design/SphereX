@@ -94,12 +94,45 @@ def _gaia_irsa(ra: float, dec: float, radius: float) -> list[dict]:
     return [_gaia_row(r.get) for r in _irsa_csv(_gaia_query("gaia_dr3_source", ra, dec, radius))]
 
 
+def _gaia_vizier(ra: float, dec: float, radius: float) -> list[dict]:
+    """Gaia DR3 from VizieR's Harvard mirror (positions are at epoch 2016.0, as in the archive)."""
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astroquery.vizier import Vizier
+
+    cols = {"source_id": "Source", "ra": "RA_ICRS", "dec": "DE_ICRS", "pmra": "pmRA",
+            "pmdec": "pmDE", "parallax": "Plx", "phot_g_mean_mag": "Gmag"}  # fmt: skip
+    viz = Vizier(
+        columns=[*list(cols.values())[:-1], "+Gmag"],  # "+": brightest first
+        column_filters={"Gmag": f"<{G_LIMIT}"},
+        row_limit=MAX_STARS,
+        timeout=60,
+        vizier_server="vizier.cfa.harvard.edu",
+    )
+    found = viz.query_region(
+        SkyCoord(ra, dec, unit="deg"), radius=radius * u.deg, catalog="I/355/gaiadr3"
+    )
+    if not found:
+        return []  # no stars in the cone
+    rows = []
+    for r in found[0]:
+
+        def get(k: str, r=r) -> object:
+            v = r[cols[k]]
+            return None if np.ma.is_masked(v) else v
+
+        rows.append(_gaia_row(get))
+    return rows
+
+
 def gaia_cone(ra: float, dec: float, radius: float) -> list[dict]:
-    """Gaia DR3 stars (G < 17) at epoch 2016.0. ESA first, IRSA copy if ESA is busy."""
-    try:
-        return _gaia_esa(ra, dec, radius)
-    except Exception:
-        return _gaia_irsa(ra, dec, radius)
+    """Gaia DR3 stars (G < 17) at epoch 2016.0: ESA, else IRSA's copy, else VizieR's."""
+    for source in (_gaia_esa, _gaia_irsa):
+        try:
+            return source(ra, dec, radius)
+        except Exception:
+            continue  # busy or unreachable: try the next copy
+    return _gaia_vizier(ra, dec, radius)
 
 
 def catwise_cone(ra: float, dec: float, radius: float) -> list[dict]:
