@@ -1,13 +1,13 @@
-"""Record the Blink demo path in a real browser: a backup video for the pitch, plus a GIF.
+"""Record the SpotX demo path in a real browser: a backup video for the pitch, plus a GIF.
 
 Drives the live site (real data, nothing staged), captures it in real time, and writes
-    docs/media/blink-demo.mp4   full demo path with captions (backup recording)
-    docs/media/blink-demo.gif   the Barnard's Star part, small enough for the README
+    docs/media/spotx-demo.mp4   full demo path with captions (backup recording)
+    docs/media/spotx-demo.gif   the Barnard's Star part, small enough for the README
 
 Every object on the path must be warm first, or the video shows loading spinners:
     python scripts/warm_cache.py barnards-star orion
 
-Setup (dev only, not needed to run Blink):
+Setup (dev only, not needed to run SpotX):
     pip install playwright imageio imageio-ffmpeg pillow
     python -m playwright install chromium
 
@@ -39,21 +39,23 @@ t_start = 0.0
 paused = 0.0  # seconds spent waiting off camera: cut from the video's clock
 in_gif = False
 
+# A caption strip above the app (the page is a flex column, so it pushes everything down a
+# little instead of covering any of it), like subtitles in their own band.
 CAPTION_JS = """(t) => {
   let c = document.getElementById("demo-caption");
   if (!c) {
     c = document.createElement("div");
     c.id = "demo-caption";
     Object.assign(c.style, {
-      position: "fixed", left: "50%", top: "124px", transform: "translateX(-50%)", zIndex: 99,
-      background: "rgba(124,196,255,0.96)", color: "#021624", padding: "9px 18px",
-      borderRadius: "999px", font: "600 17px system-ui, sans-serif", pointerEvents: "none",
-      boxShadow: "0 10px 30px rgba(0,0,0,0.55)", whiteSpace: "nowrap",
+      flex: "none", height: "46px", display: "flex", alignItems: "center", justifyContent: "center",
+      gap: "10px", padding: "0 20px", background: "oklch(0.205 0 0)", color: "oklch(0.985 0 0)",
+      borderBottom: "1px solid oklch(1 0 0 / 10%)", font: "600 16px Inter, system-ui, sans-serif",
+      letterSpacing: "-0.2px", pointerEvents: "none", whiteSpace: "nowrap",
     });
-    document.body.append(c);
+    document.body.prepend(c);
   }
   c.textContent = t;
-  c.style.display = t ? "block" : "none";
+  c.style.display = t ? "flex" : "none";
 }"""
 
 
@@ -113,7 +115,7 @@ def record(page: Page) -> None:
     page.wait_for_selector(".card")
     t_start = time.time()
 
-    caption(page, "Blink: every visit NASA's SPHEREx made to the same patch of sky")
+    caption(page, "SpotX: every visit NASA's SPHEREx made to the same patch of sky")
     hold(page, 3)
 
     caption(page, "Search any object")
@@ -171,7 +173,7 @@ def record(page: Page) -> None:
         page.wait_for_selector("#spec-loading", state="hidden", timeout=SLOW)
     hold(page, 4)
 
-    caption(page, "Blink: real NASA data, real dates, nothing made up")
+    caption(page, "SpotX: real NASA data, real dates, nothing made up")
     page.click('[data-tab="explore"]')
     hold(page, 3)
 
@@ -192,7 +194,7 @@ def resample(items: list[tuple[float, bytes, bool]], fps: int) -> list[bytes]:
 
 def write_outputs() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    video = OUT / "blink-demo.mp4"
+    video = OUT / "spotx-demo.mp4"
     with imageio.get_writer(video, fps=FPS, codec="libx264", quality=7, pixelformat="yuv420p") as w:
         for jpg in resample(frames, FPS):
             w.append_data(np.asarray(Image.open(io.BytesIO(jpg)).convert("RGB")))
@@ -203,7 +205,7 @@ def write_outputs() -> None:
         im = Image.open(io.BytesIO(jpg)).convert("RGB")
         im = im.resize((GIF_WIDTH, round(im.height * GIF_WIDTH / im.width)), Image.LANCZOS)
         gif_frames.append(im.quantize(colors=128, method=Image.MEDIANCUT, dither=Image.NONE))
-    gif = OUT / "blink-demo.gif"
+    gif = OUT / "spotx-demo.gif"
     if gif_frames:
         gif_frames[0].save(
             gif,

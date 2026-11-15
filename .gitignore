@@ -43,7 +43,7 @@ Thumbs.db
 *.log
 tmp/
 
-# Blink cache (demo snapshot is committed)
+# SpotX cache (demo snapshot is committed)
 cache/*
 !cache/demo/
 

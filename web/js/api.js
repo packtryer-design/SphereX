@@ -51,8 +51,8 @@ async function findApi() {
   if (ep?.status === "online" && ep.url && (await alive(ep.url))) return ep.url.replace(/\/$/, "");
   throw new OfflineError(
     ep?.status === "online"
-      ? "The computer hosting Blink's data has stopped answering."
-      : "Blink's data server is offline right now.",
+      ? "The computer hosting SpotX's data has stopped answering."
+      : "SpotX's data server is offline right now.",
     { hosted: true },
   );
 }
@@ -75,12 +75,12 @@ async function getJSON(url, signal, { fromApi = false } = {}) {
   } catch (err) {
     if (err.name === "AbortError") throw err;
     if (fromApi) basePromise = null; // the host may have changed: look it up again next time
-    throw new OfflineError("Blink's data server can't be reached.", { hosted: fromApi && !OVERRIDE });
+    throw new OfflineError("SpotX's data server can't be reached.", { hosted: fromApi && !OVERRIDE });
   }
   const isJSON = (res.headers.get("content-type") ?? "").includes("json");
   if (!isJSON) {
     if (fromApi) basePromise = null;
-    throw new OfflineError("Blink's data server isn't answering.", { hosted: fromApi && !OVERRIDE });
+    throw new OfflineError("SpotX's data server isn't answering.", { hosted: fromApi && !OVERRIDE });
   }
   const body = await res.json();
   if (!res.ok) {

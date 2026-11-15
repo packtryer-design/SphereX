@@ -3,78 +3,104 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blink · Track Pluto</title>
+  <title>SpotX · Track Pluto</title>
   <meta name="description" content="Follow Pluto, the original Planet X, through NASA SPHEREx images.">
   <meta name="color-scheme" content="dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    .track { max-width: 760px; margin: 0 auto; padding: 16px; }
-    .track h1 { font-size: 1.5rem; margin: 8px 0 4px; }
-    .track p { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
-    .sky { position: relative; aspect-ratio: 1; background: #000; border-radius: var(--radius); overflow: hidden; }
-    .sky img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+    /* Page-specific (tp-) names, so nothing collides with the explorer's .track/.stamp/.note */
+    a.brand { display: inline-flex; align-items: center; color: var(--foreground); text-decoration: none; }
+    .tp-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+    .tp { max-width: 820px; margin: 0 auto; padding: 36px 20px 56px; }
+    .tp-head { margin-bottom: 22px; }
+    .tp .tp-head .eyebrow { margin-bottom: 14px; color: var(--foreground); font-size: 12px; }
+    .tp h1 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 12px; }
+    .tp h2 { font-size: 24px; margin: 0 0 10px; }
+    .tp p { color: var(--muted-foreground); margin: 0 0 14px; font-size: 15px; }
+    .tp p strong { color: var(--foreground); font-weight: 600; }
+    .tp-card {
+      padding: 14px; border-radius: var(--radius-4xl); background: var(--card);
+      box-shadow: var(--shadow-md), 0 0 0 1px var(--border);
+    }
+    .tp-sky { position: relative; aspect-ratio: 1; background: #000; border-radius: var(--radius-3xl); overflow: hidden; }
+    .tp-sky img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
     .ring { position: absolute; width: 9%; aspect-ratio: 1; border: 2px solid var(--b);
             border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; }
     .ring[hidden] { display: none; }
-    .stamp { position: absolute; left: 12px; bottom: 10px; text-shadow: 0 1px 3px #000; }
-    .stamp strong { font-size: 1.15rem; display: block; }
-    .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
-    .controls input[type=range] { flex: 1; min-width: 160px; }
-    .controls button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
-                       background: var(--surface-2); color: var(--text); cursor: pointer; }
-    .controls button:focus-visible, .controls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .note { font-size: .9rem; color: var(--muted); margin-top: 12px; }
-    .px { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
-    .px h2 { font-size: 1.25rem; margin: 0 0 8px; }
-    .result { color: var(--text) !important; font-weight: 500; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .grid figure { margin: 0; }
-    .pic { position: relative; }
+    .tp-stamp { position: absolute; left: 16px; bottom: 14px; display: grid; gap: 2px; text-shadow: 0 1px 8px #000; }
+    .tp-stamp strong { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; font-variant-numeric: tabular-nums; }
+    .tp-stamp span { font-size: 13px; color: oklch(0.87 0 0); }
+    .tp-controls { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 14px 4px 2px; }
+    .tp-controls input[type=range] { flex: 1; min-width: 160px; accent-color: var(--foreground); }
+    .tp-controls label { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted-foreground); }
+    .tp-controls input[type=checkbox] { accent-color: var(--foreground); width: 16px; height: 16px; margin: 0; }
+    .tp .tp-fine { font-size: 13px; margin: 12px 0 0; }
+    .tp-section { margin-top: 44px; }
+    .tp .tp-result { color: var(--foreground); font-weight: 500; }
+    .tp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .tp-grid figure { margin: 0; }
+    .tp-pic { position: relative; }
     .px-ring { width: 18%; }
-    .grid img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: 6px; display: block; }
-    .grid figcaption { font-size: .85rem; color: var(--muted); margin-top: 4px; }
-    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+    .tp-grid img { width: 100%; aspect-ratio: 1; image-rendering: pixelated; border-radius: var(--radius-2xl); display: block; background: #000; }
+    .tp-grid figcaption { font-size: 12.5px; font-weight: 500; color: var(--muted-foreground); margin-top: 8px; text-align: center; }
+    @media (max-width: 520px) { .tp-grid { grid-template-columns: 1fr; } .tp { padding: 24px 16px 40px; } }
   </style>
 </head>
 <body>
-  <main class="track">
-    <a href="./">← Blink</a>
-    <h1>Pluto, the original Planet X</h1>
-    <p>In 1930 Clyde Tombaugh found Pluto by blinking two photographs: stars stay put, Pluto
-      moves. Here are NASA SPHEREx's own images of Pluto over three days. The ring is where
-      NASA JPL's orbit predicts it, worked out independently of these images.</p>
+  <header class="top">
+    <a class="brand" href="./" title="All objects"><img src="favicon.svg" alt=""><span>SpotX</span></a>
+    <a class="top-link" href="./">← All objects</a>
+  </header>
 
-    <div class="sky">
-      <img id="frame" alt="SPHEREx infrared image of the sky around Pluto">
-      <div id="ring" class="ring" aria-hidden="true"></div>
-      <div class="stamp" aria-live="polite"><strong id="when">Loading…</strong><span id="what"></span></div>
+  <div class="tp-scroll">
+  <main class="tp">
+    <header class="tp-head">
+      <p class="eyebrow">Planet X</p>
+      <h1>Pluto, the original Planet X</h1>
+      <p>In 1930 Clyde Tombaugh found Pluto by blinking two photographs: stars stay put, Pluto
+        moves. Here are NASA SPHEREx's own images of Pluto over three days. The ring is where
+        NASA JPL's orbit predicts it, worked out independently of these images.</p>
+    </header>
+
+    <div class="tp-card">
+      <div class="tp-sky">
+        <img id="frame" alt="SPHEREx infrared image of the sky around Pluto">
+        <div id="ring" class="ring" aria-hidden="true"></div>
+        <div class="tp-stamp" aria-live="polite"><strong id="when">Loading…</strong><span id="what"></span></div>
+      </div>
+      <div class="tp-controls">
+        <button id="play" class="play" type="button">Pause</button>
+        <input id="scrub" type="range" min="0" value="0" aria-label="Frame">
+        <label><input id="show-ring" type="checkbox" checked> Show predicted position</label>
+      </div>
     </div>
+    <p class="tp-fine" id="note"></p>
 
-    <div class="controls">
-      <button id="play" type="button">Pause</button>
-      <input id="scrub" type="range" min="0" value="0" aria-label="Frame">
-      <label><input id="show-ring" type="checkbox" checked> Show predicted position</label>
-    </div>
-    <p class="note" id="note"></p>
-
-    <section class="px" aria-labelledby="px-title">
+    <section class="tp-section" aria-labelledby="px-title">
       <h2 id="px-title">Could SPHEREx find a new planet?</h2>
       <p>A planet far beyond Pluto would be too faint to see in any single image. Astronomers
         add images up while shifting each one along a guessed path: only something moving
         that way builds up, while the noise averages out. We tried every plausible path, blind.</p>
-      <p id="px-pluto" class="result">Searching…</p>
+      <p id="px-pluto" class="tp-result">Searching…</p>
       <p>To test how far this goes, we <strong>planted a simulated planet</strong>, moving like a
         world 300 times farther from the Sun than Earth, into the real images, and searched again.</p>
-      <div class="grid">
-        <figure><div class="pic"><img id="px-single" alt="One SPHEREx image: the simulated planet is not visible"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>One image: nothing to see</figcaption></figure>
-        <figure><div class="pic"><img id="px-plain_stack" alt="All images added without shifting: a faint streak"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Added as they are: a smear</figcaption></figure>
-        <figure><div class="pic"><img id="px-shift_stack" alt="Images shifted along the planet's path and added: a clear dot"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Shifted along its path: found</figcaption></figure>
+      <div class="tp-card">
+        <div class="tp-grid">
+          <figure><div class="tp-pic"><img id="px-single" alt="One SPHEREx image: the simulated planet is not visible"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>One image: nothing to see</figcaption></figure>
+          <figure><div class="tp-pic"><img id="px-plain_stack" alt="All images added without shifting: a faint streak"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Added as they are: a smear</figcaption></figure>
+          <figure><div class="tp-pic"><img id="px-shift_stack" alt="Images shifted along the planet's path and added: a clear dot"><div class="ring px-ring" aria-hidden="true"></div></div><figcaption>Shifted along its path: found</figcaption></figure>
+        </div>
       </div>
-      <p id="px-limit" class="result"></p>
-      <p class="note">Black patches: bright stars masked out before searching. The planted planet is
+      <p id="px-limit" class="tp-result" style="margin-top: 16px"></p>
+      <p class="tp-fine">Black patches: bright stars masked out before searching. The planted planet is
         simulated, to test the method; this is not a discovery.</p>
     </section>
   </main>
+  </div>
 
   <script type="module">
     import { apiBase } from "./js/api.js";

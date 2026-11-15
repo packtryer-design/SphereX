@@ -59,12 +59,12 @@ export const KINDS = {
     label: "Pulsating red giant",
     plural: "Variable stars",
     about: "An old, swollen star that slowly pulsates, getting brighter and fainter over months. It's very bright in the infrared, often too bright for SPHEREx's detectors.",
-    overTime: "Its brightness changes a lot between visits. When it's too bright the detector saturates, and Blink leaves those frames out rather than guessing.",
+    overTime: "Its brightness changes a lot between visits. When it's too bright the detector saturates, and SpotX leaves those frames out rather than guessing.",
   },
   unknown: {
     label: "Object",
     plural: "Other",
-    about: "This object came from a name lookup, so Blink has no description for it. The facts below come straight from the catalog.",
+    about: "This object came from a name lookup, so SpotX has no description for it. The facts below come straight from the catalog.",
     overTime: "Compare visits to see whether anything in the field moved or changed brightness. Check the detector coverage before trusting a difference.",
   },
 };

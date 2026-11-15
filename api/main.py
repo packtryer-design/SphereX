@@ -1,4 +1,4 @@
-"""Blink API. Shared by Person A (imaging) and Person C (science).
+"""SpotX API. Shared by Person A (imaging) and Person C (science).
 
 Also serves the front end from web/, so `make serve` runs the whole app on one port.
 """
@@ -25,7 +25,7 @@ from api.science.surface import build_surface_spectrum
 
 WEB_DIR = Path(__file__).resolve().parents[1] / "web"
 
-app = FastAPI(title="Blink")
+app = FastAPI(title="SpotX")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])  # public read-only
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 seed_cache()
@@ -35,7 +35,7 @@ app.mount("/cache", StaticFiles(directory=CACHE_DIR), name="cache")
 @app.get("/api/health")
 def health() -> dict[str, Any]:
     """Cheap check the front end uses to find a live API (see scripts/host.py)."""
-    return {"ok": True, "name": "Blink"}
+    return {"ok": True, "name": "SpotX"}
 
 
 @app.get("/api/visits")

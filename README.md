@@ -1,4 +1,4 @@
-# Blink
+# SpotX
 
 [![CI](https://github.com/packtryer-design/SphereX/actions/workflows/ci.yml/badge.svg)](https://github.com/packtryer-design/SphereX/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
@@ -6,12 +6,12 @@
 
 **Search a nebula and watch how it looks across every visit NASA's SPHEREx telescope has made to it.**
 
-![Blink on Barnard's Star: SPHEREx visits in sequence, blink, difference and colour-time](docs/media/blink-demo.gif)
+![SpotX on Barnard's Star: SPHEREx visits in sequence, blink, difference and colour-time](docs/media/spotx-demo.gif)
 
-*Real SPHEREx data: Barnard's Star moving between visits. Full 40-second demo with captions: [docs/media/blink-demo.mp4](docs/media/blink-demo.mp4).*
+*Real SPHEREx data: Barnard's Star moving between visits. Full 40-second demo with captions: [docs/media/spotx-demo.mp4](docs/media/spotx-demo.mp4).*
 
 
-In 1930 Clyde Tombaugh found Pluto by "blinking" between two photos of the same sky taken days apart. Blink does the same with SPHEREx, the infrared telescope that maps the whole sky in 102 colours about every six months. Pick an object, then step through its real observation dates. Blink between two visits, put them side by side, swipe between them, or subtract one from the other to see what changed. Spectra are there as an extra layer: click a spot to see how bright it is in each infrared colour.
+In 1930 Clyde Tombaugh found Pluto by "blinking" between two photos of the same sky taken days apart. SpotX does the same with SPHEREx, the infrared telescope that maps the whole sky in 102 colours about every six months. Pick an object, then step through its real observation dates. SpotX between two visits, put them side by side, swipe between them, or subtract one from the other to see what changed. Spectra are there as an extra layer: click a spot to see how bright it is in each infrared colour.
 
 Built for the NASA Space Apps Challenge 2026 (Sharjah), SPHEREx challenge. Team plan: [docs/PLAN.md](docs/PLAN.md).
 
@@ -25,7 +25,7 @@ uv pip install --python .venv numpy astropy astroquery reproject pillow fastapi 
 
 Open http://localhost:8000. With an activated environment, `make serve` does the same.
 
-The first time you open an object, Blink downloads its exposures from IRSA and builds the images, which takes a few minutes. After that the object loads instantly. `make warm` pre-builds every catalog object.
+The first time you open an object, SpotX downloads its exposures from IRSA and builds the images, which takes a few minutes. After that the object loads instantly. `make warm` pre-builds every catalog object.
 
 ## Public site
 

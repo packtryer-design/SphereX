@@ -1,4 +1,4 @@
-# Blink: API + web site in one process. Works on Render, Fly.io, Cloud Run, Hugging Face Spaces.
+# SpotX: API + web site in one process. Works on Render, Fly.io, Cloud Run, Hugging Face Spaces.
 #   docker build -t blink . && docker run -p 8000:8000 blink   ->  http://localhost:8000
 FROM python:3.12-slim
 
