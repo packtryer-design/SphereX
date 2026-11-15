@@ -14,20 +14,71 @@
     <button id="home-link" class="brand" title="All objects">Blink</button>
     <div class="search" id="search">
       <input id="search-input" type="search" autocomplete="off" spellcheck="false"
-        placeholder="Search nebulae: Orion, Ring, NGC 7293…"
+        placeholder="Search: Orion, Barnard's Star, NGC 7293…"
         role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list" aria-label="Search for an object">
       <ul id="search-results" class="search-results" role="listbox" hidden></ul>
     </div>
+    <a class="top-link" href="track.html">Planet X</a>
   </header>
 
   <!-- Home: browse the catalog -->
   <section id="home" class="home" hidden>
-    <div class="home-intro">
+    <div class="hero">
+      <p class="eyebrow">NASA SPHEREx · real data from 2025 and 2026</p>
       <h1>Watch the sky change</h1>
-      <p>Pick a nebula and step through every visit NASA's SPHEREx telescope has made to it. Each image is the same patch of sky on the same grid, so anything that moved or changed stands out.</p>
+      <p>SPHEREx photographs the whole sky every six months in 102 infrared colours. Blink lines up every visit to the same patch of sky on one grid, so anything that moved, brightened or faded stands out: the same flipbook trick that found Pluto in 1930 and that volunteers still use to discover new worlds.</p>
     </div>
+
+    <div class="featured" aria-label="Start here">
+      <a class="feature" href="track.html">
+        <img src="data/thumbs/pluto-field.jpg" alt="" loading="lazy">
+        <span class="f-body">
+          <span class="f-tag">Planet X</span>
+          <span class="f-title">Find a planet hiding in the noise</span>
+          <span class="f-text">Follow Pluto through SPHEREx frames, then watch a planet too faint for any single image appear once the frames are shifted and stacked.</span>
+          <span class="f-go">Open the planet search →</span>
+        </span>
+      </a>
+      <a class="feature" href="?o=barnards-star&amp;tab=explore&amp;view=diff">
+        <img src="data/thumbs/barnards-star.jpg" alt="" loading="lazy">
+        <span class="f-body">
+          <span class="f-tag">Motion</span>
+          <span class="f-title">Watch a star move</span>
+          <span class="f-text">Barnard's Star crosses the sky faster than any other star. Between two SPHEREx visits it visibly shifts against the stars behind it.</span>
+          <span class="f-go">Compare the visits →</span>
+        </span>
+      </a>
+      <a class="feature" href="?o=wise-0855&amp;tab=spectrum">
+        <img src="data/thumbs/wise-0855.jpg" alt="" loading="lazy">
+        <span class="f-body">
+          <span class="f-tag">Spectrum</span>
+          <span class="f-title">Read the light of a frozen world</span>
+          <span class="f-text">WISE 0855 is the coldest brown dwarf known, about as cold as the North Pole. SPHEREx's colours show what its air is made of.</span>
+          <span class="f-go">See its spectrum →</span>
+        </span>
+      </a>
+    </div>
+
+    <section class="uses" aria-labelledby="uses-title">
+      <h2 id="uses-title">What it's for</h2>
+      <div class="use-grid">
+        <div class="use">
+          <h3>Volunteers discovering new worlds</h3>
+          <p>In 2017 a science teacher in Tasmania found a new brown dwarf by flipping between NASA WISE images in the <a href="https://www.nasa.gov/centers-and-facilities/goddard/nasa-funded-citizen-science-project-discovers-new-brown-dwarf/" target="_blank" rel="noopener">Backyard Worlds</a> project; volunteers have since found many more. Blink gives anyone the same flipbook for SPHEREx's brand-new data, plus a spectrum to check a find.</p>
+        </div>
+        <div class="use">
+          <h3>Hunting faint moving objects</h3>
+          <p>Shift-and-stack is how astronomers look for distant planets and faint asteroids that no single image shows. The <a href="track.html">Planet X page</a> runs it on real SPHEREx frames: it finds Pluto blind and recovers a planted test planet.</p>
+        </div>
+        <div class="use">
+          <h3>A real lab for classrooms</h3>
+          <p>Students measure how far Barnard's Star moved between this year's visits and work out its speed, with today's space-telescope data instead of 1950s photographic plates.</p>
+        </div>
+      </div>
+    </section>
+
     <div id="catalog" class="catalog"></div>
-    <p class="credit">Images: NASA/JPL-Caltech/IPAC SPHEREx, via IRSA. Coordinates and object types: SIMBAD.</p>
+    <p class="credit">Images: NASA/JPL-Caltech/IPAC SPHEREx, via IRSA. Coordinates and object types: SIMBAD. Card previews: unWISE (NASA WISE infrared) via the Legacy Survey viewer.</p>
   </section>
 
   <!-- One object, four tabs -->
