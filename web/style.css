@@ -186,6 +186,7 @@ a:hover { text-decoration-color: var(--foreground); }
 .top-link:hover { background: color-mix(in oklch, var(--input) 30%, transparent); }
 
 .catalog { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+.demo-note { margin: 0; color: var(--muted-foreground); font-size: 13px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
 /* Card: rounded, hairline ring, soft shadow, image preview on top */
 .card {

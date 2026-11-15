@@ -1,4 +1,4 @@
-import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, getPointSpectrum, resolveName, OfflineError } from "./api.js";
+import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, getPointSpectrum, resolveName, OfflineError, NotInDemoError, snapshotIds } from "./api.js";
 import { readState, writeState, TABS } from "./state.js";
 import { Pane, skyAt, formatRaDec } from "./viewer.js";
 import { sampleLayers } from "./sample.js";
@@ -33,6 +33,7 @@ const BLINK_MS = 650, BLINK_FADE = 90;
 const STEP_FADE = 450;
 
 let catalog = [];
+let demoMode = false; // true when reading the static snapshot instead of a live API
 let features = { bands: [], glossary: {} };
 let obj = null;          // the open object
 let visits = [];         // [{epoch, mjd_start, mjd_end, n_frames, detectors, full_coverage, frame, color}]
@@ -90,10 +91,9 @@ function showMsg(kind, title = "", text = "") {
 }
 
 function errorText(err) {
+  if (err instanceof NotInDemoError) return ["Not in this demo", err.message];
   if (err instanceof OfflineError) {
-    return err.hosted
-      ? [err.message, "Images and spectra come from SpotX's data server, which runs on a team member's computer. It's not on right now; try again later. (Team: start it with python scripts/host.py.)"]
-      : ["SpotX's data service isn't running", "Images and spectra come from the Python API. Start it with `make serve` and open http://localhost:8000."];
+    return [err.message, "Images and spectra come from SpotX's Python server or its demo snapshot, and neither is available. To run it yourself: `make serve`, then open http://localhost:8000."];
   }
   if (err.status === 503) return ["NASA's archive is busy", `${err.message}. Try again in a minute.`];
   return ["Something went wrong", err.message];
@@ -1079,6 +1079,7 @@ function wire() {
     getCatalog: () => catalog,
     onPick: (o) => openObject(o),
     onLookup: lookup,
+    allowLookup: () => !demoMode,
   });
 }
 
@@ -1086,11 +1087,22 @@ async function init() {
   if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embed");
   wire();
   const route = readState();
-  [catalog, features] = await Promise.all([
+  let ids;
+  [catalog, features, ids] = await Promise.all([
     getCatalog().catch(() => []),
     getFeatures().catch(() => features),
+    snapshotIds(),
   ]);
+  // Demo edition (static snapshot, e.g. on Netlify): list only what it includes.
+  demoMode = Boolean(ids);
+  if (demoMode) catalog = catalog.filter((o) => ids.has(o.id));
   renderCatalog();
+  if (demoMode) {
+    ui.catalog.prepend(Object.assign(document.createElement("p"), {
+      className: "demo-note",
+      textContent: `Demo edition: ${catalog.length} objects, with real SPHEREx data prepared in advance. The full version, with every object and name lookup, runs on SpotX's Python server.`,
+    }));
+  }
   renderBands();
   const known = catalog.find((o) => o.id === route.objectId);
   if (known) {

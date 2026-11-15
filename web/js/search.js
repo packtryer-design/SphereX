@@ -25,7 +25,7 @@ export function visitBadge(o) {
   return { text: `${v.n} visit${v.n === 1 ? "" : "s"}`, cls: "has" };
 }
 
-export function setupSearch({ input, list, getCatalog, onPick, onLookup }) {
+export function setupSearch({ input, list, getCatalog, onPick, onLookup, allowLookup = () => true }) {
   let items = [];
   let active = -1;
 
@@ -56,7 +56,7 @@ export function setupSearch({ input, list, getCatalog, onPick, onLookup }) {
       .sort((a, b) => b.s - a.s || a.o.name.localeCompare(b.o.name))
       .slice(0, 8)
       .map((m) => ({ type: "object", o: m.o }));
-    items = raw.length >= 2 ? [...matches, { type: "lookup", name: raw }] : matches;
+    items = raw.length >= 2 && allowLookup() ? [...matches, { type: "lookup", name: raw }] : matches;
 
     list.replaceChildren(...items.map((it, i) => {
       const li = document.createElement("li");

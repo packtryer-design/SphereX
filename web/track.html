@@ -103,24 +103,17 @@
   </div>
 
   <script type="module">
-    import { apiBase } from "./js/api.js";
+    import { getPage, apiUrl } from "./js/api.js";
     const q = new URLSearchParams(location.search);
-    // The API may live elsewhere (e.g. this page on Vercel, the API on a hosting computer):
-    // apiBase() finds it, and abs() turns its /cache/... paths into full URLs.
-    const base = await apiBase().catch((e) => {
-      document.getElementById("when").textContent = e.message + " Try again later.";
-      throw e;
-    });
-    const abs = (p) => (p && p.startsWith("/") ? new URL(p, (base || location.origin) + "/").href : p);
-    const api = base + "/api/track?" + new URLSearchParams({
-      body: q.get("body") ?? "pluto", mjd: q.get("mjd") ?? "60956", days: q.get("days") ?? "2",
-    });
+    // The live API if one is running, else the static snapshot (scripts/build_snapshot.py).
+    const query = { body: q.get("body") ?? "pluto", mjd: q.get("mjd") ?? "60956", days: q.get("days") ?? "2" };
     const $ = (id) => document.getElementById(id);
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const r = await fetch(api).then((x) => x.ok ? x.json() : Promise.reject(x.statusText))
-      .catch((e) => { $("when").textContent = "Couldn't load the images: " + e; throw e; });
-    const f = r.frames.map((x) => ({ ...x, png: abs(x.png) })), n = r.target.size_px, t0 = f[0].mjd;
+    const r = await getPage("track", { ...query, fov: 0.1 })
+      .catch((e) => { $("when").textContent = "Couldn't load the images. " + e.message; throw e; });
+    const f = await Promise.all(r.frames.map(async (x) => ({ ...x, png: await apiUrl(x.png) })));
+    const n = r.target.size_px, t0 = f[0].mjd;
     f.forEach((x) => { new Image().src = x.png; });  // preload so playback doesn't stutter
     $("scrub").max = f.length - 1;
     $("note").textContent = `${f.length} SPHEREx exposures over ${((f.at(-1).mjd - t0) * 24).toFixed(0)} hours, ` +
@@ -146,7 +139,7 @@
     reduced ? pause() : play();
 
     // Planet search (slow the first time: tries ~500 paths x 3 tests; cached after)
-    const px = await fetch(api.replace("/api/track?", "/api/planetx?")).then((x) => x.ok ? x.json() : null);
+    const px = await getPage("planetx", query).catch(() => null);
     if (!px) { $("px-pluto").textContent = "The planet search is unavailable right now."; }
     else {
       const p = px.pluto, f1 = px.faintest_recovered;
@@ -154,7 +147,7 @@
         ? `Without being told where to look, the search found Pluto (signal ${p.snr}× the noise), ` +
           `moving ${p.motion_arcsec_day}″ a day; NASA JPL predicts ${p.true_motion_arcsec_day}″.`
         : "The blind search did not single out Pluto in this window.";
-      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = abs(px.images[k]);
+      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = await apiUrl(px.images[k]);
       const X = px.planet_x, m = px.size_px;  // ring where the simulated planet was planted
       document.querySelectorAll(".px-ring").forEach((r) => {
         r.style.left = `${((X.x + 0.5) / m) * 100}%`;

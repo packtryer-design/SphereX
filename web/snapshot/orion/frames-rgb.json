@@ -1,0 +1,1 @@
+{"target":{"ra":83.8201,"dec":-5.3876,"fov":0.4},"frames":[{"mjd":61297.47,"mjd_start":61287.3303,"mjd_end":61317.7422,"detectors":[1,2,3,4,5,6],"epoch":null,"detector":null,"wavelength_um":null,"n_frames":359,"flagged_frac":0.056,"epochs":[1,2,3],"png":"snapshot/orion/png/v3_83.8201_-5.3876_0.400_rgb_all-000.png"}]}
