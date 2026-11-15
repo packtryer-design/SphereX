@@ -443,7 +443,7 @@ function loadKnown() {
     known = {
       stars: g.value?.stars ?? [],
       asteroids: a.value?.objects ?? [],
-      failed: [g.status === "rejected" && "the star catalogues (Gaia, CatWISE)", a.status === "rejected" && "the asteroid list (SkyBoT)"].filter(Boolean),
+      failed: [g.status === "rejected" && "The star catalogue (Gaia, CatWISE)", a.status === "rejected" && "The asteroid list (SkyBoT)"].filter(Boolean),
     };
     drawKnown();
   });
@@ -491,7 +491,7 @@ function drawKnown() {
     `${nStars} catalogued star${nStars === 1 ? "" : "s"} here. ${names.length ? `Known asteroid${names.length > 1 ? "s" : ""}: ${names.join(", ")}.` : "No known asteroids at this visit."}`,
     `<span class="fine">A dot with no ring on it is worth a closer look: a candidate for review, not a discovery.</span>`,
   ];
-  if (known.failed.length) rows.push(`<span class="fine" style="color:var(--warn)">Couldn't reach ${known.failed.join(" or ")} just now, so some marks are missing. Turn Known objects off and on to try again.</span>`);
+  if (known.failed.length) rows.push(`<span class="fine" style="color:var(--warn)">${known.failed.join(" and ")} ${known.failed.length > 1 ? "aren't" : "isn't"} available right now, so those marks are missing.</span>`);
   knownNote(rows.join("<br>"));
 }
 
@@ -1223,8 +1223,6 @@ async function init() {
   // Demo edition (static snapshot, e.g. on Netlify): list only what it includes.
   demoMode = Boolean(ids);
   if (demoMode) catalog = catalog.filter((o) => ids.has(o.id));
-  // The known-objects overlay queries live star and asteroid catalogues: not in the snapshot.
-  if (demoMode) ui.knownToggle.hidden = true;
   renderCatalog();
   if (demoMode) {
     ui.catalog.prepend(Object.assign(document.createElement("p"), {

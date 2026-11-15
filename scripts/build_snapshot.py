@@ -120,6 +120,15 @@ def main() -> None:
         if s and s.get("points"):
             save(folder, f"spectrum-{kind}.json", s)
             files["spectrum"] = f"spectrum-{kind}.json"
+        # "Is this new?" marks (Known objects button). These query Gaia/CatWISE and SkyBoT unless
+        # cached; a service that's down just leaves that layer out of the demo.
+        for kind in ("ghosts", "asteroids"):
+            k = get(kind, **pos, fov=o["fov"])
+            if k is None:
+                skipped.append(f"{oid}: {kind} unavailable (catalog service down?)")
+                continue
+            save(folder, f"{kind}.json", k)
+            files[kind] = f"{kind}.json"
         index["objects"][oid] = {"ra": o["ra"], "dec": o["dec"], "fov": o["fov"], "files": files}
         size = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file()) / 1e6
         print(f"{oid}: {', '.join(files)} ({size:.1f} MB)", flush=True)
