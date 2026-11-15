@@ -196,6 +196,10 @@ def build_planetx(body: str = "pluto", mjd: float = 60956.0, days: float = 2.0) 
         "size_px": n,
         "pluto": {
             "found_blind": bool(pluto_found),
+            # how far the blind find sits from where JPL Horizons says Pluto is
+            "offset_arcsec": round(
+                float(np.hypot(best[3] - px0, best[4] - py0)) * PIXEL_SCALE_ARCSEC, 1
+            ),
             "snr": round(best[0], 1),
             "motion_arcsec_day": round(float(np.hypot(best[1], best[2])) * PIXEL_SCALE_ARCSEC, 1),
             "true_motion_arcsec_day": round(float(np.hypot(pvx, pvy)) * PIXEL_SCALE_ARCSEC, 1),

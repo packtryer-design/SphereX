@@ -1,0 +1,350 @@
+{
+ "generated": "2026-11-15",
+ "motion": [
+  {
+   "id": "barnards-star",
+   "name": "Barnard's Star",
+   "ok": true,
+   "n_frames": 358,
+   "n_used": 344,
+   "span_days": 403,
+   "per_frame_scatter_arcsec": 1.39,
+   "measured": {
+    "pm_arcsec_yr": 9.96,
+    "err": 1.8,
+    "pm_east": -0.42,
+    "pm_north": 9.95
+   },
+   "catalogue": {
+    "pm_arcsec_yr": 10.39,
+    "pm_east": -0.802,
+    "pm_north": 10.362
+   },
+   "difference_sigma": 0.2,
+   "moved_arcsec": 11.0
+  },
+  {
+   "id": "eps-indi-b",
+   "name": "Epsilon Indi B",
+   "ok": true,
+   "n_frames": 458,
+   "n_used": 395,
+   "span_days": 526,
+   "per_frame_scatter_arcsec": 0.2,
+   "measured": {
+    "pm_arcsec_yr": 4.68,
+    "err": 0.06,
+    "pm_east": 3.98,
+    "pm_north": -2.46
+   },
+   "catalogue": {
+    "pm_arcsec_yr": 4.68,
+    "pm_east": 3.982,
+    "pm_north": -2.467
+   },
+   "difference_sigma": 0.0,
+   "moved_arcsec": 6.7
+  },
+  {
+   "id": "wise-0855",
+   "name": "WISE 0855-0714",
+   "ok": true,
+   "n_frames": 258,
+   "n_used": 40,
+   "span_days": 373,
+   "per_frame_scatter_arcsec": 1.82,
+   "measured": {
+    "pm_arcsec_yr": 9.24,
+    "err": 1.11,
+    "pm_east": -9.23,
+    "pm_north": 0.24
+   },
+   "catalogue": {
+    "pm_arcsec_yr": 8.15,
+    "pm_east": -8.124,
+    "pm_north": 0.673
+   },
+   "difference_sigma": 1.0,
+   "moved_arcsec": 9.4
+  },
+  {
+   "id": "rw-aur",
+   "name": "RW Aurigae",
+   "ok": true,
+   "n_frames": 335,
+   "n_used": 99,
+   "span_days": 380,
+   "per_frame_scatter_arcsec": 2.18,
+   "measured": {
+    "pm_arcsec_yr": 0.85,
+    "err": 1.57,
+    "pm_east": -0.09,
+    "pm_north": -0.84
+   },
+   "catalogue": {
+    "pm_arcsec_yr": 0.02,
+    "pm_east": 0.007,
+    "pm_north": -0.02
+   },
+   "difference_sigma": 0.5,
+   "moved_arcsec": 0.9
+  },
+  {
+   "id": "r-dra",
+   "name": "R Draconis",
+   "ok": true,
+   "n_frames": 539,
+   "n_used": 276,
+   "span_days": 424,
+   "per_frame_scatter_arcsec": 1.44,
+   "measured": {
+    "pm_arcsec_yr": 0.6,
+    "err": 0.81,
+    "pm_east": 0.32,
+    "pm_north": 0.51
+   },
+   "catalogue": {
+    "pm_arcsec_yr": 0.02,
+    "pm_east": -0.021,
+    "pm_north": 0.006
+   },
+   "difference_sigma": 0.7,
+   "moved_arcsec": 0.7
+  }
+ ],
+ "pluto": {
+  "found_blind": true,
+  "offset_arcsec": 1.9,
+  "snr": 45.4,
+  "frames": 46
+ },
+ "planet_x": {
+  "frames": 46,
+  "window_days": 2.93,
+  "faintest_recovered_sigma": 0.7,
+  "times_fainter_than_pluto": 45.1,
+  "stack_snr": 8.1,
+  "masked_frac": 0.29,
+  "reach": [
+   {
+    "planet": "Neptune-size",
+    "au_same_reflectivity_as_pluto": 420,
+    "au_5x_darker": 280
+   },
+   {
+    "planet": "Super-Earth (2x Earth)",
+    "au_same_reflectivity_as_pluto": 300,
+    "au_5x_darker": 200
+   }
+  ],
+  "assumption": "Reflected sunlight scales as R^2 / (r^2 * Delta^2) at opposition; reflectivity as Pluto's, or 5x darker (methane-rich giants are dark in the near-infrared)."
+ },
+ "w2": [
+  {
+   "id": "barnards-star",
+   "name": "Barnard's Star",
+   "catalog_id": "AllWISE J175747.94+044323.8",
+   "w2_mag": 3.658,
+   "wise_mJy": 5912.7606,
+   "spherex_mJy": 4629.0419,
+   "spherex_err": 124.1844,
+   "ratio": 0.783,
+   "wise_saturated": true
+  },
+  {
+   "id": "eps-indi-b",
+   "name": "Epsilon Indi B",
+   "catalog_id": "AllWISE J220415.75-564724.4",
+   "w2_mag": 9.492,
+   "wise_mJy": 27.4278,
+   "spherex_mJy": 23.3425,
+   "spherex_err": 0.1987,
+   "ratio": 0.851,
+   "wise_saturated": false
+  },
+  {
+   "id": "wise-0855",
+   "name": "WISE 0855-0714",
+   "catalog_id": "AllWISE J085510.74-071442.5",
+   "w2_mag": 13.704,
+   "wise_mJy": 0.5667,
+   "spherex_mJy": 0.4858,
+   "spherex_err": 0.0203,
+   "ratio": 0.857,
+   "wise_saturated": false
+  },
+  {
+   "id": "rw-aur",
+   "name": "RW Aurigae",
+   "catalog_id": "AllWISE J050749.54+302404.7",
+   "w2_mag": 5.228,
+   "wise_mJy": 1392.4843,
+   "spherex_mJy": 1546.4758,
+   "spherex_err": 57.4991,
+   "ratio": 1.111,
+   "wise_saturated": true
+  }
+ ],
+ "labels": [
+  {
+   "id": "barnards-star",
+   "name": "Barnard's Star",
+   "bands": [
+    {
+     "molecule": "H2O",
+     "center_um": 1.415,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 1.925,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "CO",
+     "center_um": 2.37,
+     "status": "no_coverage"
+    }
+   ]
+  },
+  {
+   "id": "eps-indi-b",
+   "name": "Epsilon Indi B",
+   "bands": [
+    {
+     "molecule": "H2O",
+     "center_um": 1.415,
+     "status": "seen"
+    },
+    {
+     "molecule": "CH4",
+     "center_um": 1.675,
+     "status": "opposite"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 1.925,
+     "status": "seen"
+    },
+    {
+     "molecule": "CH4 + H2",
+     "center_um": 2.3,
+     "status": "seen"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 2.775,
+     "status": "seen"
+    },
+    {
+     "molecule": "CH4",
+     "center_um": 3.35,
+     "status": "seen"
+    },
+    {
+     "molecule": "none",
+     "center_um": 4.225,
+     "status": "seen"
+    },
+    {
+     "molecule": "CO",
+     "center_um": 4.65,
+     "status": "seen"
+    }
+   ]
+  },
+  {
+   "id": "wise-0855",
+   "name": "WISE 0855-0714",
+   "bands": [
+    {
+     "molecule": "H2O",
+     "center_um": 1.415,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "CH4",
+     "center_um": 1.675,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 1.925,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "CH4 + H2",
+     "center_um": 2.3,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 2.775,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "CH4",
+     "center_um": 3.35,
+     "status": "too_faint"
+    },
+    {
+     "molecule": "none",
+     "center_um": 4.225,
+     "status": "seen"
+    },
+    {
+     "molecule": "CO",
+     "center_um": 4.65,
+     "status": "not_clear"
+    }
+   ]
+  },
+  {
+   "id": "rw-aur",
+   "name": "RW Aurigae",
+   "bands": [
+    {
+     "molecule": "dust",
+     "center_um": 4.0,
+     "status": "seen"
+    },
+    {
+     "molecule": "H (Br-alpha)",
+     "center_um": 4.05,
+     "status": "not_clear"
+    }
+   ]
+  },
+  {
+   "id": "r-dra",
+   "name": "R Draconis",
+   "bands": [
+    {
+     "molecule": "H2O",
+     "center_um": 1.415,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 1.925,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "CO",
+     "center_um": 2.37,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "H2O",
+     "center_um": 2.775,
+     "status": "no_coverage"
+    },
+    {
+     "molecule": "CO",
+     "center_um": 4.65,
+     "status": "no_coverage"
+    }
+   ]
+  }
+ ]
+}

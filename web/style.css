@@ -175,6 +175,13 @@ a:hover { text-decoration-color: var(--foreground); }
 }
 .use h3 { font-size: 15px; margin-bottom: 6px; }
 .use p { color: var(--muted-foreground); font-size: 13.5px; margin: 0; }
+.proof-lede { color: var(--muted-foreground); font-size: 13.5px; margin: -4px 0 14px; }
+.proof .use p + p { margin-top: 8px; }
+.proof table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 8px; }
+.proof th, .proof td { text-align: left; padding: 4px 6px 4px 0; border-bottom: 1px solid var(--border); font-weight: 400; }
+.proof th { color: var(--muted-foreground); font-size: 12px; }
+.proof td.num { font-family: var(--font-mono, ui-monospace, monospace); white-space: nowrap; }
+.proof .big { font-size: 22px; font-weight: 600; color: var(--foreground); margin: 2px 0 4px; }
 
 @media (max-width: 600px) {
   .home { padding: 28px 16px; }
