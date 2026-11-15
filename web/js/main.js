@@ -738,6 +738,48 @@ function setupSwipe() {
 
 // ---------- click a spot: brightness over time ----------
 
+// Press on the image to drop the marker, drag to move it (it stays on the picture), let go to
+// measure that spot. A plain click is just a press and release in one place.
+function clampToImage(e, pane) {
+  const r = pane.imageRect();
+  if (!r) return null;
+  return {
+    clientX: Math.min(Math.max(e.clientX, r.left), r.left + r.width),
+    clientY: Math.min(Math.max(e.clientY, r.top), r.top + r.height),
+  };
+}
+
+function moveMarker(p) {
+  const box = ui.viewer.getBoundingClientRect();
+  ui.marker.style.left = `${p.clientX - box.left}px`;
+  ui.marker.style.top = `${p.clientY - box.top}px`;
+  ui.marker.hidden = false;
+}
+
+function setupSpotDrag(pane) {
+  let dragging = false;
+  pane.el.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || !imagesReady) return;
+    const r = pane.imageRect();
+    if (!r || e.clientX < r.left || e.clientX > r.left + r.width || e.clientY < r.top || e.clientY > r.top + r.height) return;
+    e.preventDefault();
+    dragging = true;
+    pane.el.setPointerCapture(e.pointerId);
+    moveMarker(clampToImage(e, pane));
+  });
+  pane.el.addEventListener("pointermove", (e) => {
+    if (dragging) moveMarker(clampToImage(e, pane));
+  });
+  const finish = (e, measure) => {
+    if (!dragging) return;
+    dragging = false;
+    const p = clampToImage(e, pane);
+    if (measure && p) onPaneClick(p, pane);
+  };
+  pane.el.addEventListener("pointerup", (e) => finish(e, true));
+  pane.el.addEventListener("pointercancel", (e) => finish(e, false));
+}
+
 async function onPaneClick(e, pane) {
   if (!imagesReady) return;
   const r = pane.imageRect();
@@ -1167,8 +1209,8 @@ function wire() {
   ui.knownToggle.addEventListener("click", toggleKnown);
   ui.pickA.addEventListener("change", () => onPairChange("a", ui.pickA.value));
   ui.pickB.addEventListener("change", () => onPairChange("b", ui.pickB.value));
-  paneA.el.addEventListener("click", (e) => onPaneClick(e, paneA));
-  paneB.el.addEventListener("click", (e) => onPaneClick(e, paneB));
+  setupSpotDrag(paneA);
+  setupSpotDrag(paneB);
   ui.spotClose.addEventListener("click", closeSpot);
   ui.spotSpectrum.addEventListener("click", () => setTab("spectrum"));
   ui.specCentre.addEventListener("click", () => { spot = null; closeSpot(); loadSpectrum(); });

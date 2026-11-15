@@ -239,7 +239,7 @@ a:hover { text-decoration-color: var(--foreground); }
 .explore { display: flex; flex-direction: column; }
 .stage { position: relative; flex: 1; min-height: 0; background: #000; overflow: hidden; }
 .viewer { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr; gap: 4px; }
-.pane { position: relative; margin: 0; min-width: 0; min-height: 0; cursor: crosshair; }
+.pane { position: relative; margin: 0; min-width: 0; min-height: 0; cursor: crosshair; touch-action: none; }
 .layer {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: contain; opacity: 0; user-select: none; -webkit-user-drag: none;
