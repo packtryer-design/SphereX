@@ -40,6 +40,27 @@ python scripts/build_snapshot.py ring helix   # export them, plus the default de
 
 Then commit `web/snapshot/` and push: Netlify redeploys on its own.
 
+## How we know it works
+
+Our code on real SPHEREx frames, checked against independent measurements. Rebuild with
+`python scripts/build_results.py` (writes `web/data/results.json`, shown on the home page).
+
+| Check | SPHEREx (ours) | Independent answer |
+|---|---|---|
+| Barnard's Star proper motion | 10.0 ± 1.8 ″/yr | 10.4 (Gaia DR3) |
+| Epsilon Indi B proper motion | 4.68 ± 0.06 ″/yr | 4.68 (published) |
+| WISE 0855 proper motion | 9.2 ± 1.1 ″/yr | 8.2 (published) |
+| RW Aur, R Dra (should not move) | 0.8 ± 1.6, 0.6 ± 0.8 ″/yr | ~0 |
+| Pluto, blind shift-and-stack find | 1.9″ from predicted spot | NASA JPL Horizons |
+| Faintest planted planet recovered | 45× fainter than Pluto (46 frames, 3 days) | — |
+| 4.2-5.0 µm flux vs WISE W2 | WISE 0855 −14%, Eps Indi B −15% | AllWISE |
+
+What the planet limit means: one 3-day SPHEREx visit could catch a Neptune-size planet out to
+about 280-420 AU (5× darker than Pluto, or as reflective), unless it sits behind a bright star.
+Molecule labels are only shown as "seen" when the dip is measured: Eps Indi B shows its water,
+methane and CO bands; for WISE 0855 only the bright 4-4.4 µm window is clear, the short-wave
+bands are too faint and are labelled so.
+
 ## How it fits together
 
 ```

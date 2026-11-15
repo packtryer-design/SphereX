@@ -1252,6 +1252,50 @@ function wire() {
   });
 }
 
+// ---------- "how we know it works" (web/data/results.json, from scripts/build_results.py) ----------
+
+async function renderProof() {
+  let r;
+  try {
+    const res = await fetch("data/results.json");
+    if (!res.ok) return;
+    r = await res.json();
+  } catch { return; }
+  const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const cards = [];
+
+  const moving = r.motion.filter((m) => m.ok && m.catalogue?.pm_arcsec_yr > 1);
+  const still = r.motion.filter((m) => m.ok && m.catalogue?.pm_arcsec_yr <= 1);
+  if (moving.length) {
+    const rows = moving.map((m) => `<tr><td>${esc(m.name)}</td><td class="num">${m.measured.pm_arcsec_yr.toFixed(1)} ± ${m.measured.err.toFixed(1)}</td><td class="num">${m.catalogue.pm_arcsec_yr.toFixed(1)}</td></tr>`).join("");
+    const nul = still.length ? `<p>Control: ${still.map((m) => esc(m.name)).join(" and ")}, which barely move, come out at ${still.map((m) => `${m.measured.pm_arcsec_yr.toFixed(1)} ± ${m.measured.err.toFixed(1)}`).join(" and ")}″/yr: consistent with zero.</p>` : "";
+    cards.push(`<div class="use"><h3>Stars move at their known speed</h3>
+      <p>We find each star's centre in every frame, take away the yearly wobble from Earth's orbit, and fit its drift across the visits.</p>
+      <table><thead><tr><th>Star</th><th>SPHEREx (″/yr)</th><th>Gaia / published</th></tr></thead><tbody>${rows}</tbody></table>${nul}</div>`);
+  }
+
+  const p = r.pluto, x = r.planet_x;
+  if (p?.found_blind) {
+    const nep = x.reach.find((q) => q.planet.startsWith("Neptune"));
+    cards.push(`<div class="use"><h3>Planet search finds Pluto blind</h3>
+      <div class="big">${p.offset_arcsec}″ from JPL</div>
+      <p>Not told where Pluto is, the shift-and-stack search over ${p.frames} frames picks it out, ${p.offset_arcsec}″ from NASA JPL Horizons' position (one SPHEREx pixel is 6.2″).</p>
+      <p>Planted test planets ${Math.round(x.times_fainter_than_pluto)}× fainter than Pluto are still recovered. ${nep ? `That means one ${Math.round(x.window_days)}-day SPHEREx visit could catch a Neptune-size planet out to about <b>${nep.au_5x_darker}–${nep.au_same_reflectivity_as_pluto} AU</b>, if it isn't behind a bright star (${Math.round(x.masked_frac * 100)}% of this field is).` : ""}</p></div>`);
+  }
+
+  if (r.w2?.length) {
+    const rows = r.w2.map((w) => `<tr><td>${esc(w.name)}</td><td class="num">${Math.round(Math.abs(w.ratio - 1) * 100)}% ${w.ratio < 1 ? "lower" : "higher"}${w.wise_saturated ? "*" : ""}</td></tr>`).join("");
+    cards.push(`<div class="use"><h3>Brightness matches NASA WISE</h3>
+      <p>Our 4.2–5.0 µm brightness against WISE's 4.6 µm band, measured about 15 years earlier with a different telescope.</p>
+      <table><thead><tr><th>Object</th><th>SPHEREx vs WISE</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="fine">Within ~20% is expected: WISE's band runs past where SPHEREx stops. * WISE itself saturated on this star.</p></div>`);
+  }
+
+  if (!cards.length) return;
+  $("proof-grid").innerHTML = cards.join("");
+  $("proof").hidden = false;
+}
+
 async function init() {
   if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embed");
   wire();
@@ -1275,6 +1319,7 @@ async function init() {
     }));
   }
   renderBands();
+  renderProof();
   const known = catalog.find((o) => o.id === route.objectId);
   if (known) {
     openObject(known, route);
