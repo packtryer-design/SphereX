@@ -1,4 +1,4 @@
-# SpotX
+# SpotX - https://spherexspotx.netlify.app/
 
 [![CI](https://github.com/packtryer-design/SphereX/actions/workflows/ci.yml/badge.svg)](https://github.com/packtryer-design/SphereX/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
