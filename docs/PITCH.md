@@ -16,8 +16,8 @@ The talk opens and closes on the same idea (flipping between photos to find plan
 |---|---|---|
 | 0:00–0:20 | 1 Title, 2 Problem | "In 1930 Clyde Tombaugh found Pluto by blinking between two photos of the same sky. Stars stay put; planets move. Today NASA's SPHEREx photographs the whole sky every six months in 102 colours: over 550 million stars and galaxies. But it arrives as hundreds of thousands of raw files only astronomers can open." The person: a science teacher in Tasmania found a brown dwarf just by flipping NASA images (Backyard Worlds, 2017). People like them can't get into SPHEREx. |
 | 0:20–0:40 | 3 Solution | "We're team Ballers. We built SpotX, a flipbook for SPHEREx: it lines up every visit to the same patch of sky, so anything that moves jumps out. Any browser, no login." |
-| 0:40–2:10 | 5 Demo | Play the 30-second video (below), or demo live along the same path: Pluto → planet search → Barnard's Star → spectrum. |
-| 2:10–2:45 | 4 NASA data, 6 Impact | "Everything is real NASA data: SPHEREx images, JPL orbits, Gaia and WISE to rule out known stars. JPL's prediction is placed without looking at our images, and Uranus lands 0.3 pixels from it. We planted a test planet 45 times fainter than Pluto, and the search found it." Who benefits: 2.7 million Zooniverse volunteers, 125,000+ Backyard Worlds planet hunters, every classroom. Nothing to install. |
+| 0:40–2:10 | 5 Demo (Planet X search) | Play the 30-second video (below), or demo live on the Planet X page. Pluto lands on JPL's orbit (then Neptune, Uranus). Then the search: "A planet far beyond Pluto is too faint for any single image. Stacking smears it. Shifting each image along its path makes it build up while the noise averages out. Without being told where to look, it found Pluto at 45× the noise. Then we planted a simulated planet, 300 times farther from the Sun than Earth, in the real frames, and found it down to 45× fainter than Pluto." Say it's a test, not a discovery. |
+| 2:10–2:45 | 4 NASA data, 6 Impact | "Everything is real NASA data: SPHEREx images, JPL orbits, Gaia and WISE to rule out known stars. JPL's prediction is placed without looking at our images, and Uranus lands 0.3 pixels from it." Who benefits: 2.7 million Zooniverse volunteers, 125,000+ Backyard Worlds planet hunters, every classroom. Nothing to install. And it works on any object: a star's motion (Barnard's Star), a world's air (WISE 0855's spectrum). |
 | 2:45–3:00 | 7 Next steps | "Next: scan the whole sky for moving dots nobody can explain, let volunteers flag them, and send the best to professionals. We haven't found Planet X; we built the tool people will use to look. Thank you." Then stop. |
 
 Numbers and where they come from:
@@ -30,16 +30,18 @@ Numbers and where they come from:
 
 ### Shot list
 
-Each line is one subtitle. Open the links in this order.
+The Planet X search is the centre: 12 of the 30 seconds. Each line is one subtitle. Open the links in this order.
 
 | Time | Page | Action | Subtitle |
 |---|---|---|---|
 | 0–3 s | `/` | Hold on the home page | NASA SPHEREx photographs the whole sky every six months. |
-| 3–12 s | `/track.html?body=pluto` | Press play, "Show predicted position" on | Pluto drifts across still stars and lands in NASA JPL's predicted circle. |
-| 12–15 s | same page | Click Neptune, then Uranus | Neptune and Uranus land on their predictions too. |
-| 15–21 s | same page, Pluto | Scroll to "Could SPHEREx find a new planet?" | Too faint for one image. Shift and stack 46 images: found. |
-| 21–26 s | `/?o=barnards-star&view=rgb` | Hold on colour-time | Three visits in red, green and blue: the moving star leaves a rainbow. |
+| 3–10 s | `/track.html?body=pluto` | Press play, "Show predicted position" on | Pluto drifts across still stars and lands in NASA JPL's predicted circle. |
+| 10–16 s | same page | Scroll slowly to "Could SPHEREx find a new planet?" | Planet X search: a far planet is too faint for any single image. |
+| 16–22 s | same page | Hold on the three panels (one image, stacked, shifted) | Shift 46 images along its path: a test planet 45× fainter than Pluto appears. |
+| 22–26 s | `/?o=barnards-star&view=rgb` | Hold on colour-time | Works on any object: a moving star leaves a rainbow. |
 | 26–30 s | `/?o=wise-0855&tab=spectrum` | Hold on the chart | Its light shows water and methane. All real NASA data. |
+
+Neptune and Uranus are left out of the video for time; click them live if the demo runs long enough.
 
 ### Recording it
 
