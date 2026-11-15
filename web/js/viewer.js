@@ -69,13 +69,20 @@ export class Pane {
 // Sky position of a point on the image. The API draws every field on a TAN grid centred on
 // the object, north up and east left, at 6.15"/pixel (api/imaging/pipeline.py: target_grid).
 const PIXEL_ARCSEC = 6.15;
+const gridDeg = (fov) => ((Math.ceil((fov * 3600) / PIXEL_ARCSEC) | 1) * PIXEL_ARCSEC) / 3600;
 export function skyAt(field, fx, fy) {
-  const n = Math.ceil((field.fov * 3600) / PIXEL_ARCSEC) | 1;
-  const deg = (n * PIXEL_ARCSEC) / 3600;
+  const deg = gridDeg(field.fov);
   const dec = field.dec + (0.5 - fy) * deg;
   let ra = field.ra - ((fx - 0.5) * deg) / Math.cos((field.dec * Math.PI) / 180);
   ra = ((ra % 360) + 360) % 360;
   return { ra: Math.round(ra * 1e5) / 1e5, dec: Math.round(dec * 1e5) / 1e5 };
+}
+
+// The inverse of skyAt: where (ra, dec) falls on the image, as fractions (0..1, top-left origin).
+export function fracAt(field, ra, dec) {
+  const deg = gridDeg(field.fov);
+  const dra = ((((ra - field.ra) % 360) + 540) % 360) - 180; // across RA = 0/360
+  return { fx: 0.5 - (dra * Math.cos((field.dec * Math.PI) / 180)) / deg, fy: 0.5 - (dec - field.dec) / deg };
 }
 
 export function formatRaDec(ra, dec) {

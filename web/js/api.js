@@ -151,3 +151,13 @@ export async function getPage(name, query) {
   if (!file) throw new NotInDemoError("This part isn't in the demo.");
   return getJSON(file);
 }
+
+// "Is this new?": where catalogued stars (Gaia DR3 + CatWISE2020) should be at each visit, and
+// known asteroids/comets (IMCCE SkyBoT) at each frame time. Each can take ~30 s the first time.
+async function knownObjects(path, { ra, dec, fov }, signal) {
+  const src = await dataSource();
+  if (src.kind === "api") return fromApi(path, { ra, dec, fov }, signal);
+  return snapshotFile(snapshotEntry(src.index, { ra, dec }), path, "Known objects");
+}
+export const getGhosts = (q, signal) => knownObjects("ghosts", q, signal);
+export const getAsteroids = (q, signal) => knownObjects("asteroids", q, signal);

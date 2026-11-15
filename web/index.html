@@ -103,7 +103,7 @@
     <div role="tabpanel" id="panel-explore" class="panel explore" aria-labelledby="tab-explore">
       <div class="stage">
         <div id="viewer" class="viewer" data-view="sequence">
-          <figure class="pane" id="pane-a"><img class="layer" alt=""><img class="layer" alt=""><figcaption class="pane-label"></figcaption></figure>
+          <figure class="pane" id="pane-a"><img class="layer" alt=""><img class="layer" alt=""><svg id="known-layer" class="known-layer" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" hidden></svg><figcaption class="pane-label"></figcaption></figure>
           <figure class="pane" id="pane-b"><img class="layer" alt=""><img class="layer" alt=""><figcaption class="pane-label"></figcaption></figure>
           <div id="swipe-handle" class="swipe-handle" role="slider" tabindex="0" aria-label="Swipe position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden></div>
           <div id="marker" class="marker" hidden></div>
@@ -115,6 +115,7 @@
         </div>
         <p id="caveat" class="caveat" hidden></p>
         <div id="legend" class="legend" hidden></div>
+        <div id="known-note" class="legend" aria-live="polite" hidden></div>
         <div id="msg" class="msg" hidden></div>
 
         <aside id="spot" class="spot" hidden aria-label="This spot over time">
@@ -128,6 +129,7 @@
       </div>
 
       <div class="controls">
+        <div class="view-row">
         <div class="views" role="radiogroup" aria-label="How to compare">
           <button role="radio" data-view="sequence" title="Step through visits in order">Sequence</button>
           <button role="radio" data-view="blink" title="Flip quickly between two visits">Blink</button>
@@ -135,6 +137,8 @@
           <button role="radio" data-view="swipe" title="Drag a divider across two visits">Swipe</button>
           <button role="radio" data-view="diff" title="What changed between two visits">Difference</button>
           <button role="radio" data-view="rgb" title="Three visits as red, green and blue">Colour-time</button>
+        </div>
+        <button id="known-toggle" class="known-toggle" aria-pressed="false" title="Mark where catalogued stars and known asteroids should be on each visit's date">Known objects</button>
         </div>
         <div class="timeline">
           <button id="play" class="icon play" aria-label="Play">▶</button>

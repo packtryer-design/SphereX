@@ -1,6 +1,6 @@
-import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, getPointSpectrum, resolveName, OfflineError, NotInDemoError, snapshotIds } from "./api.js";
+import { getCatalog, getFeatures, getVisits, getFrames, getSpectrum, getPointSpectrum, resolveName, getGhosts, getAsteroids, OfflineError, NotInDemoError, snapshotIds } from "./api.js";
 import { readState, writeState, TABS } from "./state.js";
-import { Pane, skyAt, formatRaDec } from "./viewer.js";
+import { Pane, skyAt, fracAt, formatRaDec } from "./viewer.js";
 import { sampleLayers } from "./sample.js";
 import { drawSpectrum, drawSeries } from "./spectrum.js";
 import { setupSearch, visitBadge } from "./search.js";
@@ -15,6 +15,7 @@ const ui = {
   viewer: $("viewer"), swipe: $("swipe-handle"), marker: $("marker"),
   stamp: $("stamp"), stampDate: $("stamp-date"), stampSub: $("stamp-sub"),
   caveat: $("caveat"), legend: $("legend"), msg: $("msg"),
+  knownToggle: $("known-toggle"), knownLayer: $("known-layer"), knownNote: $("known-note"),
   spot: $("spot"), spotClose: $("spot-close"), spotPos: $("spot-pos"), spotChart: $("spot-chart"), spotSpectrum: $("spot-spectrum"),
   viewButtons: [...document.querySelectorAll(".views [data-view]")], // not #viewer, which has data-view too
   play: $("play"), pair: $("pair"), pickA: $("pick-a"), pickB: $("pick-b"), track: $("track"),
@@ -49,6 +50,9 @@ let spot = null;         // {ra, dec, x, y} last clicked spot
 let spectrumKey = null;
 let spectrumData = null;
 const hiddenVisits = new Set();
+let known = null;        // {stars, asteroids, failed} for the open object, once fetched
+let knownLoading = false;
+let showKnown = false;
 
 // ---------- small helpers ----------
 
@@ -193,6 +197,9 @@ async function openObject(o, opts = {}) {
   spectrumData = null;
   renderBands();
   hiddenVisits.clear();
+  known = null;
+  knownLoading = false;
+  drawKnown();
   paneA.clear();
   paneB.clear();
 
@@ -340,6 +347,7 @@ function setView(view, { quiet = false } = {}) {
   ui.play.hidden = !(view === "sequence" || view === "blink");
   if (view !== "side" && view !== "swipe") paneB.clear();
   renderTrack();
+  drawKnown(); // now, not after the new view's image loads
   if (quiet) return;
   refresh(0);
   if (view === "blink") startBlink();
@@ -405,6 +413,93 @@ async function refresh(fade = STEP_FADE) {
     await showRgb(fade);
   }
   ui.stampDate.style.color = view === "blink" ? ui.stampDate.style.color : "";
+  drawKnown();
+}
+
+// ---------- explore: known objects ("Is this new?") ----------
+// Rings where Gaia DR3 / CatWISE2020 put each catalogued star on this visit's date, squares on
+// known asteroids. A dot with no ring is worth a second look: a candidate, never a discovery.
+
+function knownVisit() {
+  if (state.view === "sequence") return state.cur;
+  if (state.view === "blink") return blinkShowsB ? state.b : state.a;
+  return null;
+}
+
+function knownNote(html) {
+  ui.knownNote.innerHTML = html;
+  ui.knownNote.hidden = !html;
+}
+
+function loadKnown() {
+  if (known || knownLoading || !obj) return;
+  knownLoading = true;
+  const my = token;
+  const q = { ra: obj.ra, dec: obj.dec, fov: obj.fov };
+  knownNote("Looking up known stars and asteroids… The first time takes up to a minute.");
+  Promise.allSettled([getGhosts(q, ctrl.signal), getAsteroids(q, ctrl.signal)]).then(([g, a]) => {
+    if (my !== token) return;
+    knownLoading = false;
+    known = {
+      stars: g.value?.stars ?? [],
+      asteroids: a.value?.objects ?? [],
+      failed: [g.status === "rejected" && "the star catalogues (Gaia, CatWISE)", a.status === "rejected" && "the asteroid list (SkyBoT)"].filter(Boolean),
+    };
+    drawKnown();
+  });
+}
+
+function drawKnown() {
+  const layer = ui.knownLayer;
+  const i = knownVisit();
+  layer.toggleAttribute("hidden", true); // an <svg> has no .hidden property
+  // one visit on screen at a time, or the marks would belong to neither image
+  ui.knownToggle.disabled = i == null;
+  ui.knownToggle.title = i == null ? "Known objects are marked in the Sequence and Blink views" : "Mark where catalogued stars and known asteroids should be on each visit's date";
+  if (!showKnown || !obj || !imagesReady || i == null) return knownNote("");
+  if (!known) return loadKnown();
+
+  const v = visits[i];
+  const mjd = v.frame?.mjd ?? (v.mjd_start + v.mjd_end) / 2;
+  const at = (ra, dec) => {
+    const { fx, fy } = fracAt(obj, ra, dec);
+    return [(fx * 100).toFixed(2), (fy * 100).toFixed(2)];
+  };
+  const marks = [];
+  let nStars = 0;
+  for (const s of known.stars) {
+    const p = s.positions.find((x) => x.epoch === v.epoch);
+    if (!p) continue;
+    const [x, y] = at(p.ra, p.dec);
+    marks.push(`<circle class="${s.catalog === "catwise" ? "catwise" : "gaia"}" cx="${x}" cy="${y}" r="2.2"/>`);
+    nStars++;
+  }
+  const names = [];
+  for (const o of known.asteroids) {
+    const here = o.positions.filter((x) => x.epoch === v.epoch);
+    if (!here.length) continue;
+    const p = here.reduce((b, x) => (Math.abs(x.mjd - mjd) < Math.abs(b.mjd - mjd) ? x : b));
+    const [x, y] = at(p.ra, p.dec);
+    marks.push(`<rect class="asteroid" x="${x - 2.5}" y="${y - 2.5}" width="5" height="5"/><text x="${+x + 3.5}" y="${+y + 1}">${esc(o.name)}</text>`);
+    names.push(esc(o.number ? `(${o.number}) ${o.name}` : o.name));
+  }
+  layer.innerHTML = marks.join("");
+  layer.toggleAttribute("hidden", false);
+
+  const rows = [
+    `<span class="ring" style="color:var(--ghost-gaia)"></span>Gaia star, moved to this date · <span class="ring" style="color:var(--ghost-catwise)"></span>CatWISE (infrared only)`,
+    `${nStars} catalogued star${nStars === 1 ? "" : "s"} here. ${names.length ? `Known asteroid${names.length > 1 ? "s" : ""}: ${names.join(", ")}.` : "No known asteroids at this visit."}`,
+    `<span class="fine">A dot with no ring on it is worth a closer look: a candidate for review, not a discovery.</span>`,
+  ];
+  if (known.failed.length) rows.push(`<span class="fine" style="color:var(--warn)">Couldn't reach ${known.failed.join(" or ")} just now, so some marks are missing. Turn Known objects off and on to try again.</span>`);
+  knownNote(rows.join("<br>"));
+}
+
+function toggleKnown() {
+  showKnown = !showKnown;
+  ui.knownToggle.setAttribute("aria-pressed", String(showKnown));
+  if (showKnown && known?.failed.length) known = null; // retry what failed last time
+  drawKnown();
 }
 
 async function showDiff(fade) {
@@ -1038,6 +1133,7 @@ function wire() {
   }
   for (const b of ui.viewButtons) b.addEventListener("click", () => setView(b.dataset.view));
   ui.play.addEventListener("click", togglePlay);
+  ui.knownToggle.addEventListener("click", toggleKnown);
   ui.pickA.addEventListener("change", () => onPairChange("a", ui.pickA.value));
   ui.pickB.addEventListener("change", () => onPairChange("b", ui.pickB.value));
   paneA.el.addEventListener("click", (e) => onPaneClick(e, paneA));
@@ -1096,6 +1192,8 @@ async function init() {
   // Demo edition (static snapshot, e.g. on Netlify): list only what it includes.
   demoMode = Boolean(ids);
   if (demoMode) catalog = catalog.filter((o) => ids.has(o.id));
+  // The known-objects overlay queries live star and asteroid catalogues: not in the snapshot.
+  if (demoMode) ui.knownToggle.hidden = true;
   renderCatalog();
   if (demoMode) {
     ui.catalog.prepend(Object.assign(document.createElement("p"), {
