@@ -1,4 +1,4 @@
-# Blink — 3-minute pitch script
+# SpotX — 3-minute pitch script
 
 Speaker notes for the judges' demo. Times are targets; rehearse with a stopwatch.
 Rule: **no discovery claims.** The strongest wording we use is "candidate for review".

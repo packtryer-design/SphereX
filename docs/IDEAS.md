@@ -1,4 +1,4 @@
-# Blink: Competitor Review and Product Ideas
+# SpotX: Competitor Review and Product Ideas
 
 Status: a proposal for the team to decide on, 14 Nov 2026. Related: [PLAN.md](PLAN.md) and [BACKEND_IMAGING.md](BACKEND_IMAGING.md).
 
@@ -6,7 +6,7 @@ Status: a proposal for the team to decide on, 14 Nov 2026. Related: [PLAN.md](PL
 
 ## 1. Why this document
 
-Most of what Blink planned has already been built by other teams in this year's Planet X and SPHEREx challenge, often more thoroughly: the flipbook, epoch stacks, RGB and difference views, click-for-spectrum, catalog cross-checks and URL links. We need an angle nobody else has.
+Most of what SpotX planned has already been built by other teams in this year's Planet X and SPHEREx challenge, often more thoroughly: the flipbook, epoch stacks, RGB and difference views, click-for-spectrum, catalog cross-checks and URL links. We need an angle nobody else has.
 
 This document has two parts:
 - **Competitor review (§2):** what other teams have built and what we can learn from them.
@@ -119,7 +119,7 @@ Showing quality flags and contamination for each data point is already done well
 Keep the flipbook as the base: the challenge requires it, and it already works. Then add **one engine and one audience** on top:
 
 - **Engine: SPHEREx Watch (Idea 1).** It's the only idea that turns "data arrives weekly" from a problem into the product, and nobody else has it.
-  > *"SPHEREx never stops looking. Blink tells you the moment it looks at your star again, and shows you what changed."*
+  > *"SPHEREx never stops looking. SpotX tells you the moment it looks at your star again, and shows you what changed."*
 - **Audience: the classroom lab in Arabic and English (Ideas 3 + 4).** It gives the demo a human story (a student measures a star's speed live on stage) and plays well with Sharjah judges.
 
 **If we only make one change, it's SPHEREx Watch:** the cheapest to build, and nobody else has it.

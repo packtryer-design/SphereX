@@ -1,11 +1,11 @@
-# Space Apps 2026 submission — Blink
+# Space Apps 2026 submission — SpotX
 
 Paste-ready text for the spaceappschallenge.org project page. **A human on the team must submit** (needs the team account). Deadline: submit by **10:00, 15 Nov**; hard cut-off 12:00.
 
 ## Checklist (09:00–10:00)
 
 - [ ] Live demo URL works on a phone (B)
-- [ ] Backup demo video uploaded (YouTube unlisted or Drive, public link) (B). Recorded: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4) (40 s). Needs uploading by a team member
+- [ ] Backup demo video uploaded (YouTube unlisted or Drive, public link) (B). Recorded: [`docs/media/spotx-demo.mp4`](media/spotx-demo.mp4) (40 s). Needs uploading by a team member
 - [ ] Repo public (team decision). README has the GIF + run instructions (B, done)
 - [ ] All `[fill in]` fields below are filled in
 - [ ] Project page submitted on spaceappschallenge.org, challenge **"Planet X and SPHEREx"**
@@ -16,16 +16,16 @@ Paste-ready text for the spaceappschallenge.org project page. **A human on the t
 
 ## Project name
 
-Blink
+SpotX
 
 ## High-level summary (≤ 150 words)
 
-Blink is a browser-based blink comparator for NASA's SPHEREx all-sky infrared survey. Pick any spot on the sky and it pulls SPHEREx images live from IRSA, aligns them, and flips through the visits so anything that moves jumps out — the same technique Clyde Tombaugh used to find Pluto. One click turns the 102 SPHEREx colours into a spectrum, and the app marks molecules like water, methane and CO₂ only when the data shows them at 3σ, citing the paper behind each label. A "ghost" marker shows where Gaia predicts each known star should be on that date, and SkyBoT labels known asteroids, so a moving dot that matches nothing becomes a candidate for human review. No install, no account, shareable links.
+SpotX is a browser-based blink comparator for NASA's SPHEREx all-sky infrared survey. Pick any spot on the sky and it pulls SPHEREx images live from IRSA, aligns them, and flips through the visits so anything that moves jumps out — the same technique Clyde Tombaugh used to find Pluto. One click turns the 102 SPHEREx colours into a spectrum, and the app marks molecules like water, methane and CO₂ only when the data shows them at 3σ, citing the paper behind each label. A "ghost" marker shows where Gaia predicts each known star should be on that date, and SkyBoT labels known asteroids, so a moving dot that matches nothing becomes a candidate for human review. No install, no account, shareable links.
 
 ## Link to project / demo
 
 - Demo: `[fill in live URL]`
-- Video: `[fill in public link after uploading]`. File: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4), recorded from the live app on real data by `scripts/record_demo.py`
+- Video: `[fill in public link after uploading]`. File: [`docs/media/spotx-demo.mp4`](media/spotx-demo.mp4), recorded from the live app on real data by `scripts/record_demo.py`
 - Code: https://github.com/packtryer-design/SphereX
 
 ## Project details

@@ -1,4 +1,4 @@
-# Hosting Blink
+# Hosting SpotX
 
 The public site (Vercel) is static: it shows the catalog, search and About pages by itself. Images and spectra come from the Python API, which runs on **any team member's computer** and is reached through a free Cloudflare tunnel.
 
@@ -22,7 +22,7 @@ What `host.py` does:
 2. **Opens a Cloudflare quick tunnel**: a public https address, with no account needed. The first time, it downloads `cloudflared` into `.tools/` if it isn't installed.
 3. **Publishes the address** as `endpoint.json` on the `api-endpoint` branch. The site reads that file on every visit (`apiBase()` in `web/js/api.js`) and checks the address is alive before using it.
 4. **Watches the tunnel** every 30 s and reopens it if it drops, publishing the new address.
-5. **On Ctrl+C, marks the server offline**, so visitors see "Blink's data server is offline right now" instead of an error. If another computer has started hosting since, it leaves that one alone.
+5. **On Ctrl+C, marks the server offline**, so visitors see "SpotX's data server is offline right now" instead of an error. If another computer has started hosting since, it leaves that one alone.
 
 ## Requirements on the hosting computer
 

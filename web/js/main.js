@@ -92,8 +92,8 @@ function showMsg(kind, title = "", text = "") {
 function errorText(err) {
   if (err instanceof OfflineError) {
     return err.hosted
-      ? [err.message, "Images and spectra come from Blink's data server, which runs on a team member's computer. It's not on right now; try again later. (Team: start it with python scripts/host.py.)"]
-      : ["Blink's data service isn't running", "Images and spectra come from the Python API. Start it with `make serve` and open http://localhost:8000."];
+      ? [err.message, "Images and spectra come from SpotX's data server, which runs on a team member's computer. It's not on right now; try again later. (Team: start it with python scripts/host.py.)"]
+      : ["SpotX's data service isn't running", "Images and spectra come from the Python API. Start it with `make serve` and open http://localhost:8000."];
   }
   if (err.status === 503) return ["NASA's archive is busy", `${err.message}. Try again in a minute.`];
   return ["Something went wrong", err.message];
@@ -172,7 +172,7 @@ function showHome() {
   obj = null;
   ui.object.hidden = true;
   ui.home.hidden = false;
-  document.title = "Blink";
+  document.title = "SpotX";
   syncUrl();
 }
 
@@ -198,7 +198,7 @@ async function openObject(o, opts = {}) {
 
   ui.home.hidden = true;
   ui.object.hidden = false;
-  document.title = `${o.name} · Blink`;
+  document.title = `${o.name} · SpotX`;
   ui.objName.textContent = o.name;
   ui.objSub.textContent = [KINDS[o.kind]?.label, o.constellation && `in ${o.constellation}`].filter(Boolean).join(" ");
   setView(opts.view ?? "sequence", { quiet: true });
@@ -226,7 +226,7 @@ async function openObject(o, opts = {}) {
   renderAbout();
   if (!visits.length) {
     showMsg("empty", "SPHEREx hasn't observed this spot yet",
-      "No SPHEREx exposures cover this position in the data releases Blink searches. There's nothing to compare yet. New data arrives weekly, so check back later.");
+      "No SPHEREx exposures cover this position in the data releases SpotX searches. There's nothing to compare yet. New data arrives weekly, so check back later.");
     renderTrack();
     renderObservations();
     syncUrl();
@@ -264,7 +264,7 @@ async function openObject(o, opts = {}) {
   imagesReady = true;
   if (!withImage().length) {
     showMsg("empty", "No usable image",
-      "SPHEREx covered this position, but only at the very edge of its detectors, so Blink couldn't build a clean image from any visit.");
+      "SPHEREx covered this position, but only at the very edge of its detectors, so SpotX couldn't build a clean image from any visit.");
     renderTrack();
     renderObservations();
     return;
@@ -772,7 +772,7 @@ function renderBands(s) {
     const fb = s?.features?.bands ?? [];
     ui.bandsTitle.textContent = "Molecule bands";
     ui.bandsNote.textContent = fb.length
-      ? "Where molecules in this kind of object leave a mark. A band counts as seen only when the data shows it at 3σ or more; otherwise Blink says so instead of labelling it. Each band cites the paper it comes from."
+      ? "Where molecules in this kind of object leave a mark. A band counts as seen only when the data shows it at 3σ or more; otherwise SpotX says so instead of labelling it. Each band cites the paper it comes from."
       : s ? "No band list for this object." : "The band list appears with the spectrum.";
     ui.bandsList.replaceChildren(...fb.flatMap((b) => {
       const dt = document.createElement("dt");
@@ -854,8 +854,8 @@ async function loadSpectrum(force = false) {
     ui.specMsg.textContent = "";
     renderBands(null);
     if (status === "none") specLoading("No SPHEREx data here yet", "SPHEREx hasn't observed this position, so there's no spectrum to show.", { spinner: false });
-    else if (status === "error") specLoading("The visit list couldn't be loaded", "Without it Blink can't measure a spectrum. Check that the data service is running, then reopen the object.", { spinner: false });
-    else specLoading("Checking SPHEREx visits…", "The spectrum starts as soon as Blink knows when SPHEREx looked here.");
+    else if (status === "error") specLoading("The visit list couldn't be loaded", "Without it SpotX can't measure a spectrum. Check that the data service is running, then reopen the object.", { spinner: false });
+    else specLoading("Checking SPHEREx visits…", "The spectrum starts as soon as SpotX knows when SPHEREx looked here.");
     return;
   }
   if (key === spectrumKey && !force) return;
@@ -870,7 +870,7 @@ async function loadSpectrum(force = false) {
   specLoading(
     point ? `Measuring ${spot ? "this spot" : obj.name} in ${exposures} exposures…` : "Measuring every exposure at this spot…",
     point
-      ? "If this object wasn't prepared in advance, Blink first downloads small cutouts of every exposure from NASA's archive. That can take several minutes the first time; after that it opens instantly."
+      ? "If this object wasn't prepared in advance, SpotX first downloads small cutouts of every exposure from NASA's archive. That can take several minutes the first time; after that it opens instantly."
       : "This reuses the downloads behind the Explore images, so it's quick once they're built. If they aren't yet, it waits for them, which can take several minutes the first time.",
   );
   const my = token;

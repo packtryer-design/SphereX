@@ -1,4 +1,4 @@
-"""Build web/data/objects.json: the searchable catalog of objects Blink can open.
+"""Build web/data/objects.json: the searchable catalog of objects SpotX can open.
 
 Only the names and the kind of object are written by hand below. Coordinates, SIMBAD
 types, sizes and proper motions come from SIMBAD; visit dates come from IRSA. Nothing

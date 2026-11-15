@@ -1,4 +1,4 @@
-"""Host Blink's data server from this computer, for the public site (e.g. on Vercel).
+"""Host SpotX's data server from this computer, for the public site (e.g. on Vercel).
 
     python scripts/host.py            # Ctrl+C to stop
 
@@ -96,14 +96,14 @@ def healthy(base: str, timeout: float = 8) -> bool:
 def start_api(port: int) -> subprocess.Popen[bytes] | None:
     local = f"http://127.0.0.1:{port}"
     if healthy(local, 3):
-        log(f"using the Blink API already running on port {port}")
+        log(f"using the SpotX API already running on port {port}")
         return None
     try:
         import fastapi  # noqa: F401
         import uvicorn  # noqa: F401
     except ImportError:
         sys.exit("The API's dependencies aren't installed. See README.md, 'Run it'.")
-    log(f"starting the Blink API on port {port}…")
+    log(f"starting the SpotX API on port {port}…")
     proc = subprocess.Popen(
         [
             sys.executable,
@@ -225,9 +225,9 @@ def publish(url: str | None) -> None:
     env = dict(os.environ)
     if not subprocess.run(["git", "config", "user.email"], cwd=ROOT, capture_output=True).stdout:
         env.update(
-            GIT_AUTHOR_NAME="Blink host",
+            GIT_AUTHOR_NAME="SpotX host",
             GIT_AUTHOR_EMAIL="blink-host@users.noreply.github.com",
-            GIT_COMMITTER_NAME="Blink host",
+            GIT_COMMITTER_NAME="SpotX host",
             GIT_COMMITTER_EMAIL="blink-host@users.noreply.github.com",
         )
     commit = git("commit-tree", tree, "-m", f"API endpoint: {doc['status']}", env=env)

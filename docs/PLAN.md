@@ -1,8 +1,8 @@
-# Blink: Team Plan
+# SpotX: Team Plan
 
-> *In 1930, Clyde Tombaugh found Pluto by blinking between two photographic plates. Blink does the same with every visit NASA's SPHEREx telescope makes to a patch of sky, so anyone can see what changed, and what it's made of.*
+> *In 1930, Clyde Tombaugh found Pluto by blinking between two photographic plates. SpotX does the same with every visit NASA's SPHEREx telescope makes to a patch of sky, so anyone can see what changed, and what it's made of.*
 
-> **Update, 14 Nov:** the project is now called **Blink**, and its focus moved. Users search for a nebula (or any object) and compare its observations **across time**. Spectra stay as an extra layer. See [web/README.md](../web/README.md) for the current app and API.
+> **Update, 14 Nov:** the project is now called **SpotX**, and its focus moved. Users search for a nebula (or any object) and compare its observations **across time**. Spectra stay as an extra layer. See [web/README.md](../web/README.md) for the current app and API.
 
 NASA Space Apps Challenge Sharjah 2026, SPHEREx challenge.
 **Submit by 10:00 on 15 Nov. The hard deadline is 12:00 noon.**

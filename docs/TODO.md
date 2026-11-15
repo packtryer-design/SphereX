@@ -1,4 +1,4 @@
-# Blink: To-Do by Person
+# SpotX: To-Do by Person
 
 Status at **14 Nov, 16:30**. Built from the reviews of PRs #13 (frontend) and #15 (science v2), and a click-through of the site in a real browser.
 
@@ -12,8 +12,8 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 
 | # | Task | Why | Done when |
 |---|---|---|---|
-| T1 | ✅ **Decided: lead with Planet X, show Blink as the tool, end with "What's next".** (1) Story 3, Planet X (`/track.html`, PR #19): Pluto tracked against JPL Horizons, the blind search finds Pluto, a simulated planet appears only when stacked. (2) Story 1, the Blink explorer: "anyone can do this for any star", on Barnard's Star, covering the challenge's required features and test targets. (3) Story 2 (SPHEREx Watch, classroom lab) is **not built**; it's the "What's next?" slide, with a deeper planet search. | The pitch and demo path follow from it. `PITCH.md` and `SUBMISSION.md` still describe the older pitch (C4). | Done |
-| T2 | ⏳ **Exact demo path:** decided while preparing the pitch, following T1's order (Pluto → blind search → planted planet → Barnard's Star in Blink) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
+| T1 | ✅ **Decided: lead with Planet X, show SpotX as the tool, end with "What's next".** (1) Story 3, Planet X (`/track.html`, PR #19): Pluto tracked against JPL Horizons, the blind search finds Pluto, a simulated planet appears only when stacked. (2) Story 1, the SpotX explorer: "anyone can do this for any star", on Barnard's Star, covering the challenge's required features and test targets. (3) Story 2 (SPHEREx Watch, classroom lab) is **not built**; it's the "What's next?" slide, with a deeper planet search. | The pitch and demo path follow from it. `PITCH.md` and `SUBMISSION.md` still describe the older pitch (C4). | Done |
+| T2 | ⏳ **Exact demo path:** decided while preparing the pitch, following T1's order (Pluto → blind search → planted planet → Barnard's Star in SpotX) | Everything on the path must be pre-warmed and rehearsed | The path is listed in `PITCH.md` and every object on it is warmed |
 | T3 | ✅ **CodeQL:** the repo is public, and CodeQL passes on PRs. Close Copilot's draft PR #8, which is no longer needed. | — | Done |
 | T4 | ✅ **Team brief:** no change needed. It never named the project ("Blink102" never appeared; only the phrases "blink compare" and "imaged 102 times"). | — | Done |
 
@@ -41,7 +41,7 @@ Every task has a "done when" so anyone can tick it off. Open a PR for every chan
 | B3 | ✅ Show a clear "first load can take minutes" state on the Spectrum tab, as the Explore tab does | No blank chart without an explanation |
 | B4 | ✅ Add a favicon (the only 404 in the browser console) | Console is clean |
 | B5 | ✅ Phone layout check, `<iframe>` embed example (`/embed.html`) | Works at phone width |
-| B6 | ✅ *Recorded: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4) (40 s) + GIF in the README, linked in `SUBMISSION.md`. Still to do by a human: upload it (YouTube unlisted / Drive) and paste the link. Barnard's Star's spectrum step is left out until that spectrum is warm on the recording machine; re-record with `python scripts/record_demo.py`.* README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
+| B6 | ✅ *Recorded: [`docs/media/spotx-demo.mp4`](media/spotx-demo.mp4) (40 s) + GIF in the README, linked in `SUBMISSION.md`. Still to do by a human: upload it (YouTube unlisted / Drive) and paste the link. Barnard's Star's spectrum step is left out until that spectrum is warm on the recording machine; re-record with `python scripts/record_demo.py`.* README with a GIF of the demo path, plus **a backup screen recording of the demo** | Video saved and linked in `SUBMISSION.md` |
 
 **Done in PR #18 (C, on B's files):** stars, brown dwarfs and the young/variable stars now use `/api/spectrum` (PSF fit, saturation note, WISE W2 check, per-band status: seen / not clear / too faint / not measured). Nebulae stay on `surface-spectrum`. `objects.json` takes the 2026 positions from `data/targets.json` and now lists all 5 science targets. Point spectra start as soon as the visit list arrives instead of waiting for the images. Also fixed (A's file): two requests fetching the same cutout at once crashed on Windows (`WinError 32`) in `api/imaging/cutouts.py`.
 
