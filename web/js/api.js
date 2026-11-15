@@ -147,7 +147,9 @@ export async function resolveName(name, signal) {
 export async function getPage(name, query) {
   const src = await dataSource();
   if (src.kind === "api") return fromApi(name, query);
-  const file = src.index.pages?.[name];
+  // per-body pages ("track:neptune"); older snapshots only have Pluto, under the bare name
+  const pages = src.index.pages ?? {};
+  const file = pages[`${name}:${query?.body}`] ?? (!query?.body || query.body === "pluto" ? pages[name] : null);
   if (!file) throw new NotInDemoError("This part isn't in the demo.");
   return getJSON(file);
 }

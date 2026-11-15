@@ -27,6 +27,8 @@ from api.imaging.pipeline import (
 # Allowlist, not free text: the id goes to an external service from a public endpoint.
 BODIES = {
     "pluto": ("999", None, "Pluto"),
+    "neptune": ("899", None, "Neptune"),
+    "uranus": ("799", None, "Uranus"),
 }
 
 
