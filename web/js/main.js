@@ -91,7 +91,9 @@ function showMsg(kind, title = "", text = "") {
 
 function errorText(err) {
   if (err instanceof OfflineError) {
-    return ["Blink's data service isn't running", "Images and spectra come from the Python API. Start it with `make serve` and open http://localhost:8000."];
+    return err.hosted
+      ? [err.message, "Images and spectra come from Blink's data server, which runs on a team member's computer. It's not on right now; try again later. (Team: start it with python scripts/host.py.)"]
+      : ["Blink's data service isn't running", "Images and spectra come from the Python API. Start it with `make serve` and open http://localhost:8000."];
   }
   if (err.status === 503) return ["NASA's archive is busy", `${err.message}. Try again in a minute.`];
   return ["Something went wrong", err.message];

@@ -27,6 +27,16 @@ Open http://localhost:8000. With an activated environment, `make serve` does the
 
 The first time you open an object, Blink downloads its exposures from IRSA and builds the images, which takes a few minutes. After that the object loads instantly. `make warm` pre-builds every catalog object.
 
+## Public site
+
+The site is deployed on Vercel as static files (Root Directory `web`). Images and spectra come from the API, hosted from any team member's computer through a free Cloudflare tunnel:
+
+```bash
+python scripts/host.py      # Ctrl+C to stop. See docs/HOSTING.md
+```
+
+The site finds whichever computer is hosting by itself, so there's no redeploy and no link to change.
+
 ## How it fits together
 
 ```

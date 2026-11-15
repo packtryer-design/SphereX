@@ -32,6 +32,12 @@ seed_cache()
 app.mount("/cache", StaticFiles(directory=CACHE_DIR), name="cache")
 
 
+@app.get("/api/health")
+def health() -> dict[str, Any]:
+    """Cheap check the front end uses to find a live API (see scripts/host.py)."""
+    return {"ok": True, "name": "Blink"}
+
+
 @app.get("/api/visits")
 def visits(
     ra: float = Query(ge=0, lt=360),

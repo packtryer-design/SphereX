@@ -46,3 +46,6 @@ tmp/
 # Blink cache (demo snapshot is committed)
 cache/*
 !cache/demo/
+
+# Downloaded helper binaries (cloudflared for scripts/host.py)
+.tools/

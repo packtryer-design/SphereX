@@ -64,7 +64,7 @@ The URL always holds the view (`?o=orion&tab=explore&view=blink&a=1&b=3`), so an
 | File | What it does |
 |---|---|
 | `js/main.js` | App wiring: home, opening objects, tabs, views, timeline, click-a-spot, tab contents |
-| `js/api.js` | The only file that knows where data comes from |
+| `js/api.js` | The only file that knows where data comes from. Finds the API at runtime: `?api=`, else this site, else the address `scripts/host.py` publishes (docs/HOSTING.md) |
 | `js/state.js` | View state ↔ URL |
 | `js/viewer.js` | Crossfading image panes; pixel → sky position |
 | `js/search.js` | Search box (catalog matches + name lookup) |
