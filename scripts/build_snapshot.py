@@ -24,6 +24,8 @@ sys.path.insert(0, str(ROOT))
 OUT = ROOT / "web" / "snapshot"
 DEFAULT_IDS = ["barnards-star", "wise-0855", "orion"]
 PLUTO = {"body": "pluto", "mjd": 60956.0, "days": 2.0}
+# Dates SPHEREx photographed each body (same as BODIES in web/track.html)
+TRACKS = {"pluto": 60956.0, "neptune": 60849.0, "uranus": 60908.0}
 
 
 def offline() -> None:
@@ -123,16 +125,18 @@ def main() -> None:
         print(f"{oid}: {', '.join(files)} ({size:.1f} MB)", flush=True)
 
     # The Planet X page (track.html)
+    for body, mjd in TRACKS.items():
+        folder = OUT / body
+        track = get("track", body=body, mjd=mjd, days=2.0, fov=0.1)
+        if track and track.get("frames"):
+            for f in track["frames"]:
+                f["png"] = copy_png(f["png"], folder / "png")
+            save(folder, "track.json", track)
+            index["pages"][f"track:{body}"] = f"snapshot/{body}/track.json"
+        else:
+            skipped.append(f"Planet X page: {body} track not built locally")
     folder = OUT / "pluto"
-    track = get("track", **PLUTO, fov=0.1)
     planetx = get("planetx", **PLUTO)
-    if track and track.get("frames"):
-        for f in track["frames"]:
-            f["png"] = copy_png(f["png"], folder / "png")
-        save(folder, "track.json", track)
-        index["pages"]["track"] = "snapshot/pluto/track.json"
-    else:
-        skipped.append("Planet X page: Pluto track not built locally")
     if planetx and planetx.get("images"):
         for k, v in planetx["images"].items():
             if isinstance(v, str) and v.startswith("/cache/"):

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SpotX · Track Pluto</title>
-  <meta name="description" content="Follow Pluto, the original Planet X, through NASA SPHEREx images.">
+  <title>SpotX · Track a planet</title>
+  <meta name="description" content="Follow Pluto, Neptune and Uranus through NASA SPHEREx images, the way planets are found.">
   <meta name="color-scheme" content="dark">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,6 +41,10 @@
     .tp .tp-fine { font-size: 13px; margin: 12px 0 0; }
     .tp-section { margin-top: 44px; }
     .tp .tp-result { color: var(--foreground); font-weight: 500; }
+    .tp-pick { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+    .tp-pick button[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); border-color: transparent; }
+    .tp-steps { margin: 0 0 22px; padding-left: 22px; color: var(--muted-foreground); font-size: 15px; display: grid; gap: 6px; }
+    .tp-steps strong { color: var(--foreground); font-weight: 600; }
     .tp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .tp-grid figure { margin: 0; }
     .tp-pic { position: relative; }
@@ -60,15 +64,26 @@
   <main class="tp">
     <header class="tp-head">
       <p class="eyebrow">Planet X</p>
-      <h1>Pluto, the original Planet X</h1>
-      <p>In 1930 Clyde Tombaugh found Pluto by blinking two photographs: stars stay put, Pluto
-        moves. Here are NASA SPHEREx's own images of Pluto over three days. The ring is where
-        NASA JPL's orbit predicts it, worked out independently of these images.</p>
+      <h1 id="title">Track a planet</h1>
+      <p>In 1930 Clyde Tombaugh found Pluto by blinking two photographs: stars stay put, planets
+        move. Pick a world and follow it through NASA SPHEREx's own images.</p>
     </header>
+
+    <div class="tp-pick" role="group" aria-label="Choose a planet">
+      <button type="button" data-body="pluto">Pluto</button>
+      <button type="button" data-body="neptune">Neptune</button>
+      <button type="button" data-body="uranus">Uranus</button>
+    </div>
+    <ol class="tp-steps">
+      <li><strong>Predict.</strong> NASA JPL's orbit says where <span class="b-name">it</span> should be at each moment.</li>
+      <li><strong>Collect.</strong> SpotX pulls every SPHEREx exposure of that patch of sky from those days.</li>
+      <li><strong>Align.</strong> All the images go on one grid, so the stars stay perfectly still.</li>
+      <li><strong>Watch.</strong> Press play: the dot drifting across the still stars is <span class="b-name">it</span>. The ring is JPL's prediction, placed without looking at the images.</li>
+    </ol>
 
     <div class="tp-card">
       <div class="tp-sky">
-        <img id="frame" alt="SPHEREx infrared image of the sky around Pluto">
+        <img id="frame" alt="SPHEREx infrared image of the sky around the planet">
         <div id="ring" class="ring" aria-hidden="true"></div>
         <div class="tp-stamp" aria-live="polite"><strong id="when">Loading…</strong><span id="what"></span></div>
       </div>
@@ -80,7 +95,7 @@
     </div>
     <p class="tp-fine" id="note"></p>
 
-    <section class="tp-section" aria-labelledby="px-title">
+    <section id="px-section" class="tp-section" aria-labelledby="px-title">
       <h2 id="px-title">Could SPHEREx find a new planet?</h2>
       <p>A planet far beyond Pluto would be too faint to see in any single image. Astronomers
         add images up while shifting each one along a guessed path: only something moving
@@ -106,8 +121,30 @@
     import { getPage, apiUrl } from "./js/api.js";
     const q = new URLSearchParams(location.search);
     // The live API if one is running, else the static snapshot (scripts/build_snapshot.py).
-    const query = { body: q.get("body") ?? "pluto", mjd: q.get("mjd") ?? "60956", days: q.get("days") ?? "2" };
+    // Dates SPHEREx photographed each body (JPL positions checked against the IRSA archive).
+    // The API accepts only these bodies (BODIES in api/imaging/track.py); keep TRACKS in
+    // scripts/build_snapshot.py in step.
+    const BODIES = {
+      pluto: { name: "Pluto", mjd: "60956", blurb: "the original Planet X" },
+      neptune: { name: "Neptune", mjd: "60849", blurb: "the planet found by prediction in 1846", bright: true },
+      uranus: { name: "Uranus", mjd: "60908", blurb: "the first planet found with a telescope", bright: true },
+    };
+    const body = BODIES[q.get("body")] ? q.get("body") : "pluto";
+    const B = BODIES[body];
+    const query = { body, mjd: q.get("mjd") ?? B.mjd, days: q.get("days") ?? "2" };
     const $ = (id) => document.getElementById(id);
+    document.title = `SpotX · Track ${B.name}`;
+    $("title").textContent = `${B.name}, ${B.blurb}`;
+    document.querySelectorAll(".b-name").forEach((e) => { e.textContent = B.name; });
+    for (const btn of document.querySelectorAll(".tp-pick button")) {
+      btn.setAttribute("aria-pressed", String(btn.dataset.body === body));
+      btn.onclick = () => { location.search = `?body=${btn.dataset.body}`; };
+    }
+    // The planet search (shift-and-stack + a planted Planet X) is built on Pluto only
+    if (body !== "pluto") {
+      $("px-section").innerHTML = `<h2>Could SPHEREx find a new planet?</h2>
+        <p>The blind planet search runs on Pluto, the faintest of these worlds. <a href="?body=pluto">See it on Pluto →</a></p>`;
+    }
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const r = await getPage("track", { ...query, fov: 0.1 })
@@ -117,7 +154,7 @@
     f.forEach((x) => { new Image().src = x.png; });  // preload so playback doesn't stutter
     $("scrub").max = f.length - 1;
     $("note").textContent = `${f.length} SPHEREx exposures over ${((f.at(-1).mjd - t0) * 24).toFixed(0)} hours, ` +
-      `aligned so the stars stay still. ${r.source}`;
+      `aligned so the stars stay still. ${B.bright ? `${B.name} is bright enough to overload SPHEREx's detector, so the centre of its glow shows black where those pixels are masked. ` : ""}${r.source}`;
 
     function show(i) {
       const x = f[i], p = x.predicted;
@@ -139,8 +176,9 @@
     reduced ? pause() : play();
 
     // Planet search (slow the first time: tries ~500 paths x 3 tests; cached after)
-    const px = await getPage("planetx", query).catch(() => null);
-    if (!px) { $("px-pluto").textContent = "The planet search is unavailable right now."; }
+    const px = body === "pluto" ? await getPage("planetx", query).catch(() => null) : undefined;
+    if (px === undefined) { /* no planet search for this body */ }
+    else if (!px) { $("px-pluto").textContent = "The planet search is unavailable right now."; }
     else {
       const p = px.pluto, f1 = px.faintest_recovered;
       $("px-pluto").textContent = p.found_blind
