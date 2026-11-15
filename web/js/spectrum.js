@@ -55,13 +55,18 @@ export function drawSpectrum(container, points, bands = [], { yLabel = "brightne
   const y = (f) => H - PAD.b - ((f - yLo) / (yHi - yLo)) * (H - PAD.t - PAD.b);
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yLabel} by wavelength` });
 
-  bands.forEach((b, i) => {
+  const lastAt = new Map(); // name -> x of its last label: one label per cluster of the same substance
+  let drawn = 0;
+  bands.forEach((b) => {
     const half = (b.center_um ?? 1) / resolvingPower(b.center_um ?? 1) / 2;
     const x0 = x(b.lo ?? b.center_um - half), x1 = x(b.hi ?? b.center_um + half);
     const rect = el("rect", { class: `band ${b.status ?? ""}`, x: x0, y: PAD.t, width: Math.max(x1 - x0, 2), height: H - PAD.t - PAD.b });
     if (b.title) rect.append(el("title", {}, b.title));
     svg.append(rect);
-    svg.append(el("text", { class: "band-label", x: (x0 + x1) / 2, y: PAD.t - 4 - (i % 2) * 11, "text-anchor": "middle" }, b.name));
+    const mid = (x0 + x1) / 2;
+    if (mid - (lastAt.get(b.name) ?? -Infinity) < 70) return;
+    lastAt.set(b.name, mid);
+    svg.append(el("text", { class: "band-label", x: mid, y: PAD.t - 4 - (drawn++ % 2) * 11, "text-anchor": "middle" }, b.name));
   });
 
   svg.append(el("line", { class: "axis", x1: PAD.l, y1: H - PAD.b, x2: W - PAD.r, y2: H - PAD.b }));
