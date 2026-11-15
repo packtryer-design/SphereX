@@ -126,3 +126,8 @@ export const getPointSpectrum = ({ ra, dec, target }, signal) =>
   fromApi("spectrum", { ra, dec, target }, signal).then((s) => ({ ...s, unit: s.units.flux, point: true }));
 
 export const resolveName = (name, signal) => fromApi("resolve", { name }, signal);
+
+// "Is this new?": where catalogued stars (Gaia DR3 + CatWISE2020) should be at each visit, and
+// known asteroids/comets (IMCCE SkyBoT) at each frame time. Each can take ~30 s the first time.
+export const getGhosts = ({ ra, dec, fov }, signal) => fromApi("ghosts", { ra, dec, fov }, signal);
+export const getAsteroids = ({ ra, dec, fov }, signal) => fromApi("asteroids", { ra, dec, fov }, signal);
