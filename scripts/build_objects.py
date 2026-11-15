@@ -4,6 +4,10 @@ Only the names and the kind of object are written by hand below. Coordinates, SI
 types, sizes and proper motions come from SIMBAD; visit dates come from IRSA. Nothing
 is invented: a missing value stays missing.
 
+Person C's science targets (data/targets.json) are added too, and for those the position
+comes from targets.json (ra_2026/dec_2026), not SIMBAD. That keeps one set of coordinates
+per object: the site, warm_cache.py and /api/spectrum then share one cache entry.
+
 Usage:  python scripts/build_objects.py              # SIMBAD + SPHEREx visit summary
         python scripts/build_objects.py --no-visits  # SIMBAD only (fast)
 """
@@ -12,7 +16,6 @@ import json
 import socket
 import sys
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 from astropy.coordinates import SkyCoord, get_constellation
@@ -21,6 +24,7 @@ from astropy.time import Time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 OUT = ROOT / "web" / "data" / "objects.json"
+TARGETS = ROOT / "data" / "targets.json"
 socket.setdefaulttimeout(60)  # a stalled IRSA/SIMBAD connection must not hang the build
 
 SIMBAD_SERVERS = ["simbad.cds.unistra.fr", "simbad.harvard.edu"]
@@ -71,6 +75,30 @@ OBJECTS = [
     # Not a nebula: a control object whose change over months is real and known.
     ("barnards-star", "Barnard's Star", "NAME Barnard's star", "moving_star"),
 ]
+
+# Kind for each science profile in data/features.json, for targets not listed above.
+PROFILE_KIND = {
+    "brown_dwarf": "brown_dwarf",
+    "young_star": "young_star",
+    "mira": "variable_star",
+    "m_dwarf": "moving_star",
+}
+TARGET_EPOCH = 2026.0  # data/targets.json gives positions for 2026.0
+
+
+def science_targets() -> dict[str, dict]:
+    """Person C's targets with a fixed position (the comet moves: it has none)."""
+    if not TARGETS.exists():
+        return {}
+    data = json.loads(TARGETS.read_text(encoding="utf-8"))
+    profiles = json.loads((ROOT / "data" / "features.json").read_text(encoding="utf-8"))
+    out = {}
+    for t in data["targets"]:
+        if t.get("ra_2026") is None or t.get("dec_2026") is None:
+            continue
+        t["profile"] = profiles.get("targets", {}).get(t["id"])
+        out[t["id"]] = t
+    return out
 
 
 def simbad_table(ids: list[str]):  # type: ignore[no-untyped-def]
@@ -126,58 +154,31 @@ def visit_summary(ra: float, dec: float) -> dict[str, object] | None:
     }
 
 
-TARGETS = ROOT / "data" / "targets.json"  # Person C's point-source science targets
-# targets.json kind -> web/js/kinds.js kind
-SCIENCE_KIND = {"barnards-star": "moving_star", "rw-aur": "young_star", "r-dra": "variable_star"}
-
-
-def merge_science_targets(objects: list[dict[str, Any]], with_visits: bool) -> None:
-    """Point-source targets use the SAME 2026 position as /api/spectrum (data/targets.json),
-    so the site's requests hit the warmed cache. Missing ones are added."""
-    by_id = {o["id"]: o for o in objects}
-    for t in json.loads(TARGETS.read_text(encoding="utf-8"))["targets"]:
-        if t.get("ra_2026") is None:  # 3I/ATLAS: no fixed position
-            continue
-        ra, dec = float(t["ra_2026"]), float(t["dec_2026"])
-        o = by_id.get(t["id"])
-        if o is None:
-            o = {
-                "id": t["id"],
-                "name": t["name"],
-                "kind": SCIENCE_KIND.get(t["id"], t["kind"]),
-                "simbad_id": t.get("simbad_id"),
-                "simbad_type": t.get("otype"),
-                "aliases": [],
-                "size_arcmin": None,
-                "fov": t.get("fov", 0.1),
-            }
-            objects.append(o)
-        o["ra"], o["dec"] = round(ra, 5), round(dec, 5)
-        o["constellation"] = str(get_constellation(SkyCoord(ra, dec, unit="deg")))
-        o["coord_epoch"] = 2026.0
-        if t.get("pmra_mas_yr") is not None:
-            o["pm_mas_yr"] = [t["pmra_mas_yr"], t["pmdec_mas_yr"]]
-        o["spectrum"] = "point"  # the site asks /api/spectrum, not /api/surface-spectrum
-        if with_visits and "visits" not in o:
-            summary = visit_summary(round(ra, 4), round(dec, 4))
-            if summary is not None:
-                o["visits"] = summary
-            print(f"{o['name']}: {summary}", flush=True)
-
-
 def main() -> None:
     with_visits = "--no-visits" not in sys.argv
-    t = simbad_table([o[2] for o in OBJECTS])
+    science = science_targets()
+    listed = {o[0] for o in OBJECTS}
+    todo = list(OBJECTS) + [
+        (t["id"], t["name"], t["simbad_id"], PROFILE_KIND.get(t["profile"], "moving_star"))
+        for t in science.values()
+        if t["id"] not in listed
+    ]
+    t = simbad_table([o[2] for o in todo])
     rows = {str(r["user_specified_id"]).strip(): r for r in t}
     objects = []
-    for oid, name, sid, kind in OBJECTS:
+    for oid, name, sid, kind in todo:
         r = rows.get(sid)
         if r is None or num(r["ra"]) is None:
             print(f"skip {name}: not found in SIMBAD", file=sys.stderr)
             continue
         ra, dec = float(r["ra"]), float(r["dec"])
         pmra, pmdec = num(r["pmra"]), num(r["pmdec"])
-        if kind == "moving_star" and pmra is not None and pmdec is not None:
+        target = science.get(oid)
+        if target:
+            # One position per object: C's 2026 position, at full precision, so the cache
+            # keys match warm_cache.py and /api/spectrum exactly.
+            ra, dec = float(target["ra_2026"]), float(target["dec_2026"])
+        elif kind == "moving_star" and pmra is not None and pmdec is not None:
             # SIMBAD positions are J2000; a fast star has moved arcminutes since then.
             yrs = EPOCH - 2000.0
             dec += pmdec / 3.6e6 * yrs
@@ -191,13 +192,19 @@ def main() -> None:
             "simbad_id": " ".join(str(r["main_id"]).split()),
             "simbad_type": str(r["otype"]),
             "aliases": [a for a in aliases(r["ids"]) if a != name],
-            "ra": round(ra, 5),
-            "dec": round(dec, 5),
+            "ra": ra if target else round(ra, 5),
+            "dec": dec if target else round(dec, 5),
             "constellation": str(get_constellation(SkyCoord(ra, dec, unit="deg"))),
             "size_arcmin": None if size is None else round(size, 2),
-            "fov": round(fov, 3),
+            "fov": round(float(target.get("fov", FOV_MIN)) if target else fov, 3),
         }
-        if kind == "moving_star":
+        if target:
+            o["target_id"] = oid  # /api/spectrum?target=<id>: PSF photometry + bands
+            o["spectrum"] = "point"  # the site asks /api/spectrum, not /api/surface-spectrum
+            o["profile"] = target["profile"]
+            o["coord_epoch"] = TARGET_EPOCH
+            o["pm_mas_yr"] = [target.get("pmra_mas_yr"), target.get("pmdec_mas_yr")]
+        elif kind == "moving_star":
             o["coord_epoch"] = EPOCH
             o["pm_mas_yr"] = [pmra, pmdec]
         if with_visits:
@@ -206,7 +213,6 @@ def main() -> None:
                 o["visits"] = summary
             print(f"{name}: {summary}", flush=True)
         objects.append(o)
-    merge_science_targets(objects, with_visits)
 
     OUT.write_text(
         json.dumps(

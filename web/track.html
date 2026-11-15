@@ -77,8 +77,16 @@
   </main>
 
   <script type="module">
+    import { apiBase } from "./js/api.js";
     const q = new URLSearchParams(location.search);
-    const api = (q.get("api") ?? "") + "/api/track?" + new URLSearchParams({
+    // The API may live elsewhere (e.g. this page on Vercel, the API on a hosting computer):
+    // apiBase() finds it, and abs() turns its /cache/... paths into full URLs.
+    const base = await apiBase().catch((e) => {
+      document.getElementById("when").textContent = e.message + " Try again later.";
+      throw e;
+    });
+    const abs = (p) => (p && p.startsWith("/") ? new URL(p, (base || location.origin) + "/").href : p);
+    const api = base + "/api/track?" + new URLSearchParams({
       body: q.get("body") ?? "pluto", mjd: q.get("mjd") ?? "60956", days: q.get("days") ?? "2",
     });
     const $ = (id) => document.getElementById(id);
@@ -86,7 +94,7 @@
 
     const r = await fetch(api).then((x) => x.ok ? x.json() : Promise.reject(x.statusText))
       .catch((e) => { $("when").textContent = "Couldn't load the images: " + e; throw e; });
-    const f = r.frames, n = r.target.size_px, t0 = f[0].mjd;
+    const f = r.frames.map((x) => ({ ...x, png: abs(x.png) })), n = r.target.size_px, t0 = f[0].mjd;
     f.forEach((x) => { new Image().src = x.png; });  // preload so playback doesn't stutter
     $("scrub").max = f.length - 1;
     $("note").textContent = `${f.length} SPHEREx exposures over ${((f.at(-1).mjd - t0) * 24).toFixed(0)} hours, ` +
@@ -120,7 +128,7 @@
         ? `Without being told where to look, the search found Pluto (signal ${p.snr}× the noise), ` +
           `moving ${p.motion_arcsec_day}″ a day; NASA JPL predicts ${p.true_motion_arcsec_day}″.`
         : "The blind search did not single out Pluto in this window.";
-      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = px.images[k];
+      for (const k of ["single", "plain_stack", "shift_stack"]) $("px-" + k).src = abs(px.images[k]);
       const X = px.planet_x, m = px.size_px;  // ring where the simulated planet was planted
       document.querySelectorAll(".px-ring").forEach((r) => {
         r.style.left = `${((X.x + 0.5) / m) * 100}%`;

@@ -897,11 +897,14 @@
     "Barnard's star",
     "Barnard Star"
    ],
-   "ra": 269.44627,
-   "dec": 4.7682,
+   "ra": 269.4462679,
+   "dec": 4.7682044,
    "constellation": "Ophiucus",
    "size_arcmin": null,
    "fov": 0.1,
+   "target_id": "barnards-star",
+   "spectrum": "point",
+   "profile": "m_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
     -801.551,
@@ -912,8 +915,7 @@
     "first": "2025-08-15",
     "last": "2026-09-22",
     "full": 3
-   },
-   "spectrum": "point"
+   }
   },
   {
    "id": "eps-indi-b",
@@ -921,18 +923,23 @@
    "kind": "brown_dwarf",
    "simbad_id": "* eps Ind B",
    "simbad_type": "BD*",
-   "aliases": [],
+   "aliases": [
+    "GJ 845 B",
+    "GJ 845 C"
+   ],
+   "ra": 331.0966688,
+   "dec": -56.8006492,
+   "constellation": "Indus",
    "size_arcmin": null,
    "fov": 0.1,
-   "ra": 331.09667,
-   "dec": -56.80065,
-   "constellation": "Indus",
+   "target_id": "eps-indi-b",
+   "spectrum": "point",
+   "profile": "brown_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
     3981.977,
     -2466.832
    ],
-   "spectrum": "point",
    "visits": {
     "n": 4,
     "first": "2025-04-24",
@@ -947,17 +954,19 @@
    "simbad_id": "WISEA J085510.74-071442.5",
    "simbad_type": "BD*",
    "aliases": [],
+   "ra": 133.7597653,
+   "dec": -7.2421822,
+   "constellation": "Hydra",
    "size_arcmin": null,
    "fov": 0.1,
-   "ra": 133.75977,
-   "dec": -7.24218,
-   "constellation": "Hydra",
+   "target_id": "wise-0855",
+   "spectrum": "point",
+   "profile": "brown_dwarf",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
     -8123.7,
     673.2
    ],
-   "spectrum": "point",
    "visits": {
     "n": 3,
     "first": "2025-05-05",
@@ -972,17 +981,19 @@
    "simbad_id": "V* RW Aur",
    "simbad_type": "TT*",
    "aliases": [],
+   "ra": 76.9565866,
+   "dec": 30.4012913,
+   "constellation": "Auriga",
    "size_arcmin": null,
    "fov": 0.1,
-   "ra": 76.95659,
-   "dec": 30.40129,
-   "constellation": "Auriga",
+   "target_id": "rw-aur",
+   "spectrum": "point",
+   "profile": "young_star",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
     7.23,
     -20.33
    ],
-   "spectrum": "point",
    "visits": {
     "n": 3,
     "first": "2025-09-01",
@@ -997,17 +1008,19 @@
    "simbad_id": "V* R Dra",
    "simbad_type": "Mi*",
    "aliases": [],
+   "ra": 248.1672331,
+   "dec": 66.7550238,
+   "constellation": "Draco",
    "size_arcmin": null,
    "fov": 0.1,
-   "ra": 248.16723,
-   "dec": 66.75502,
-   "constellation": "Draco",
+   "target_id": "r-dra",
+   "spectrum": "point",
+   "profile": "mira",
    "coord_epoch": 2026.0,
    "pm_mas_yr": [
     -20.643,
     6.149
    ],
-   "spectrum": "point",
    "visits": {
     "n": 9,
     "first": "2025-05-16",

@@ -5,8 +5,8 @@ Paste-ready text for the spaceappschallenge.org project page. **A human on the t
 ## Checklist (09:00–10:00)
 
 - [ ] Live demo URL works on a phone (B)
-- [ ] Backup demo video uploaded (YouTube unlisted or Drive, public link) (B)
-- [ ] Repo public, README has GIF + run instructions (B)
+- [ ] Backup demo video uploaded (YouTube unlisted or Drive, public link) (B). Recorded: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4) (40 s). Needs uploading by a team member
+- [ ] Repo public (team decision). README has the GIF + run instructions (B, done)
 - [ ] All `[fill in]` fields below are filled in
 - [ ] Project page submitted on spaceappschallenge.org, challenge **"Planet X and SPHEREx"**
 - [ ] Local-event Google Form confirmed (Sharjah)
@@ -25,7 +25,7 @@ Blink is a browser-based blink comparator for NASA's SPHEREx all-sky infrared su
 ## Link to project / demo
 
 - Demo: `[fill in live URL]`
-- Video: `[fill in]`
+- Video: `[fill in public link after uploading]`. File: [`docs/media/blink-demo.mp4`](media/blink-demo.mp4), recorded from the live app on real data by `scripts/record_demo.py`
 - Code: https://github.com/packtryer-design/SphereX
 
 ## Project details
