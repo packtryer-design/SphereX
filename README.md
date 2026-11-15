@@ -57,6 +57,7 @@ web/  (static HTML/JS)                       api/  (FastAPI)
 
 - Images: NASA/JPL-Caltech/IPAC **SPHEREx**, through the [NASA/IPAC Infrared Science Archive](https://irsa.ipac.caltech.edu/Missions/spherex.html).
 - Object positions and types: [SIMBAD](https://simbad.cds.unistra.fr/) (CDS), with [NED](https://ned.ipac.caltech.edu/) as a fallback for name lookup.
+- Design: colours, type and component styles ported from [Shadcn UI Kit](https://github.com/bundui/shadcn-ui-kit) (MIT) into plain CSS. Fonts: Inter and Cal Sans via Google Fonts.
 
 ## Development
 
