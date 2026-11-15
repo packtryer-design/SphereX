@@ -1,0 +1,5 @@
+# SpotX front end is plain static files in web/ (no build step).
+# The Python API is hosted separately (see docs/HOSTING.md) and found at runtime by web/js/api.js.
+[build]
+  publish = "web"
+  command = ""
