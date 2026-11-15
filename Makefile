@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test check clean serve web objects warm host
+.PHONY: install lint format typecheck test check clean serve web objects warm snapshot
 
 install:
 	python -m pip install -e ".[dev]"
@@ -27,10 +27,6 @@ clean:
 serve:
 	python -m uvicorn api.main:app --reload --port 8000
 
-# Host the API for the public site from this computer (docs/HOSTING.md). Ctrl+C to stop
-host:
-	python scripts/host.py
-
 # Front end only (catalog and About work; images need `make serve`)
 web:
 	python -m http.server 8080 --directory web
@@ -42,3 +38,7 @@ objects:
 # Pre-build images for every catalog object so the demo never waits on IRSA
 warm:
 	python scripts/warm_cache.py
+
+# Export the demo objects as static files for the Netlify site (web/snapshot/)
+snapshot:
+	python scripts/build_snapshot.py

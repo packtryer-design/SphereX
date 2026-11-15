@@ -34,7 +34,7 @@ app.mount("/cache", StaticFiles(directory=CACHE_DIR), name="cache")
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
-    """Cheap check the front end uses to find a live API (see scripts/host.py)."""
+    """Cheap check the front end uses to find a live API (see web/js/api.js)."""
     return {"ok": True, "name": "SpotX"}
 
 

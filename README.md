@@ -27,15 +27,18 @@ Open http://localhost:8000. With an activated environment, `make serve` does the
 
 The first time you open an object, SpotX downloads its exposures from IRSA and builds the images, which takes a few minutes. After that the object loads instantly. `make warm` pre-builds every catalog object.
 
-## Public site
+## Public site (Netlify)
 
-The site is deployed on Vercel as static files (Root Directory `web`). Images and spectra come from the API, hosted from any team member's computer through a free Cloudflare tunnel:
+The site is deployed on Netlify as static files (`netlify.toml`: publish `web/`, no build step). Netlify can't run the Python API, so the site ships with a **snapshot**: the results for the demo objects (visit lists, images for every view, spectra, and the Planet X page), pre-built and saved as plain files in `web/snapshot/`. With no live API around, the site reads those instead and lists only the objects they cover.
+
+To add or refresh objects in the snapshot:
 
 ```bash
-python scripts/host.py      # Ctrl+C to stop. See docs/HOSTING.md
+python scripts/warm_cache.py ring helix       # build them locally (downloads from NASA)
+python scripts/build_snapshot.py ring helix   # export them, plus the default demo objects
 ```
 
-The site finds whichever computer is hosting by itself, so there's no redeploy and no link to change.
+Then commit `web/snapshot/` and push: Netlify redeploys on its own.
 
 ## How it fits together
 
