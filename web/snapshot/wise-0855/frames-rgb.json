@@ -1,0 +1,1 @@
+{"target":{"ra":133.7598,"dec":-7.2422,"fov":0.1},"frames":[{"mjd":61161.9276,"mjd_start":61151.1979,"mjd_end":61174.2872,"detectors":[1,2,3,4,5,6],"epoch":null,"detector":null,"wavelength_um":null,"n_frames":258,"flagged_frac":0.021,"epochs":[1,2,3],"png":"snapshot/wise-0855/png/v3_133.7598_-7.2422_0.100_rgb_all-000.png"}]}
