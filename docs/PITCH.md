@@ -14,11 +14,11 @@ The talk opens and closes on the same idea (flipping between photos to find plan
 
 | Time | Slide | What to say |
 |---|---|---|
-| 0:00–0:20 | 1 Title, 2 Problem | "In 1930 Clyde Tombaugh found Pluto by blinking between two photos of the same sky. Stars stay put; planets move. Today NASA's SPHEREx photographs the whole sky every six months in 102 colours: over 550 million stars and galaxies. But it arrives as hundreds of thousands of raw files only astronomers can open." The person: a science teacher in Tasmania found a brown dwarf just by flipping NASA images (Backyard Worlds, 2017). People like them can't get into SPHEREx. |
-| 0:20–0:40 | 3 Solution | "We're team Ballers. We built SpotX, a flipbook for SPHEREx: it lines up every visit to the same patch of sky, so anything that moves jumps out. Any browser, no login." |
-| 0:40–2:10 | 5 Demo (Planet X search) | Play the 30-second video (below), or demo live on the Planet X page. Pluto lands on JPL's orbit (then Neptune, Uranus). Then the search: "A planet far beyond Pluto is too faint for any single image. Stacking smears it. Shifting each image along its path makes it build up while the noise averages out. Without being told where to look, it found Pluto at 45× the noise. Then we planted a simulated planet, 300 times farther from the Sun than Earth, in the real frames, and found it down to 45× fainter than Pluto." Say it's a test, not a discovery. |
-| 2:10–2:45 | 4 NASA data, 6 Impact | "Everything is real NASA data: SPHEREx images, JPL orbits, Gaia and WISE to rule out known stars. JPL's prediction is placed without looking at our images, and Uranus lands 0.3 pixels from it." Who benefits: 2.7 million Zooniverse volunteers, 125,000+ Backyard Worlds planet hunters, every classroom. Nothing to install. And it works on any object: a star's motion (Barnard's Star), a world's air (WISE 0855's spectrum). |
-| 2:45–3:00 | 7 Next steps | "Next: scan the whole sky for moving dots nobody can explain, let volunteers flag them, and send the best to professionals. We haven't found Planet X; we built the tool people will use to look. Thank you." Then stop. |
+| 0:00–0:20 | 1 Title, 2 Problem | "In 1930, Pluto was found by flipping between two photos: stars stay still, planets move. Today NASA's SPHEREx photographs the whole sky in 102 colours, 550 million stars and galaxies. But only astronomers can open the files." |
+| 0:20–0:40 | 3 Solution | "We're team Ballers. SpotX is a flipbook for SPHEREx: anything that moves jumps out. Any browser, no login." |
+| 0:40–2:10 | 5 Demo (Planet X search) | **Live demo**, see [Live demo](#live-demo-90-s) below. |
+| 2:10–2:45 | 4 NASA data, 6 Impact | "All real NASA data: SPHEREx images, JPL orbits, WISE stars. Uranus lands 0.3 pixels from JPL's prediction. That's 2.7 million citizen scientists who could use this today." |
+| 2:45–3:00 | 7 Next steps | "Next: scan the whole sky for unexplained movers, and let volunteers flag them. We didn't find Planet X; we built the tool to look. Thank you." Then stop. |
 
 Numbers and where they come from:
 - 450M+ galaxies and 100M+ stars: NASA JPL SPHEREx mission page.
@@ -26,7 +26,37 @@ Numbers and where they come from:
 - Pluto found blind at 45× the noise; test planet recovered down to 45× fainter than Pluto: `web/snapshot/pluto/planetx.json`.
 - 2.7M Zooniverse volunteers (March 2025, Wikipedia). 125K+ Backyard Worlds volunteers (Zenodo record, undated; 2017 reports say 20–42K, so check backyardworlds.org before quoting).
 
-## Demo video (30 s, English subtitles)
+## Live demo (90 s)
+
+### Before going on stage
+
+- Open three tabs, in this order, on the Netlify site or a local copy (`python -m http.server 8080 -d web`, which needs no internet for the data):
+  1. `/track.html?body=pluto`
+  2. `/?o=barnards-star&view=rgb`
+  3. `/?o=wise-0855&tab=spectrum`
+- Load each tab once so nothing is still loading on stage. Zoom 100%, full screen (F11).
+- Have the backup video (below) ready on the laptop, in case the Wi-Fi or a page fails.
+
+### Clicks and lines
+
+| Time | Do | Say |
+|---|---|---|
+| 0:40 | Tab 1, press play | "This is Pluto in real SPHEREx images. The circle is where NASA JPL says it should be, placed without looking at the images. Watch it land there." |
+| 0:55 | Click Neptune, then Uranus | "Same for Neptune and Uranus." |
+| 1:05 | Click Pluto, scroll to "Could SPHEREx find a new planet?" | "A planet far beyond Pluto would be too faint for any single image." |
+| 1:15 | Point at the three panels, left to right | "One image: nothing. Stacked: a smear. Shifted along its path: found. It found Pluto without being told where to look." |
+| 1:35 | Point at the result line | "We planted a test planet in the real images, and it found it down to 45 times fainter than Pluto. That's how you'd hunt for Planet X." |
+| 1:50 | Tab 2 | "It works on any object. Three visits in red, green and blue: Barnard's Star moves and leaves a rainbow." |
+| 2:00 | Tab 3 | "And its colours tell you what something is made of: water and methane in this brown dwarf." |
+| 2:10 | Back to the slides | Go into NASA data and Impact. |
+
+- Rehearse with a stopwatch. Running long: cut tab 3 first, then Neptune and Uranus.
+- Say "test planet", never "we found a planet".
+- If something hangs, don't wait: say "here's the recording" and play the backup video.
+
+## Submission video and stage backup (30 s, English subtitles)
+
+The submission needs a 30-second subtitled demo video. The same file is the backup if the live demo fails.
 
 ### Shot list
 
@@ -53,7 +83,7 @@ Neptune and Uranus are left out of the video for time; click them live if the de
 2. **Set up the browser.** Chrome or Edge, zoom 100%, full screen (F11) on a 1920×1080 display. Open every page in the shot list once before recording, so nothing is still loading on camera.
 3. **Record.** Windows 11: Snipping Tool's screen recorder (Win+Shift+R, drag over the screen) or Xbox Game Bar (Win+Alt+R). macOS: Cmd+Shift+5. Follow the shot list slowly; record 2–3 takes and keep the best. Aim for about 35 s raw so there's room to trim.
 4. **Edit and add subtitles.** In Clipchamp (built into Windows 11) or any editor: trim to 30 s, add one text caption per shot-list row (bottom of the frame, white on a dark band, at least 4 s each), export at 1080p.
-5. **Back it up.** Upload as unlisted YouTube or public Drive and put the link in `docs/SUBMISSION.md`. Keep the file on the presenting laptop too.
+5. **Back it up.** Upload as unlisted YouTube or public Drive and put the link in `docs/SUBMISSION.md`. Keep the file on the presenting laptop as the stage backup.
 
 The old automated recorder, `scripts/record_demo.py`, follows the earlier Barnard's Star demo path, not this story.
 
