@@ -120,21 +120,29 @@ function syncUrl() {
 // ---------- home: the catalog ----------
 
 function renderCatalog() {
-  const order = Object.keys(KINDS);
+  // Things that visibly change go first; nebulae (which don't) after.
+  const first = ["moving_star", "brown_dwarf", "young_star", "variable_star"];
+  const order = ["stars", ...Object.keys(KINDS).filter((k) => !first.includes(k))];
   const groups = new Map(order.map((k) => [k, []]));
-  for (const o of catalog) (groups.get(o.kind) ?? groups.get("unknown")).push(o);
+  for (const k of first) for (const o of catalog) if (o.kind === k) groups.get("stars").push(o);
+  for (const o of catalog) if (!first.includes(o.kind)) (groups.get(o.kind) ?? groups.get("unknown")).push(o);
   ui.catalog.replaceChildren(...[...groups].filter(([, list]) => list.length).map(([kind, list]) => {
     const sec = document.createElement("section");
     const h = document.createElement("h2");
-    h.textContent = KINDS[kind].plural;
+    h.textContent = kind === "stars" ? "Stars that move or change" : KINDS[kind].plural;
     const cards = document.createElement("div");
     cards.className = "cards";
     cards.append(...list.map((o) => {
       const b = document.createElement("button");
       b.className = "card";
-      b.innerHTML = `<span class="c-name"></span><span class="c-sub"></span><span class="badge"></span>`;
+      b.innerHTML = `<img class="c-img" alt="" loading="lazy"><span class="c-name"></span><span class="c-sub"></span><span class="badge"></span>`;
+      const img = b.querySelector(".c-img");
+      img.addEventListener("error", () => img.remove(), { once: true });
+      img.src = `data/thumbs/${encodeURIComponent(o.id)}.jpg`;
       b.querySelector(".c-name").textContent = o.name;
-      b.querySelector(".c-sub").textContent = [o.aliases?.[0] ?? o.simbad_id, o.constellation].filter(Boolean).join(" · ");
+      b.querySelector(".c-sub").textContent = kind === "stars"
+        ? [KINDS[o.kind]?.label, o.constellation].filter(Boolean).join(" · ")
+        : [o.aliases?.[0] ?? o.simbad_id, o.constellation].filter(Boolean).join(" · ");
       const badge = visitBadge(o);
       const el = b.querySelector(".badge");
       el.textContent = badge.text;
