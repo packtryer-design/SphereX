@@ -5,6 +5,9 @@ export class Pane {
   constructor(el) {
     this.el = el;
     this.layers = [...el.querySelectorAll("img.layer")];
+    // No native "drag the picture" ghost: holding on the image moves the spot marker instead.
+    for (const l of this.layers) l.draggable = false;
+    el.addEventListener("dragstart", (e) => e.preventDefault());
     this.label = el.querySelector(".pane-label");
     this.front = 0;
     this.src = null;
