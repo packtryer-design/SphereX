@@ -1,0 +1,1 @@
+{"target":{"ra":269.4463,"dec":4.7682,"fov":0.1},"frames":[{"mjd":61274.6264,"mjd_start":61268.6308,"mjd_end":61305.628,"detectors":[1,2,3,4,5,6],"epoch":null,"detector":null,"wavelength_um":null,"n_frames":358,"flagged_frac":0.039,"epochs":[1,2,3],"png":"snapshot/barnards-star/png/v3_269.4463_+4.7682_0.100_rgb_all-000.png"}]}

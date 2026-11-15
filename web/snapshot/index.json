@@ -1,0 +1,51 @@
+{
+ "objects": {
+  "barnards-star": {
+   "ra": 269.4462679,
+   "dec": 4.7682044,
+   "fov": 0.1,
+   "files": {
+    "visits": "visits.json",
+    "epoch": "frames-epoch.json",
+    "rgb": "frames-rgb.json",
+    "diff1": "frames-diff-ref1.json",
+    "diff2": "frames-diff-ref2.json",
+    "diff3": "frames-diff-ref3.json",
+    "spectrum": "spectrum-point.json"
+   }
+  },
+  "wise-0855": {
+   "ra": 133.7597653,
+   "dec": -7.2421822,
+   "fov": 0.1,
+   "files": {
+    "visits": "visits.json",
+    "epoch": "frames-epoch.json",
+    "rgb": "frames-rgb.json",
+    "diff1": "frames-diff-ref1.json",
+    "diff2": "frames-diff-ref2.json",
+    "diff3": "frames-diff-ref3.json",
+    "spectrum": "spectrum-point.json"
+   }
+  },
+  "orion": {
+   "ra": 83.8201,
+   "dec": -5.3876,
+   "fov": 0.4,
+   "files": {
+    "visits": "visits.json",
+    "epoch": "frames-epoch.json",
+    "rgb": "frames-rgb.json",
+    "diff1": "frames-diff-ref1.json",
+    "diff2": "frames-diff-ref2.json",
+    "diff3": "frames-diff-ref3.json",
+    "spectrum": "spectrum-surface.json"
+   }
+  }
+ },
+ "pages": {
+  "track": "snapshot/pluto/track.json",
+  "planetx": "snapshot/pluto/planetx.json"
+ },
+ "built": "2026-11-15T06:05:40+00:00"
+}

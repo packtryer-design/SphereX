@@ -1,5 +1,12 @@
-# SpotX front end is plain static files in web/ (no build step).
-# The Python API is hosted separately (see docs/HOSTING.md) and found at runtime by web/js/api.js.
+# SpotX on Netlify: a static site, no build step.
+# Netlify can't run the Python API, so the site reads its pre-built snapshot (web/snapshot/,
+# made by scripts/build_snapshot.py). See README.md, "Public site (Netlify)".
 [build]
   publish = "web"
   command = ""
+
+# Snapshot files change only when someone rebuilds and pushes them.
+[[headers]]
+  for = "/snapshot/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
