@@ -20,7 +20,7 @@ const ui = {
   viewButtons: [...document.querySelectorAll(".views [data-view]")], // not #viewer, which has data-view too
   play: $("play"), pair: $("pair"), pickA: $("pick-a"), pickB: $("pick-b"), track: $("track"),
   obsTitle: $("obs-title"), obsSummary: $("obs-summary"), obsList: $("obs-list"),
-  specPos: $("spec-pos"), specCentre: $("spec-centre"), specChart: $("spec-chart"), specLegend: $("spec-legend"), specMsg: $("spec-msg"),
+  specPos: $("spec-pos"), specCentre: $("spec-centre"), specChart: $("spec-chart"), specLegend: $("spec-legend"), specMsg: $("spec-msg"), specSci: $("spec-sci"),
   specLede: $("spec-lede"), specNotes: $("spec-notes"), specLoading: $("spec-loading"),
   bandsTitle: $("bands-title"), bandsNote: $("bands-note"), bandsList: $("bands-list"),
   aboutName: $("about-name"), aboutKind: $("about-kind"), aboutText: $("about-text"), aboutTime: $("about-time"),
@@ -865,16 +865,17 @@ const BAND_STATUS = {
 function renderBands(s) {
   if (isPointSource()) {
     const fb = s?.features?.bands ?? [];
-    ui.bandsTitle.textContent = "Molecule bands";
+    ui.bandsTitle.textContent = "What to look for";
     ui.bandsNote.textContent = fb.length
-      ? "Where molecules in this kind of object leave a mark. A band counts as seen only when the data shows it at 3σ or more; otherwise SpotX says so instead of labelling it. Each band cites the paper it comes from."
+      ? "Where substances in this kind of object leave a mark. \"Seen\" means the data shows it clearly; otherwise SpotX says so instead of guessing. Each one cites the paper it comes from."
       : s ? "No band list for this object." : "The band list appears with the spectrum.";
     ui.bandsList.replaceChildren(...fb.flatMap((b) => {
       const dt = document.createElement("dt");
-      dt.textContent = `${b.molecule === "none" ? "Clear window" : b.molecule} · ${b.lo}–${b.hi} µm`;
+      dt.textContent = `${plainName(b.molecule)} · ${b.lo}–${b.hi} µm`;
+      dt.title = b.snr != null ? `${b.molecule}: ${b.snr}σ` : b.molecule;
       const st = Object.assign(document.createElement("span"), {
         className: `status ${b.status}`,
-        textContent: `${BAND_STATUS[b.status] ?? b.status}${b.snr != null ? ` (${b.snr}σ)` : ""}`,
+        textContent: BAND_STATUS[b.status] ?? b.status,
       });
       dt.append(st);
       const dd = Object.assign(document.createElement("dd"), { textContent: b.plain });
@@ -883,11 +884,15 @@ function renderBands(s) {
     }));
     return;
   }
-  ui.bandsTitle.textContent = "Shaded bands";
-  ui.bandsNote.textContent = "Each shaded band marks where a line common in nebulae would fall in SPHEREx data. A band is a reference, not a detection: the line is only there if the points rise inside it.";
-  ui.bandsList.replaceChildren(...features.bands.flatMap((b) => {
-    const dt = Object.assign(document.createElement("dt"), { textContent: `${b.name} · ${b.center_um} µm` });
-    const dd = Object.assign(document.createElement("dd"), { textContent: features.glossary[b.what] ?? "" });
+  ui.bandsTitle.textContent = "What the stripes mean";
+  ui.bandsNote.textContent = "Glowing gases shine at their own exact colours. A stripe shows where to look, not what was found: the gas is only there if the dots rise inside it.";
+  const bySubstance = new Map();
+  for (const b of features.bands) bySubstance.set(b.what, [...(bySubstance.get(b.what) ?? []), b]);
+  ui.bandsList.replaceChildren(...[...bySubstance].flatMap(([what, bs]) => {
+    const n = bs.length;
+    const dt = Object.assign(document.createElement("dt"), { textContent: `${NEBULA_GAS[what] ?? what}${n > 1 ? ` · ${n} stripes` : ""}` });
+    const dd = Object.assign(document.createElement("dd"), { textContent: features.glossary[what] ?? "" });
+    dd.append(Object.assign(document.createElement("span"), { className: "ref", textContent: bs.map((b) => `${b.name} ${b.center_um} µm`).join(" · ") }));
     return [dt, dd];
   }));
 }
@@ -940,12 +945,13 @@ async function loadSpectrum(force = false) {
   ui.specCentre.hidden = !spot;
   ui.specCentre.textContent = point ? `Back to ${obj.name}` : "Use field centre";
   ui.specLede.textContent = point
-    ? "How bright this object is in each infrared colour. Each dot is one SPHEREx exposure, coloured by visit. The white line combines them."
-    : "How bright one spot is in each infrared colour. Each dot is one SPHEREx exposure, coloured by visit.";
+    ? "A spectrum is a barcode of light: every substance glows or absorbs at its own colours. This is how bright this object is in each of SPHEREx's infrared colours."
+    : "A spectrum is a barcode of light: every substance glows or absorbs at its own colours. This is how bright one spot is in each of SPHEREx's infrared colours.";
   if (!visits.length) {
     ui.specChart.replaceChildren();
     ui.specLegend.replaceChildren();
     ui.specNotes.replaceChildren();
+  ui.specSci.replaceChildren();
     ui.specMsg.textContent = "";
     renderBands(null);
     if (status === "none") specLoading("No SPHEREx data here yet", "SPHEREx hasn't observed this position, so there's no spectrum to show.", { spinner: false });
@@ -960,6 +966,7 @@ async function loadSpectrum(force = false) {
   ui.specChart.replaceChildren();
   ui.specLegend.replaceChildren();
   ui.specNotes.replaceChildren();
+  ui.specSci.replaceChildren();
   ui.specMsg.textContent = "";
   const exposures = visits.reduce((n, v) => n + v.n_frames, 0);
   specLoading(
@@ -986,13 +993,30 @@ async function loadSpectrum(force = false) {
   drawSpectrumNow();
 }
 
+// Plain words for the codes in data/features.json and web/data/features.json.
+const SUBSTANCE = {
+  H2O: "Water", CH4: "Methane", CO: "Carbon monoxide", CO2: "Carbon dioxide", "CH4 + H2": "Methane and hydrogen",
+  "H (Br-alpha)": "Hydrogen", dust: "Warm dust", "organics (C-H)": "Organic molecules", "OH / H2O": "Water",
+  heat: "Its own heat", "olivine/pyroxene": "Minerals", pyroxene: "Minerals", none: "Clear window",
+};
+const NEBULA_GAS = { hydrogen: "Hydrogen", h2: "Hydrogen molecules", pah: "Carbon dust" };
+const plainName = (m) => SUBSTANCE[m] ?? m;
+const listText = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}` : xs[0] ?? "");
+
+// top: what everyone reads above the chart. sci: details under "For scientists".
 function pointNotes(s) {
-  const out = [];
-  if (s.saturation_note) out.push(note(`<b>Saturated.</b> ${esc(s.saturation_note)}`, "warn"));
+  const top = [], out = [];
+  if (s.saturation_note) top.push(note(`<b>Heads-up.</b> ${esc(s.saturation_note)}`, "warn"));
   const f = s.features;
   if (f) {
     const n = f.bands.length;
-    out.push(note(`<b>${esc(f.label)}.</b> ${esc(f.plain)} <span class="muted">${f.seen} of ${n} expected band${n === 1 ? "" : "s"} clearly seen (3σ or more).</span>`));
+    const seen = [...new Set(f.bands.filter((b) => b.status === "seen" && b.molecule !== "none").map((b) => plainName(b.molecule).toLowerCase()))];
+    top.push(note(`<b>What this shows: ${esc(f.label)}.</b> ${esc(f.plain)} ${seen.length
+      ? `In this light we can clearly see <b>${esc(listText(seen))}</b>.`
+      : s.saturation_note
+        ? "Its usual marks can't be checked well here, because most exposures were too bright to use."
+        : "None of its usual marks are clear in this data: it may be too faint, or the marks too weak to call."}`, "verdict"));
+    out.push(note(`<b>Band test.</b> ${f.seen} of ${n} expected band${n === 1 ? "" : "s"} seen at 3σ or more, against a power-law continuum.`));
     if (f.caveat) out.push(note(esc(f.caveat), "check"));
   }
   const w = s.w2_check;
@@ -1015,15 +1039,22 @@ function pointNotes(s) {
     ];
     out.push(note(`<b>Nearby stars.</b> ${parts.filter(Boolean).join(" ")}`, mixed ? "check" : ""));
   }
-  return out;
+  return { top, sci: out };
+}
+
+function nebulaNotes(s) {
+  const top = s.saturation_note ? [note(`<b>Heads-up.</b> ${esc(s.saturation_note)}`, "warn")] : [];
+  top.push(note(`<b>How to read this.</b> Glowing gases shine at their own exact colours, so they show up as sharp peaks. The stripes mark where to look: a peak inside a stripe means that gas is glowing at this spot in ${esc(obj.name)}. Dots that stay flat in a stripe mean it isn't, or it's too faint to tell.`, "verdict"));
+  return { top, sci: [] };
 }
 
 function drawSpectrumNow() {
   const s = spectrumData;
   if (!s) return;
   renderBands(s);
-  const notes = s.point ? pointNotes(s) : s.saturation_note ? [note(esc(s.saturation_note), "warn")] : [];
-  ui.specNotes.replaceChildren(...notes);
+  const { top, sci } = s.point ? pointNotes(s) : nebulaNotes(s);
+  ui.specNotes.replaceChildren(...top);
+  ui.specSci.replaceChildren(...sci);
   if (!s.points.length) {
     ui.specChart.replaceChildren();
     ui.specLegend.replaceChildren();
@@ -1043,13 +1074,13 @@ function drawSpectrumNow() {
   const groups = [...new Set(pts.map((p) => p.group))].sort((a, b) => a - b);
   const bands = s.point
     ? (s.features?.bands ?? []).map((b) => ({
-        name: b.molecule === "none" ? "window" : b.molecule,
+        name: plainName(b.molecule),
         lo: b.lo,
         hi: b.hi,
         status: b.status,
         title: `${b.molecule}: ${BAND_STATUS[b.status] ?? b.status}`,
       }))
-    : features.bands;
+    : features.bands.map((b) => ({ ...b, name: NEBULA_GAS[b.what] ?? b.name, title: `${b.name} · ${b.center_um} µm` }));
   drawSpectrum(ui.specChart, pts.filter((p) => !hiddenVisits.has(p.group)), bands, {
     yLabel: s.point ? `flux (${unit})` : `brightness (${unit})`,
     binned: s.point ? (s.binned ?? []) : [],
