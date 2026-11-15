@@ -11,7 +11,8 @@
     "diff1": "frames-diff-ref1.json",
     "diff2": "frames-diff-ref2.json",
     "diff3": "frames-diff-ref3.json",
-    "spectrum": "spectrum-point.json"
+    "spectrum": "spectrum-point.json",
+    "asteroids": "asteroids.json"
    }
   },
   "wise-0855": {
@@ -25,7 +26,8 @@
     "diff1": "frames-diff-ref1.json",
     "diff2": "frames-diff-ref2.json",
     "diff3": "frames-diff-ref3.json",
-    "spectrum": "spectrum-point.json"
+    "spectrum": "spectrum-point.json",
+    "asteroids": "asteroids.json"
    }
   },
   "orion": {
@@ -39,7 +41,8 @@
     "diff1": "frames-diff-ref1.json",
     "diff2": "frames-diff-ref2.json",
     "diff3": "frames-diff-ref3.json",
-    "spectrum": "spectrum-surface.json"
+    "spectrum": "spectrum-surface.json",
+    "asteroids": "asteroids.json"
    }
   }
  },
@@ -49,5 +52,5 @@
   "track:uranus": "snapshot/uranus/track.json",
   "planetx": "snapshot/pluto/planetx.json"
  },
- "built": "2026-11-15T07:01:56+00:00"
+ "built": "2026-11-15T07:15:21+00:00"
 }
